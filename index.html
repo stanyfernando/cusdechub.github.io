@@ -116,6 +116,7 @@
             margin-bottom: var(--spacing-2xl);
             padding: var(--spacing-xl) 0;
             position: relative;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
         }
 
         .header::after {
@@ -200,6 +201,7 @@
             position: relative;
             overflow: hidden;
             transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .option-card::before {
@@ -221,18 +223,23 @@
             box-shadow: var(--shadow-lg);
         }
 
+        .option-card:active {
+            transform: translateY(-2px);
+        }
+
         .option-card:hover::before {
             opacity: 1;
         }
 
         .option-icon {
             margin-bottom: var(--spacing-lg);
-            color: var(--accent-primary);
-            transition: transform var(--transition-base);
+            color: var(--text-muted);
+            transition: all var(--transition-base);
         }
 
         .option-card:hover .option-icon {
             transform: scale(1.1) rotate(3deg);
+            color: var(--accent-primary);
         }
 
         .option-title {
@@ -250,7 +257,7 @@
         /* Search Section */
         .search-section {
             display: none;
-            background: var(--bg-secondary);
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(26, 26, 26, 0.95) 100%);
             border-radius: var(--radius-2xl);
             padding: var(--spacing-xl);
             margin: var(--spacing-lg) auto;
@@ -304,6 +311,10 @@
         .close-btn-header:hover {
             background: var(--bg-hover);
             color: var(--text-primary);
+        }
+
+        .close-btn-header:active {
+            transform: scale(0.95);
         }
 
         /* Search Input */
@@ -387,6 +398,10 @@
             transform: translateY(-1px);
         }
 
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
         .action-btn.primary {
             background: var(--accent-primary);
             border-color: var(--accent-primary);
@@ -395,6 +410,10 @@
         .action-btn.primary:hover {
             background: var(--accent-hover);
             border-color: var(--accent-hover);
+        }
+
+        .action-btn.primary:active {
+            transform: translateY(0);
         }
 
         .action-btn.sync {
@@ -408,43 +427,53 @@
             border-color: #00b8e6;
         }
 
+        .action-btn.sync:active {
+            transform: translateY(0);
+        }
+
         /* Results */
         .results {
             flex: 1;
-            display: grid;
-            gap: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
             padding-right: var(--spacing-sm);
+            padding-bottom: var(--spacing-md);
             align-content: start;
+            scroll-behavior: smooth;
         }
 
         .results::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         .results::-webkit-scrollbar-track {
-            background: var(--bg-tertiary);
-            border-radius: var(--radius-full);
+            background: transparent;
         }
 
         .results::-webkit-scrollbar-thumb {
-            background: var(--border-strong);
+            background: var(--border-default);
             border-radius: var(--radius-full);
         }
 
         .results::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
+            background: var(--border-strong);
         }
 
         .result-item {
             background: var(--bg-tertiary);
-            padding: var(--spacing-lg);
+            padding: var(--spacing-xl);
             border-radius: var(--radius-lg);
-            border: 1px solid var(--border-subtle);
+            border: 1px solid transparent;
             transition: all var(--transition-fast);
             text-align: left;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border-subtle);
+        }
+
+        .result-item:not(:last-child) {
+            margin-bottom: var(--spacing-md);
         }
 
         .result-item::before {
@@ -453,7 +482,7 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 3px;
+            width: 4px;
             background: var(--info);
             transition: width var(--transition-fast);
         }
@@ -466,13 +495,13 @@
         }
 
         .result-item:hover::before {
-            width: 5px;
+            width: 6px;
         }
 
         .result-title {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             font-weight: 600;
-            margin-bottom: var(--spacing-xs);
+            margin-bottom: var(--spacing-sm);
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
@@ -490,27 +519,32 @@
             color: var(--accent-primary);
         }
 
+        .result-title:active {
+            transform: scale(0.98);
+        }
+
         .copy-hint {
-            font-size: 0.75rem;
-            color: var(--accent-primary);
-            opacity: 0.7;
-            transition: opacity var(--transition-fast);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: all var(--transition-fast);
             font-family: var(--font-sans);
             font-weight: 400;
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            margin-left: auto;
         }
 
         .result-title:hover .copy-hint {
-            opacity: 1;
-            transform: scale(1.05);
+            opacity: 0.8;
         }
 
         .result-details {
-            color: var(--text-secondary);
+            color: var(--text-primary);
             font-size: 0.875rem;
             margin-bottom: var(--spacing-xs);
+            line-height: 1.5;
         }
 
         .result-category {
@@ -519,13 +553,14 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             font-weight: 500;
+            margin-top: var(--spacing-xs);
         }
 
         /* Warehouse Chips */
         .warehouse-label {
             font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: var(--spacing-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             font-weight: 500;
@@ -570,10 +605,14 @@
         }
 
         .warehouse-chip:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--info);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
+            background: var(--bg-elevated);
+            border-color: var(--border-strong);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .warehouse-chip:active {
+            transform: translateY(0);
         }
 
         .warehouse-chip:hover::before {
@@ -608,11 +647,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 1000;
             opacity: 0;
             transition: opacity var(--transition-slow);
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         .modal.active {
@@ -674,6 +714,10 @@
             background: var(--bg-tertiary);
         }
 
+        .close-btn:active {
+            transform: scale(0.95);
+        }
+
         .form-group {
             margin-bottom: var(--spacing-lg);
         }
@@ -726,24 +770,33 @@
             box-shadow: var(--shadow-md);
         }
 
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: var(--spacing-3xl) var(--spacing-xl);
             color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
         }
 
         .empty-icon {
-            font-size: 4rem;
+            font-size: 3rem;
             margin-bottom: var(--spacing-lg);
-            opacity: 0.3;
+            opacity: 0.2;
             display: inline-block;
-            animation: pulse 2s infinite;
+            animation: pulse 3s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.05); }
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.02); }
         }
 
         .empty-title {
@@ -761,8 +814,8 @@
         /* Notification */
         .notification {
             position: fixed;
-            top: var(--spacing-md);
-            right: var(--spacing-md);
+            top: var(--spacing-lg);
+            right: var(--spacing-lg);
             background: var(--bg-elevated);
             color: var(--text-primary);
             padding: var(--spacing-md) var(--spacing-lg);
@@ -783,22 +836,38 @@
 
         .notification.success {
             border-color: var(--success);
+            background: var(--bg-tertiary);
         }
 
         .notification.success::before {
             content: '✓';
             color: var(--success);
             font-weight: bold;
+            font-size: 1rem;
         }
 
         .notification.error {
             border-color: var(--danger);
+            background: var(--bg-tertiary);
         }
 
         .notification.error::before {
             content: '✕';
             color: var(--danger);
             font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .notification.info {
+            border-color: var(--info);
+            background: var(--bg-tertiary);
+        }
+
+        .notification.info::before {
+            content: 'ℹ';
+            color: var(--info);
+            font-weight: bold;
+            font-size: 1rem;
         }
 
         .notification.show {
@@ -881,15 +950,18 @@
             }
 
             .search-header {
-                flex-direction: column;
-                gap: var(--spacing-md);
-                align-items: stretch;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: var(--spacing-lg);
+            }
+
+            .search-header h2 {
+                font-size: 1.25rem;
             }
 
             .close-btn-header {
-                position: absolute;
-                top: var(--spacing-md);
-                right: var(--spacing-md);
+                position: static;
             }
 
             .search-input {
@@ -911,15 +983,26 @@
             }
 
             .warehouse-container {
-                flex-direction: column;
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
             }
 
             .warehouse-chip {
-                width: 100%;
-                display: flex;
+                min-height: 56px;
+                flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
                 padding: var(--spacing-md);
+                text-align: left;
+            }
+
+            .warehouse-code {
+                font-size: 1rem;
+                margin-bottom: 0;
+            }
+
+            .warehouse-name {
+                text-align: right;
             }
 
             .modal-content {
@@ -930,6 +1013,20 @@
 
             .empty-state {
                 padding: var(--spacing-2xl) var(--spacing-lg);
+            }
+        }
+
+        /* Tablet view */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .warehouse-container {
+                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            }
+        }
+
+        /* Large screens */
+        @media (min-width: 1025px) {
+            .warehouse-container {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             }
         }
 
@@ -1134,8 +1231,8 @@
 
             // Google Drive integration
             googleDrive: {
-                CLIENT_ID: 'YOUR_CLIENT_ID_HERE', // Replace with your Google Client ID
-                API_KEY: 'YOUR_API_KEY_HERE', // Replace with your API Key
+                CLIENT_ID: '743884461731-hjfbiee6j35ljc44rakgc5c4j1uaos85.apps.googleusercontent.com',
+                API_KEY: 'YOUR_API_KEY_HERE', // Replace with your API Key from Google Console
                 DISCOVERY_DOCS: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
                 SCOPES: 'https://www.googleapis.com/auth/drive.file',
                 isSignedIn: false,
@@ -1679,10 +1776,10 @@
                         div.innerHTML = `
                             <div class="result-title" onclick="app.copyToClipboard('${item.code}', 'HSN Code')" title="Click to copy HSN code">
                                 ${this.escapeHtml(item.code || 'N/A')}
-                                <span class="copy-hint">📋 Click to copy</span>
+                                <span class="copy-hint">📋 Copy</span>
                             </div>
-                            <div class="result-details"><strong>Product:</strong> ${this.escapeHtml(item.product || 'N/A')}</div>
-                            <div class="result-category">Category: ${this.escapeHtml(item.category || 'N/A')}</div>
+                            <div class="result-details"><span style="color: var(--text-secondary);">Product:</span> ${this.escapeHtml(item.product || 'N/A')}</div>
+                            <div class="result-category">${this.escapeHtml(item.category || 'N/A')}</div>
                         `;
                         container.appendChild(div);
                     });
@@ -1703,13 +1800,15 @@
                         
                         div.innerHTML = `
                             <div class="result-title" onclick="app.copyToClipboard('${company.tin}', 'TIN')" title="Click to copy TIN">
-                                TIN: ${this.escapeHtml(company.tin || 'N/A')}
-                                <span class="copy-hint">📋 Click to copy</span>
+                                <span style="color: var(--text-secondary); font-weight: 400; font-size: 0.875rem;">TIN:</span> ${this.escapeHtml(company.tin || 'N/A')}
+                                <span class="copy-hint">📋 Copy</span>
                             </div>
-                            <div class="result-details"><strong>Company:</strong> ${this.escapeHtml(company.name || 'N/A')}</div>
-                            <div class="warehouse-container">
-                                <div class="warehouse-label">Warehouses (click to copy):</div>
-                                ${warehouseChips}
+                            <div class="result-details"><span style="color: var(--text-secondary);">Company:</span> ${this.escapeHtml(company.name || 'N/A')}</div>
+                            <div style="margin-top: var(--spacing-md);">
+                                <div class="warehouse-label">Warehouses</div>
+                                <div class="warehouse-container">
+                                    ${warehouseChips}
+                                </div>
                             </div>
                         `;
                         container.appendChild(div);
