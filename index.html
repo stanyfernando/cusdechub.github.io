@@ -1,230 +1,2028 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CUSDEC Assistant</title>
-    <!-- Favicon -->
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5253/5253968.png" type="image/png">
+    <title>CUSDEC Assistant - Cloud Sync</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5253/5253968.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #212121;
-        color: #B0BEC5;
-      }
-
-      .banner {
-        width: 100%;
-        max-width: 600px;
-        height: auto;
-        margin-bottom: 50px;
-      }
-
-      .icon-container {
-        display: flex;
-        gap: 40px;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-      }
-
-      .icon-box {
-        background-color: #303030;
-        border-radius: 15px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        cursor: pointer;
-      }
-
-      .icon {
-        width: 100px;
-        height: 100px;
-        margin-bottom: 10px;
-      }
-
-      .icon-box:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
-      }
-
-      .icon-link p {
-        margin: 0;
-        font-size: 16px;
-        font-weight: bold;
-        color: #B0BEC5;
-      }
-
-      .footer {
-        text-align: center;
-        margin-top: 40px;
-        font-size: 12px;
-      }
-
-      .footer a {
-        text-decoration: none;
-        color: #B0BEC5;
-        transition: color 0.8s ease;
-      }
-
-      .footer a:hover {
-        color: #FFFFFF;
-      }
-
-      @media (max-width: 768px) {
-        .icon-container {
-          flex-direction: column;
-          gap: 20px;
+        :root {
+            /* Color Palette */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #252525;
+            --bg-elevated: #2a2a2a;
+            --bg-hover: #303030;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8b8;
+            --text-muted: #888888;
+            
+            --accent-primary: #5865f2;
+            --accent-hover: #4752c4;
+            --accent-light: rgba(88, 101, 242, 0.1);
+            
+            --success: #43b581;
+            --warning: #faa61a;
+            --danger: #f04747;
+            --info: #00d4ff;
+            
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-default: rgba(255, 255, 255, 0.1);
+            --border-strong: rgba(255, 255, 255, 0.2);
+            
+            /* Spacing System */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+            
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            --font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.5);
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Modern Icons as SVG */
         .icon {
-          width: 80px;
-          height: 80px;
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            vertical-align: middle;
+            fill: currentColor;
         }
 
-        .icon-link p {
-          font-size: 14px;
+        .icon-lg {
+            width: 48px;
+            height: 48px;
         }
-      }
 
-      /* Modal styles */
-      .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        opacity: 0;
-        transition: opacity 0.4s ease, transform 0.4s ease;
-      }
+        .icon-xl {
+            width: 64px;
+            height: 64px;
+        }
 
-      .modal-content {
-        background-color: #303030;
-        padding: 20px;
-        border-radius: 10px;
-        width: 90%;
-        max-width: 900px;
-        height: 90%;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        transform: scale(0.8);
-        transition: transform 0.4s ease, opacity 0.4s ease;
-      }
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+            padding: var(--spacing-xl) 0;
+            position: relative;
+        }
 
-      /* Fix iframe to fill modal better */
-      iframe {
-        flex-grow: 1;
-        border: none;
-        width: 100%;
-        height: 100%;
-      }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            opacity: 0.5;
+        }
 
-      /* Close button styles */
-      .close {
-        position: absolute;
-        top: -20px;
-        /* Move it up above the modal */
-        right: -20px;
-        /* Move it to the right, outside the modal */
-        color: #FFFFFF;
-        font-size: 36px;
-        /* Make it larger */
-        background-color: #ff3d3d;
-        /* Red background for better visibility */
-        border-radius: 50%;
-        padding: 5px 15px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+        }
 
-      .close:hover {
-        background-color: #ff6666;
-        /* Slight hover effect */
-      }
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+        }
 
-      .modal.show {
-        display: flex;
-        opacity: 1;
-        transform: scale(1);
-      }
+        .logo-img {
+            height: 72px;
+            width: auto;
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+        }
 
-      .modal-content.show {
-        opacity: 1;
-        transform: scale(1);
-      }
+        .logo {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all var(--transition-slow);
+        }
+
+        .dashboard.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .main-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .option-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            border: 1px solid var(--border-subtle);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--info));
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        .option-card:hover {
+            transform: translateY(-4px);
+            background: var(--bg-tertiary);
+            border-color: var(--border-default);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .option-card:hover::before {
+            opacity: 1;
+        }
+
+        .option-icon {
+            margin-bottom: var(--spacing-lg);
+            color: var(--accent-primary);
+            transition: transform var(--transition-base);
+        }
+
+        .option-card:hover .option-icon {
+            transform: scale(1.1) rotate(3deg);
+        }
+
+        .option-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: -0.01em;
+        }
+
+        .option-desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Search Section */
+        .search-section {
+            display: none;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-2xl);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg) auto;
+            border: 1px solid var(--border-subtle);
+            max-width: 900px;
+            width: 100%;
+            min-height: 70vh;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all var(--transition-slow);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .search-section.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .search-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .close-btn-header {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .close-btn-header:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* Search Input */
+        .search-controls {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: color var(--transition-fast);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) calc(var(--spacing-md) + 32px);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+            font-family: var(--font-sans);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: var(--bg-tertiary);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .search-input-wrapper:focus-within .search-icon {
+            color: var(--accent-primary);
+        }
+
+        /* Action Buttons */
+        .action-buttons-container {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xl);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-family: var(--font-sans);
+            height: 40px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-default);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.primary {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .action-btn.sync {
+            background: var(--info);
+            border-color: var(--info);
+            color: var(--bg-primary);
+        }
+
+        .action-btn.sync:hover {
+            background: #00b8e6;
+            border-color: #00b8e6;
+        }
+
+        /* Results */
+        .results {
+            flex: 1;
+            display: grid;
+            gap: var(--spacing-md);
+            overflow-y: auto;
+            padding-right: var(--spacing-sm);
+            align-content: start;
+        }
+
+        .results::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .results::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+        }
+
+        .results::-webkit-scrollbar-thumb {
+            background: var(--border-strong);
+            border-radius: var(--radius-full);
+        }
+
+        .results::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        .result-item {
+            background: var(--bg-tertiary);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            transition: all var(--transition-fast);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--info);
+            transition: width var(--transition-fast);
+        }
+
+        .result-item:hover {
+            background: var(--bg-elevated);
+            border-color: var(--border-default);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .result-item:hover::before {
+            width: 5px;
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            cursor: pointer;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            padding: 4px 8px;
+            margin-left: -8px;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .result-title:hover {
+            background: var(--accent-light);
+            color: var(--accent-primary);
+        }
+
+        .copy-hint {
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+            opacity: 0.7;
+            transition: opacity var(--transition-fast);
+            font-family: var(--font-sans);
+            font-weight: 400;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .result-title:hover .copy-hint {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .result-details {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .result-category {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        /* Warehouse Chips */
+        .warehouse-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        .warehouse-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .warehouse-chip {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-sm) var(--spacing-md);
+            min-width: 140px;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .warehouse-chip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, var(--accent-light));
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .warehouse-chip::after {
+            content: '📋';
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .warehouse-chip:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--info);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .warehouse-chip:hover::before {
+            opacity: 1;
+        }
+
+        .warehouse-chip:hover::after {
+            opacity: 0.7;
+        }
+
+        .warehouse-code {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--info);
+            margin-bottom: 2px;
+            font-family: var(--font-mono);
+            position: relative;
+        }
+
+        .warehouse-name {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.3;
+            position: relative;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity var(--transition-slow);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: var(--bg-secondary);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 500px;
+            transition: transform var(--transition-slow);
+            border: 1px solid var(--border-default);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal.active .modal-content {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--spacing-xs);
+            transition: color var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+            font-family: var(--font-sans);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: var(--bg-tertiary);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .save-btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+            font-family: var(--font-sans);
+            height: 48px;
+        }
+
+        .save-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-3xl) var(--spacing-xl);
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.3;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+        }
+
+        .empty-title {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+
+        .empty-message {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(300px);
+            transition: all var(--transition-slow);
+            max-width: 320px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-default);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .notification.success {
+            border-color: var(--success);
+        }
+
+        .notification.success::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .notification.error {
+            border-color: var(--danger);
+        }
+
+        .notification.error::before {
+            content: '✕';
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--bg-tertiary);
+            border-radius: 50%;
+            border-top-color: var(--accent-primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--bg-tertiary);
+            border-radius: 50%;
+            border-top-color: var(--accent-primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-xs: 0.25rem;
+                --spacing-sm: 0.375rem;
+                --spacing-md: 0.75rem;
+                --spacing-lg: 1rem;
+                --spacing-xl: 1.5rem;
+                --spacing-2xl: 2rem;
+                --spacing-3xl: 3rem;
+            }
+
+            body {
+                padding: var(--spacing-sm);
+            }
+
+            .header {
+                padding: var(--spacing-lg) 0;
+                margin-bottom: var(--spacing-xl);
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .logo-img {
+                height: 56px;
+            }
+
+            .main-options {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+
+            .option-card {
+                padding: var(--spacing-lg);
+            }
+
+            .search-section {
+                padding: var(--spacing-md);
+                border-radius: var(--radius-xl);
+                min-height: calc(100vh - 2rem);
+            }
+
+            .search-header {
+                flex-direction: column;
+                gap: var(--spacing-md);
+                align-items: stretch;
+            }
+
+            .close-btn-header {
+                position: absolute;
+                top: var(--spacing-md);
+                right: var(--spacing-md);
+            }
+
+            .search-input {
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+
+            .action-buttons-container {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+
+            .action-btn {
+                width: 100%;
+                height: 44px; /* Touch-friendly height */
+            }
+
+            .result-title {
+                font-size: 1.125rem;
+            }
+
+            .warehouse-container {
+                flex-direction: column;
+            }
+
+            .warehouse-chip {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: var(--spacing-md);
+            }
+
+            .modal-content {
+                padding: var(--spacing-lg);
+                margin: var(--spacing-md);
+                width: calc(100% - 2rem);
+            }
+
+            .empty-state {
+                padding: var(--spacing-2xl) var(--spacing-lg);
+            }
+        }
+
+        /* High DPI Screens */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .search-input,
+            .form-input {
+                font-size: 16px;
+            }
+        }
     </style>
-  </head>
-  <body>
-    <img src="https://i.ibb.co/pJLFmm5/ARR.png" alt="CUSDEC Assistant Banner" class="banner">
-    <div class="icon-container">
-      <div class="icon-box" onclick="openModal('https://stanyfernando.github.io/hscodesearch/')">
-        <img src="https://cdn-icons-png.flaticon.com/512/7687/7687627.png" alt="HSN Code Finder" class="icon">
-        <p>HSN CODE FINDER</p>
-      </div>
-      <div class="icon-box" onclick="openModal('https://stanyfernando.github.io/warehousefinder/')">
-        <img src="https://cdn-icons-png.flaticon.com/512/3281/3281312.png" alt="TIN & WH Finder" class="icon">
-        <p>TIN & WAREHOUSE FINDER</p>
-      </div>
-      <div class="icon-box" onclick="openModal('https://stanyfernando.github.io/CBBD1/')">
-        <img src="https://cdn-icons-png.flaticon.com/512/10982/10982463.png" alt="CBBD1 Weight List" class="icon">
-        <p>CBBD1 WEIGHT LIST</p>
-      </div>
-    </div>
-    <!-- Modal -->
-    <div class="modal" id="myModal">
-      <div class="modal-content" id="modalContent">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <iframe id="modal-iframe" src=""></iframe>
-      </div>
-    </div>
-    <footer class="footer"> Made by <a href="https://stanyfernando.blog" target="_blank">Stany Fernando</a>
-    </footer>
-    <script>
-      function openModal(link) {
-        var modal = document.getElementById('myModal');
-        var modalContent = document.getElementById('modalContent');
-        var iframe = document.getElementById('modal-iframe');
-        iframe.src = link;
-        modal.style.display = 'flex';
-        setTimeout(function() {
-          modal.classList.add('show');
-          modalContent.classList.add('show');
-        }, 10); // Delay to allow the display change to take effect
-      }
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-wrapper">
+                    <img src="https://i.ibb.co/BVzhDSVK/Untitled-1.png" alt="Sri Lanka Customs" class="logo-img">
+                </div>
+                <h1 class="logo">CUSDEC ASSISTANT</h1>
+            </div>
+            <p class="subtitle">Arrow Clearing Agency</p>
+        </div>
 
-      function closeModal() {
-        var modal = document.getElementById('myModal');
-        var modalContent = document.getElementById('modalContent');
-        var iframe = document.getElementById('modal-iframe');
-        modal.classList.remove('show');
-        modalContent.classList.remove('show');
-        setTimeout(function() {
-          modal.style.display = 'none';
-          iframe.src = '';
-        }, 400); // matches the transition duration
-      }
-      window.onclick = function(event) {
-        var modal = document.getElementById('myModal');
-        if (event.target == modal) {
-          closeModal();
-        }
-      }
+        <!-- Dashboard -->
+        <div class="dashboard active" id="dashboard">
+            <div class="main-options">
+                <div class="option-card" onclick="app.showSection('hsn')">
+                    <div class="option-icon">
+                        <svg class="icon icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </div>
+                    <h2 class="option-title">HSN CODE FINDER</h2>
+                    <p class="option-desc">Search and manage Harmonized System codes</p>
+                </div>
+                <div class="option-card" onclick="app.showSection('client')">
+                    <div class="option-icon">
+                        <svg class="icon icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                            <path d="M16 11h6m-3-3v6"></path>
+                        </svg>
+                    </div>
+                    <h2 class="option-title">TIN & WAREHOUSE</h2>
+                    <p class="option-desc">Find client TIN codes and warehouse info</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- HSN Search Section -->
+        <div class="search-section" id="hsnSection">
+            <div class="search-header">
+                <h2>HSN Code Finder</h2>
+                <button class="close-btn-header" onclick="app.showDashboard()" title="Close">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="search-controls">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" 
+                           class="search-input" 
+                           id="hsnSearch" 
+                           placeholder="Search by HSN code (e.g. 85163100) or product name (e.g. dryer, shampoo)..." 
+                           autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="action-buttons-container">
+                <button class="action-btn primary" onclick="app.showAddModal('hsn')" title="Add new HSN code">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add HSN
+                </button>
+                <button class="action-btn" onclick="app.exportData('hsn')" title="Export data">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export
+                </button>
+                <button class="action-btn sync" onclick="app.syncFromCloud('hsn')" title="Sync from Google Drive">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 12a10 10 0 0 0 18 6"></path>
+                        <path d="M22 12A10 10 0 0 0 4 6"></path>
+                        <polyline points="22 2 22 12 12 12"></polyline>
+                        <polyline points="2 22 2 12 12 12"></polyline>
+                    </svg>
+                    Sync from Cloud
+                </button>
+            </div>
+            
+            <div class="results" id="hsnResults"></div>
+        </div>
+
+        <!-- Client Search Section -->
+        <div class="search-section" id="clientSection">
+            <div class="search-header">
+                <h2>TIN & Warehouse Finder</h2>
+                <button class="close-btn-header" onclick="app.showDashboard()" title="Close">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="search-controls">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" 
+                           class="search-input" 
+                           id="clientSearch" 
+                           placeholder="Search by TIN, company name, warehouse code or name..." 
+                           autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="action-buttons-container">
+                <button class="action-btn primary" onclick="app.showAddModal('client')" title="Add new client">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Client
+                </button>
+                <button class="action-btn" onclick="app.exportData('client')" title="Export data">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export
+                </button>
+                <button class="action-btn sync" onclick="app.syncFromCloud('client')" title="Sync from Google Drive">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 12a10 10 0 0 0 18 6"></path>
+                        <path d="M22 12A10 10 0 0 0 4 6"></path>
+                        <polyline points="22 2 22 12 12 12"></polyline>
+                        <polyline points="2 22 2 12 12 12"></polyline>
+                    </svg>
+                    Sync from Cloud
+                </button>
+            </div>
+            
+            <div class="results" id="clientResults"></div>
+        </div>
+    </div>
+
+    <!-- Add Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Entry</h3>
+                <button class="close-btn" onclick="app.closeModal()">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalForm"></div>
+        </div>
+    </div>
+
+    <script>
+        // Modern CUSDEC Assistant Application with Google Drive Sync
+        const app = {
+            // Data storage with localStorage persistence
+            data: {
+                hsn: [],
+                client: []
+            },
+
+            // Search state
+            searchState: {
+                hsn: '',
+                client: ''
+            },
+
+            // Debounce timer
+            debounceTimer: null,
+            syncDebounceTimer: null,
+
+            // Google Drive integration
+            googleDrive: {
+                CLIENT_ID: 'YOUR_CLIENT_ID_HERE', // Replace with your Google Client ID
+                API_KEY: 'YOUR_API_KEY_HERE', // Replace with your API Key
+                DISCOVERY_DOCS: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+                SCOPES: 'https://www.googleapis.com/auth/drive.file',
+                isSignedIn: false,
+                syncInProgress: false
+            },
+
+            // Initialize application
+            init() {
+                this.loadData();
+                this.attachEventListeners();
+                this.showDashboard();
+                this.initGoogleDrive();
+            },
+
+            // Initialize Google Drive API
+            initGoogleDrive() {
+                const script = document.createElement('script');
+                script.src = 'https://apis.google.com/js/api.js';
+                script.onload = () => {
+                    gapi.load('client:auth2', () => {
+                        gapi.client.init({
+                            apiKey: this.googleDrive.API_KEY,
+                            clientId: this.googleDrive.CLIENT_ID,
+                            discoveryDocs: this.googleDrive.DISCOVERY_DOCS,
+                            scope: this.googleDrive.SCOPES
+                        }).then(() => {
+                            // Listen for sign-in state changes
+                            gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn) => {
+                                this.googleDrive.isSignedIn = isSignedIn;
+                                if (isSignedIn) {
+                                    this.showNotification('Connected to Google Drive', 'success');
+                                    // Initial sync when connected
+                                    this.syncFromCloud('hsn');
+                                    this.syncFromCloud('client');
+                                }
+                            });
+
+                            // Handle initial sign-in state
+                            this.googleDrive.isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+                        }).catch(error => {
+                            console.error('Error initializing Google Drive:', error);
+                        });
+                    });
+                };
+                document.head.appendChild(script);
+            },
+
+            // Sign in to Google Drive
+            async signInToGoogleDrive() {
+                try {
+                    await gapi.auth2.getAuthInstance().signIn();
+                } catch (error) {
+                    console.error('Sign in failed:', error);
+                    this.showNotification('Failed to sign in to Google Drive', 'error');
+                }
+            },
+
+            // Sync from Google Drive (merge only, never delete)
+            async syncFromCloud(type) {
+                if (!this.googleDrive.isSignedIn) {
+                    await this.signInToGoogleDrive();
+                    if (!this.googleDrive.isSignedIn) return;
+                }
+
+                if (this.googleDrive.syncInProgress) {
+                    this.showNotification('Sync already in progress...', 'info');
+                    return;
+                }
+
+                this.googleDrive.syncInProgress = true;
+                this.showNotification(`Syncing ${type} data from cloud...`, 'info');
+
+                try {
+                    const fileName = `cusdec_${type}_data.json`;
+                    
+                    // Search for the file
+                    const response = await gapi.client.drive.files.list({
+                        q: `name='${fileName}' and trashed=false`,
+                        spaces: 'drive',
+                        fields: 'files(id, name)'
+                    });
+
+                    if (response.result.files && response.result.files.length > 0) {
+                        // File exists, download it
+                        const fileId = response.result.files[0].id;
+                        const fileContent = await gapi.client.drive.files.get({
+                            fileId: fileId,
+                            alt: 'media'
+                        });
+
+                        const cloudData = JSON.parse(fileContent.body);
+                        
+                        // Merge with local data (never delete, only add missing)
+                        const mergedData = this.mergeData(type, this.data[type], cloudData);
+                        const addedCount = mergedData.length - this.data[type].length;
+                        
+                        this.data[type] = mergedData;
+                        this.saveData(false); // Save locally without triggering cloud sync
+                        
+                        // Refresh display if searching
+                        const searchInput = document.getElementById(type + 'Search');
+                        if (searchInput && searchInput.value.trim()) {
+                            this.performSearch(type, searchInput.value);
+                        }
+                        
+                        if (addedCount > 0) {
+                            this.showNotification(`Added ${addedCount} new ${type} records from cloud`, 'success');
+                        } else {
+                            this.showNotification(`${type} data is up to date`, 'success');
+                        }
+                    } else {
+                        // No file in cloud, create one with current data
+                        await this.saveToGoogleDrive(type);
+                        this.showNotification(`Created ${type} data in cloud`, 'success');
+                    }
+                } catch (error) {
+                    console.error('Sync error:', error);
+                    this.showNotification(`Failed to sync ${type} data`, 'error');
+                } finally {
+                    this.googleDrive.syncInProgress = false;
+                }
+            },
+
+            // Merge data (never delete, only add missing)
+            mergeData(type, localData, cloudData) {
+                if (type === 'hsn') {
+                    // For HSN, use code as unique identifier
+                    const localCodes = new Set(localData.map(item => item.code));
+                    const newItems = cloudData.filter(item => !localCodes.has(item.code));
+                    return [...localData, ...newItems];
+                } else {
+                    // For clients, use tin+warehouse as unique identifier
+                    const localKeys = new Set(localData.map(item => `${item.tin}-${item.warehouse}`));
+                    const newItems = cloudData.filter(item => !localKeys.has(`${item.tin}-${item.warehouse}`));
+                    return [...localData, ...newItems];
+                }
+            },
+
+            // Save to Google Drive
+            async saveToGoogleDrive(type) {
+                if (!this.googleDrive.isSignedIn) return;
+
+                try {
+                    const fileName = `cusdec_${type}_data.json`;
+                    const fileContent = JSON.stringify(this.data[type], null, 2);
+                    
+                    // Search for existing file
+                    const searchResponse = await gapi.client.drive.files.list({
+                        q: `name='${fileName}' and trashed=false`,
+                        spaces: 'drive',
+                        fields: 'files(id)'
+                    });
+
+                    const boundary = '-------314159265358979323846';
+                    const delimiter = "\r\n--" + boundary + "\r\n";
+                    const close_delim = "\r\n--" + boundary + "--";
+
+                    const metadata = {
+                        'name': fileName,
+                        'mimeType': 'application/json'
+                    };
+
+                    const multipartRequestBody =
+                        delimiter +
+                        'Content-Type: application/json\r\n\r\n' +
+                        JSON.stringify(metadata) +
+                        delimiter +
+                        'Content-Type: application/json\r\n\r\n' +
+                        fileContent +
+                        close_delim;
+
+                    if (searchResponse.result.files && searchResponse.result.files.length > 0) {
+                        // Update existing file
+                        const fileId = searchResponse.result.files[0].id;
+                        await gapi.client.request({
+                            'path': `/upload/drive/v3/files/${fileId}`,
+                            'method': 'PATCH',
+                            'params': {'uploadType': 'multipart'},
+                            'headers': {
+                                'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                            },
+                            'body': multipartRequestBody
+                        });
+                    } else {
+                        // Create new file
+                        await gapi.client.request({
+                            'path': '/upload/drive/v3/files',
+                            'method': 'POST',
+                            'params': {'uploadType': 'multipart'},
+                            'headers': {
+                                'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                            },
+                            'body': multipartRequestBody
+                        });
+                    }
+                } catch (error) {
+                    console.error('Save to Google Drive error:', error);
+                    // Don't show error notification for auto-sync failures
+                }
+            },
+
+            // Load data from localStorage or defaults
+            loadData() {
+                const savedHSN = localStorage.getItem('cusdec_hsn_data');
+                const savedClient = localStorage.getItem('cusdec_client_data');
+
+                if (savedHSN) {
+                    this.data.hsn = JSON.parse(savedHSN);
+                } else {
+                    this.loadDefaultData();
+                }
+
+                if (savedClient) {
+                    this.data.client = JSON.parse(savedClient);
+                } else {
+                    this.loadDefaultClientData();
+                }
+            },
+
+            // Save data to localStorage and Google Drive
+            saveData(syncToCloud = true) {
+                localStorage.setItem('cusdec_hsn_data', JSON.stringify(this.data.hsn));
+                localStorage.setItem('cusdec_client_data', JSON.stringify(this.data.client));
+                
+                // Auto-sync to Google Drive with debouncing
+                if (syncToCloud && this.googleDrive.isSignedIn) {
+                    clearTimeout(this.syncDebounceTimer);
+                    this.syncDebounceTimer = setTimeout(() => {
+                        this.saveToGoogleDrive('hsn');
+                        this.saveToGoogleDrive('client');
+                    }, 2000); // Wait 2 seconds before syncing to batch changes
+                }
+            },
+
+            // Load default HSN data
+            loadDefaultData() {
+                this.data.hsn = [
+                    // HAIR CARE
+                    { category: 'HAIR CARE', product: 'DRYER', code: '85163100' },
+                    { category: 'HAIR CARE', product: 'HAIR CLIPPER / GROOMER', code: '85102000' },
+                    { category: 'HAIR CARE', product: 'STRAIGHTNER', code: '85163200' },
+                    { category: 'HAIR CARE', product: 'SHAVER', code: '85101000' },
+                    
+                    // COSMETICS
+                    { category: 'COSMETICS', product: 'SHAMPOO', code: '33051000' },
+                    { category: 'COSMETICS', product: 'OTHER - HAIR COLOUR, HAIR CREAM, HAIR SPRAY', code: '33051000' },
+                    { category: 'COSMETICS', product: 'EYE MAKE-UP - EYESHADOW', code: '33042000' },
+                    { category: 'COSMETICS', product: 'LIP MAKE-UP - LIPSTICK, GLOSS', code: '33041000' },
+                    { category: 'COSMETICS', product: 'NAIL MAKE-UP - NAIL POLISH, MANICURE, PEDUCURE', code: '33043000' },
+                    { category: 'COSMETICS', product: 'POWDERS - TALCUMS', code: '33049100' },
+                    
+                    // KITCHEN APPLIANCES
+                    { category: 'KITCHEN APPLIANCES', product: 'AIR FRYER', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'BLENDER', code: '85094000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'COFFEE MAKER', code: '85167100' },
+                    { category: 'KITCHEN APPLIANCES', product: 'COOKER - OVEN (GAS/ELECTRIC)', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'COOKER', code: '73211100' },
+                    { category: 'KITCHEN APPLIANCES', product: 'COOKER HOOD', code: '84146000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'COOKWARE SET', code: '73239300' },
+                    { category: 'KITCHEN APPLIANCES', product: 'ELECTRIC OVEN', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'FOOD STEAMER', code: '76151020' },
+                    { category: 'KITCHEN APPLIANCES', product: 'HOB', code: '73211100' },
+                    { category: 'KITCHEN APPLIANCES', product: 'BUILT-IN OVEN', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'KETTLE', code: '85167920' },
+                    { category: 'KITCHEN APPLIANCES', product: 'MICROWAVE OVEN', code: '85165000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'PRESSURE COOKER', code: '76151020' },
+                    { category: 'KITCHEN APPLIANCES', product: 'RICE COOKER', code: '85166010' },
+                    { category: 'KITCHEN APPLIANCES', product: 'STAINLESS STEEL WATER BOTTLE', code: '73239900' },
+                    { category: 'KITCHEN APPLIANCES', product: 'TEA MAKER', code: '85167100' },
+                    { category: 'KITCHEN APPLIANCES', product: 'TOASTER / SANDWICH MAKER (WAFFLE)', code: '85167200' },
+                    { category: 'KITCHEN APPLIANCES', product: 'BBQ GRILL', code: '85167200' },
+                    { category: 'KITCHEN APPLIANCES', product: 'INDUCTION COOKER', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'NOODLE MAKER (SPAGHETTI / MACARONI)', code: '84381000' },
+                    
+                    // HOME APPLIANCES
+                    { category: 'HOME APPLIANCES', product: 'AIR COOLER', code: '84796000' },
+                    { category: 'HOME APPLIANCES', product: 'CD RCR', code: '85271900' },
+                    { category: 'HOME APPLIANCES', product: 'DVD', code: '85219000' },
+                    { category: 'HOME APPLIANCES', product: 'FRIDGE', code: '84181090' },
+                    { category: 'HOME APPLIANCES', product: 'HIFI SET / HOME THEATRE', code: '85279100' },
+                    { category: 'HOME APPLIANCES', product: 'IRON', code: '85164000' },
+                    { category: 'HOME APPLIANCES', product: 'GARMENT STEAMER', code: '84513000' },
+                    { category: 'HOME APPLIANCES', product: 'RADIO', code: '85271900' },
+                    { category: 'HOME APPLIANCES', product: 'SOUND BAR', code: '85182900' },
+                    { category: 'HOME APPLIANCES', product: 'SPEAKER', code: '85182900' },
+                    { category: 'HOME APPLIANCES', product: 'ORGAN - MUSIC', code: '92071000' },
+                    { category: 'HOME APPLIANCES', product: 'TV (OVER) 32"', code: '85287299' },
+                    { category: 'HOME APPLIANCES', product: 'TV 32"', code: '85287291' },
+                    { category: 'HOME APPLIANCES', product: 'TV WALL MOUNT', code: '83025000' },
+                    { category: 'HOME APPLIANCES', product: 'CAR STEREO SET (RADIO/PLAYER)', code: '85272900' },
+                    { category: 'HOME APPLIANCES', product: 'FAN', code: '84145100' },
+                    { category: 'HOME APPLIANCES', product: 'VACUUM CLEANER', code: '85081100' },
+                    { category: 'HOME APPLIANCES', product: 'MICROPHONE', code: '85181000' },
+                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE FRONT LOAD (5.5 KG TO 7.5 KG )', code: '84501143' },
+                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE FRONT LOAD (7.5 KG TO 9.5 KG)', code: '84501144' },
+                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE FRONT LOAD (OVER 10 KG)', code: '84501149' },
+                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE TOP LOAD (5.5 KG TO 7.5 KG )', code: '84501133' },
+                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE TOP LOAD (7.5 KG TO 9.5 KG)', code: '84501134' },
+                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE TOP LOAD (OVER 10 KG)', code: '84502000' },
+                    { category: 'HOME APPLIANCES', product: 'WATER DISPENSOR (FILTER/PURIFIER)', code: '84158190' },
+                    
+                    // PERSONAL ITEMS
+                    { category: 'PERSONAL ITEMS', product: 'MOBILE PHONE', code: '85171390' },
+                    { category: 'PERSONAL ITEMS', product: 'WEIGHT SCALE', code: '84231010' },
+                    { category: 'PERSONAL ITEMS', product: 'LAPTOP / NOTEBOOK', code: '84713090' },
+                    { category: 'PERSONAL ITEMS', product: 'WATCH', code: '91021900' },
+                    
+                    // BATHROOM
+                    { category: 'BATHROOM', product: 'WATER HEATER / HOME SHOWER', code: '85161000' },
+                    { category: 'BATHROOM', product: 'HIGH PRESSURE WASHER', code: '84242000' },
+                    
+                    // EMERGENCY LIGHTS & TORCHES
+                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'EMERGENCY LANTERN, TORCH, LIGHT', code: '85131090' },
+                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'EMERGENCY LIGHT LED', code: '85131090' },
+                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'TORCH', code: '85131090' },
+                    
+                    // SNACKS & OTHERS
+                    { category: 'SNACKS & OTHERS', product: 'CHOCOLATE', code: '18063100' },
+                    { category: 'SNACKS & OTHERS', product: 'NESCAFE', code: '21011200' },
+                    { category: 'SNACKS & OTHERS', product: 'PRINGLES', code: '19059020' },
+                    
+                    // PERFUMES
+                    { category: 'PERFUMES', product: 'BODY SPRAY', code: '33072000' },
+                    { category: 'PERFUMES', product: 'PERFUMES', code: '33030010' },
+                    
+                    // LIQUOR
+                    { category: 'LIQUOR', product: 'BRANDY VSOP', code: '22082000' },
+                    { category: 'LIQUOR', product: 'GIN', code: '22085000' },
+                    { category: 'LIQUOR', product: 'RUM', code: '22084010' },
+                    { category: 'LIQUOR', product: 'TEQUILA / LIQUEUR', code: '22087000' },
+                    { category: 'LIQUOR', product: 'VODKA', code: '22086000' },
+                    { category: 'LIQUOR', product: 'WHISKY', code: '22083000' },
+                    { category: 'LIQUOR', product: 'WINE (SWEET, RED, WHITE)', code: '22042100' },
+                    
+                    // CIGARETTES
+                    { category: 'CIGARETTES', product: '74 MM TO 84 MM', code: '24022050' },
+                    { category: 'CIGARETTES', product: 'MORE THAN 99 MM', code: '24022060' },
+                    
+                    // TOYS
+                    { category: 'TOYS', product: 'TOYS', code: '95030090' },
+                    { category: 'TOYS', product: 'TOY JEEP / CAR', code: '95030010' },
+                    { category: 'TOYS', product: 'TOY HELICOPTER / DOLL', code: '95030070' },
+                    
+                    // DRINKS
+                    { category: 'DRINKS', product: 'SOFT DRINKS', code: '22021000' },
+                    { category: 'DRINKS', product: 'ENERGY DRINKS', code: '22029930' }
+                ];
+                this.saveData();
+            },
+
+            // Load default client data
+            loadDefaultClientData() {
+                this.data.client = [
+                    // EDISON ELECTRICALS
+                    { name: 'EDISON ELECTRICALS', tin: '1144156182525', warehouseName: 'Colombo Harbour', warehouse: '7501121' },
+                    { name: 'EDISON ELECTRICALS', tin: '1144156182525', warehouseName: 'Palaly Arrival', warehouse: '7501302' },
+                    { name: 'EDISON ELECTRICALS', tin: '1144156182525', warehouseName: 'Palaly Departure', warehouse: '7501303' },
+                    { name: 'EDISON ELECTRICALS', tin: '1144156182525', warehouseName: 'Service Bond', warehouse: '7401172' },
+                    
+                    // ROYALE ELECTRONICS
+                    { name: 'ROYALE ELECTRONICS', tin: '1141827457000', warehouseName: 'Colombo Harbour', warehouse: '7501300' },
+                    { name: 'ROYALE ELECTRONICS', tin: '1141827457000', warehouseName: 'Hambantota', warehouse: '7501293' },
+                    { name: 'ROYALE ELECTRONICS', tin: '1141827457000', warehouseName: 'Service Bond', warehouse: '7400995' },
+                    
+                    // AMF DUTY FREE
+                    { name: 'AMF DUTY FREE', tin: '1144513632525', warehouseName: 'Feeder Bond', warehouse: '7500965' },
+                    
+                    // METRO INTERNATIONAL
+                    { name: 'METRO INTERNATIONAL', tin: '1142987192525', warehouseName: 'Feeder Bond', warehouse: '7501066' },
+                    { name: 'METRO INTERNATIONAL', tin: '1142987192525', warehouseName: 'CFS 5', warehouse: '7101127' },
+                    
+                    // MORICH TRADING
+                    { name: 'MORICH TRADING', tin: '1146083352525', warehouseName: 'Feeder Bond', warehouse: '7501122' },
+                    { name: 'MORICH TRADING', tin: '1146083352525', warehouseName: 'CFS 5', warehouse: '7101127' },
+                    
+                    // VICTORY SILK STORES
+                    { name: 'VICTORY SILK STORES', tin: '1040867722525', warehouseName: 'Feeder Bond', warehouse: '7500941' },
+                    
+                    // TELCEY SERVICES
+                    { name: 'TELCEY SERVICES', tin: '1147100327000', warehouseName: 'Feeder Bond', warehouse: '7501138' },
+                    
+                    // AVENTURA HOLDINGS
+                    { name: 'AVENTURA HOLDINGS', tin: '1747968152525', warehouseName: 'Feeder Bond', warehouse: '7501144' },
+                    
+                    // ESWARAN BROTHERS
+                    { name: 'ESWARAN BROTHERS', tin: '1141272802525', warehouseName: 'FEEDER BOND (24A)', warehouse: '7500803' },
+                    { name: 'ESWARAN BROTHERS', tin: '1141272802525', warehouseName: 'DFS (20A)', warehouse: '7501332' },
+                    
+                    // FREE LANKA TRADING
+                    { name: 'FREE LANKA TRADING', tin: '1040318707000', warehouseName: 'Feeder Bond', warehouse: '7500815' },
+                    
+                    // INDIKA INTERNATIONAL DUTY FREE
+                    { name: 'INDIKA INTERNATIONAL DUTY FREE', tin: '7622623712525-1', warehouseName: 'Feeder Bond', warehouse: '7501059' },
+                    
+                    // CROWN ELECTRONICS
+                    { name: 'CROWN ELECTRONICS', tin: '4091279912525', warehouseName: 'Feeder Bond', warehouse: '7501050' },
+                    
+                    // PROJECT PROSPECT
+                    { name: 'PROJECT PROSPECT', tin: '1141861712525', warehouseName: 'Feeder Bond', warehouse: '7501064' },
+                    
+                    // S. N JAYASINGHE
+                    { name: 'S. N JAYASINGHE', tin: '5229425882525-1', warehouseName: 'Feeder Bond', warehouse: '7501009' },
+                    
+                    // PACIFIC TRADERS
+                    { name: 'PACIFIC TRADERS', tin: '5311335872525-1', warehouseName: 'Feeder Bond', warehouse: '7501082' },
+                    
+                    // D. M JEEWAN ( DMJ )
+                    { name: 'D. M JEEWAN ( DMJ )', tin: '1144007262525', warehouseName: 'Feeder Bond', warehouse: '7501103' }
+                ];
+                this.saveData();
+            },
+
+            // Attach event listeners
+            attachEventListeners() {
+                // Search inputs with debouncing
+                document.getElementById('hsnSearch').addEventListener('input', (e) => {
+                    this.debounceSearch('hsn', e.target.value);
+                });
+
+                document.getElementById('clientSearch').addEventListener('input', (e) => {
+                    this.debounceSearch('client', e.target.value);
+                });
+
+                // Modal backdrop click
+                document.getElementById('addModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'addModal') {
+                        this.closeModal();
+                    }
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        const modal = document.getElementById('addModal');
+                        if (modal.classList.contains('active')) {
+                            this.closeModal();
+                        } else {
+                            this.showDashboard();
+                        }
+                    }
+                });
+            },
+
+            // Debounced search
+            debounceSearch(type, query) {
+                clearTimeout(this.debounceTimer);
+                this.searchState[type] = query;
+
+                this.debounceTimer = setTimeout(() => {
+                    this.performSearch(type, query);
+                }, 300);
+            },
+
+            // Perform search with smart matching
+            performSearch(type, query) {
+                const trimmedQuery = query.toLowerCase().trim();
+                
+                if (!trimmedQuery) {
+                    this.showEmptyState(type);
+                    return;
+                }
+
+                let filtered = [];
+                const searchTerms = trimmedQuery.split(/\s+/); // Split by spaces for multi-word search
+
+                if (type === 'hsn') {
+                    filtered = this.data.hsn.filter(item => {
+                        const searchableText = [
+                            item.code || '',
+                            item.product || '',
+                            item.category || ''
+                        ].join(' ').toLowerCase();
+                        
+                        // Smart matching: All search terms must be found
+                        return searchTerms.every(term => searchableText.includes(term));
+                    });
+
+                    // Sort results by relevance
+                    filtered.sort((a, b) => {
+                        // Exact code match gets highest priority
+                        if (a.code && a.code.toLowerCase() === trimmedQuery) return -1;
+                        if (b.code && b.code.toLowerCase() === trimmedQuery) return 1;
+                        
+                        // Code starts with query
+                        if (a.code && a.code.toLowerCase().startsWith(trimmedQuery)) return -1;
+                        if (b.code && b.code.toLowerCase().startsWith(trimmedQuery)) return 1;
+                        
+                        // Product exact match
+                        if (a.product && a.product.toLowerCase().includes(trimmedQuery)) return -1;
+                        if (b.product && b.product.toLowerCase().includes(trimmedQuery)) return 1;
+                        
+                        return 0;
+                    });
+                } else {
+                    filtered = this.data.client.filter(item => {
+                        const searchableText = [
+                            item.tin || '',
+                            item.name || '',
+                            item.warehouse || '',
+                            item.warehouseName || ''
+                        ].join(' ').toLowerCase();
+                        
+                        // Smart matching: All search terms must be found
+                        return searchTerms.every(term => searchableText.includes(term));
+                    });
+
+                    // Sort results by relevance
+                    filtered.sort((a, b) => {
+                        // Exact TIN match gets highest priority
+                        if (a.tin && a.tin.toLowerCase() === trimmedQuery) return -1;
+                        if (b.tin && b.tin.toLowerCase() === trimmedQuery) return 1;
+                        
+                        // Exact warehouse code match
+                        if (a.warehouse && a.warehouse.toLowerCase() === trimmedQuery) return -1;
+                        if (b.warehouse && b.warehouse.toLowerCase() === trimmedQuery) return 1;
+                        
+                        // Company name starts with query
+                        if (a.name && a.name.toLowerCase().startsWith(trimmedQuery)) return -1;
+                        if (b.name && b.name.toLowerCase().startsWith(trimmedQuery)) return 1;
+                        
+                        return 0;
+                    });
+                }
+
+                if (filtered.length === 0) {
+                    this.showEmptyState(type, `No results found for "${query}"`);
+                } else {
+                    this.displayResults(type, filtered);
+                }
+            },
+
+            // Display search results
+            displayResults(type, data) {
+                const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
+                container.innerHTML = '';
+
+                if (type === 'hsn') {
+                    data.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'result-item';
+                        div.innerHTML = `
+                            <div class="result-title" onclick="app.copyToClipboard('${item.code}', 'HSN Code')" title="Click to copy HSN code">
+                                ${this.escapeHtml(item.code || 'N/A')}
+                                <span class="copy-hint">📋 Click to copy</span>
+                            </div>
+                            <div class="result-details"><strong>Product:</strong> ${this.escapeHtml(item.product || 'N/A')}</div>
+                            <div class="result-category">Category: ${this.escapeHtml(item.category || 'N/A')}</div>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else {
+                    // Group clients by company
+                    const grouped = this.groupClientData(data);
+                    
+                    Object.values(grouped).forEach(company => {
+                        const div = document.createElement('div');
+                        div.className = 'result-item';
+                        
+                        const warehouseChips = company.warehouses.map(wh => 
+                            `<div class="warehouse-chip" onclick="app.copyToClipboard('${wh.code}', 'Warehouse Code')" title="Click to copy warehouse code">
+                                <div class="warehouse-code">${this.escapeHtml(wh.code || 'N/A')}</div>
+                                <div class="warehouse-name">${this.escapeHtml(wh.name || 'N/A')}</div>
+                            </div>`
+                        ).join('');
+                        
+                        div.innerHTML = `
+                            <div class="result-title" onclick="app.copyToClipboard('${company.tin}', 'TIN')" title="Click to copy TIN">
+                                TIN: ${this.escapeHtml(company.tin || 'N/A')}
+                                <span class="copy-hint">📋 Click to copy</span>
+                            </div>
+                            <div class="result-details"><strong>Company:</strong> ${this.escapeHtml(company.name || 'N/A')}</div>
+                            <div class="warehouse-container">
+                                <div class="warehouse-label">Warehouses (click to copy):</div>
+                                ${warehouseChips}
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+            },
+
+            // Group client data by company
+            groupClientData(data) {
+                return data.reduce((acc, item) => {
+                    const key = `${item.name}-${item.tin}`;
+                    if (!acc[key]) {
+                        acc[key] = {
+                            name: item.name,
+                            tin: item.tin,
+                            warehouses: []
+                        };
+                    }
+                    acc[key].warehouses.push({
+                        name: item.warehouseName,
+                        code: item.warehouse
+                    });
+                    return acc;
+                }, {});
+            },
+
+            // Show empty state
+            showEmptyState(type, message = null) {
+                const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
+                const defaultMessage = type === 'hsn' 
+                    ? 'Start typing to search HSN codes...' 
+                    : 'Start typing to search client information...';
+                
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">${message ? 'No Results' : 'Ready to Search'}</div>
+                        <div class="empty-message">${message || defaultMessage}</div>
+                    </div>
+                `;
+            },
+
+            // Navigation methods
+            showSection(section) {
+                // Hide dashboard
+                const dashboard = document.getElementById('dashboard');
+                dashboard.classList.remove('active');
+                
+                setTimeout(() => {
+                    dashboard.style.display = 'none';
+                    
+                    // Show section
+                    const sectionEl = document.getElementById(section + 'Section');
+                    sectionEl.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        sectionEl.classList.add('active');
+                        
+                        // Focus search input
+                        const searchInput = document.getElementById(section + 'Search');
+                        searchInput.focus();
+                        
+                        // Show appropriate empty state
+                        this.showEmptyState(section);
+                    }, 50);
+                }, 300);
+            },
+
+            showDashboard() {
+                // Hide all sections
+                ['hsnSection', 'clientSection'].forEach(id => {
+                    const section = document.getElementById(id);
+                    section.classList.remove('active');
+                    setTimeout(() => {
+                        section.style.display = 'none';
+                    }, 300);
+                });
+                
+                // Show dashboard
+                setTimeout(() => {
+                    const dashboard = document.getElementById('dashboard');
+                    dashboard.style.display = 'block';
+                    setTimeout(() => {
+                        dashboard.classList.add('active');
+                    }, 50);
+                }, 300);
+            },
+
+            // Modal methods
+            showAddModal(type) {
+                const modal = document.getElementById('addModal');
+                const title = document.getElementById('modalTitle');
+                const form = document.getElementById('modalForm');
+                
+                if (type === 'hsn') {
+                    title.textContent = 'Add New HSN Code';
+                    
+                    const categories = [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))];
+                    const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
+                    
+                    form.innerHTML = `
+                        <form onsubmit="app.saveHSN(event)">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <input type="text" class="form-input" id="newCategory" list="categoryList" required>
+                                <datalist id="categoryList">${categoryOptions}</datalist>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Product Name</label>
+                                <input type="text" class="form-input" id="newProduct" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">HSN Code</label>
+                                <input type="text" class="form-input" id="newHSNCode" required pattern="[0-9]{8}" 
+                                       placeholder="8-digit HSN code" maxlength="8">
+                            </div>
+                            <button type="submit" class="save-btn">Save HSN Code</button>
+                        </form>
+                    `;
+                } else {
+                    title.textContent = 'Add New Client';
+                    
+                    const companies = [...new Set(this.data.client.map(item => item.name).filter(Boolean))];
+                    const warehouses = [...new Set(this.data.client.map(item => item.warehouseName).filter(Boolean))];
+                    
+                    const companyOptions = companies.map(comp => `<option value="${comp}">`).join('');
+                    const warehouseOptions = warehouses.map(wh => `<option value="${wh}">`).join('');
+                    
+                    form.innerHTML = `
+                        <form onsubmit="app.saveClient(event)">
+                            <div class="form-group">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" class="form-input" id="newClientName" list="companyList" required>
+                                <datalist id="companyList">${companyOptions}</datalist>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TIN Code</label>
+                                <input type="text" class="form-input" id="newTIN" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Warehouse Name</label>
+                                <input type="text" class="form-input" id="newWarehouseName" list="warehouseList" required>
+                                <datalist id="warehouseList">${warehouseOptions}</datalist>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Warehouse Number</label>
+                                <input type="text" class="form-input" id="newWarehouse" required>
+                            </div>
+                            <button type="submit" class="save-btn">Save Client</button>
+                        </form>
+                    `;
+                }
+                
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('active');
+                    // Focus first input
+                    const firstInput = form.querySelector('input');
+                    if (firstInput) firstInput.focus();
+                }, 10);
+            },
+
+            closeModal() {
+                const modal = document.getElementById('addModal');
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            },
+
+            // Save methods
+            saveHSN(event) {
+                event.preventDefault();
+                
+                const newItem = {
+                    category: document.getElementById('newCategory').value.trim(),
+                    product: document.getElementById('newProduct').value.trim(),
+                    code: document.getElementById('newHSNCode').value.trim()
+                };
+                
+                // Check for duplicates
+                const isDuplicate = this.data.hsn.some(item => item.code === newItem.code);
+                if (isDuplicate) {
+                    this.showNotification('HSN code already exists', 'error');
+                    return;
+                }
+                
+                this.data.hsn.push(newItem);
+                this.saveData();
+                this.closeModal();
+                this.showNotification('HSN code added successfully', 'success');
+                
+                // Refresh search if active
+                const searchQuery = document.getElementById('hsnSearch').value.trim();
+                if (searchQuery) {
+                    this.performSearch('hsn', searchQuery);
+                }
+            },
+
+            saveClient(event) {
+                event.preventDefault();
+                
+                const newItem = {
+                    name: document.getElementById('newClientName').value.trim(),
+                    tin: document.getElementById('newTIN').value.trim(),
+                    warehouseName: document.getElementById('newWarehouseName').value.trim(),
+                    warehouse: document.getElementById('newWarehouse').value.trim()
+                };
+                
+                // Check for duplicate warehouse
+                const isDuplicate = this.data.client.some(item => 
+                    item.tin === newItem.tin && item.warehouse === newItem.warehouse
+                );
+                if (isDuplicate) {
+                    this.showNotification('This warehouse already exists for this TIN', 'error');
+                    return;
+                }
+                
+                this.data.client.push(newItem);
+                this.saveData();
+                this.closeModal();
+                this.showNotification('Client added successfully', 'success');
+                
+                // Refresh search if active
+                const searchQuery = document.getElementById('clientSearch').value.trim();
+                if (searchQuery) {
+                    this.performSearch('client', searchQuery);
+                }
+            },
+
+            // Export data
+            exportData(type) {
+                const data = type === 'hsn' ? this.data.hsn : this.data.client;
+                
+                if (data.length === 0) {
+                    this.showNotification('No data to export', 'error');
+                    return;
+                }
+
+                // Create workbook
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, type.toUpperCase());
+                
+                // Generate filename with timestamp
+                const date = new Date().toISOString().split('T')[0];
+                const filename = `cusdec_${type}_${date}.xlsx`;
+                
+                // Write file
+                XLSX.writeFile(wb, filename);
+                this.showNotification('Data exported successfully', 'success');
+            },
+
+            // Copy to clipboard
+            async copyToClipboard(text, type) {
+                try {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(text);
+                    } else {
+                        // Fallback method
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        textArea.style.position = 'fixed';
+                        textArea.style.opacity = '0';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                    }
+                    this.showNotification(`${type} copied: ${text}`, 'success');
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    this.showNotification('Failed to copy', 'error');
+                }
+            },
+
+            // Show notification
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10);
+                
+                // Remove notification
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            },
+
+            // Utility: Escape HTML
+            escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
     </script>
-  </body>
+</body>
 </html>
