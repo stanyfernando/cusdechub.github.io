@@ -19,9 +19,9 @@
             --text-secondary: #b8b8b8;
             --text-muted: #888888;
             
-            --accent-primary: #5865f2;
-            --accent-hover: #4752c4;
-            --accent-light: rgba(88, 101, 242, 0.1);
+            --accent-primary: #00d4ff;
+            --accent-hover: #00b8e6;
+            --accent-light: rgba(0, 212, 255, 0.1);
             
             --success: #43b581;
             --warning: #faa61a;
@@ -406,24 +406,15 @@
             border-color: var(--accent-primary);
         }
 
-        .action-btn.primary:hover {
-            background: var(--accent-hover);
-            border-color: var(--accent-hover);
-        }
-
-        .action-btn.primary:active {
-            transform: translateY(0);
-        }
-
         .action-btn.sync {
-            background: var(--info);
-            border-color: var(--info);
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
             color: var(--bg-primary);
         }
 
         .action-btn.sync:hover {
-            background: #00b8e6;
-            border-color: #00b8e6;
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
         }
 
         .action-btn.sync:active {
@@ -462,6 +453,7 @@
         .result-item {
             background: var(--bg-tertiary);
             padding: var(--spacing-xl);
+            padding-right: calc(var(--spacing-xl) + 100px);
             border-radius: var(--radius-lg);
             border: 1px solid transparent;
             transition: all var(--transition-fast);
@@ -495,6 +487,51 @@
 
         .result-item:hover::before {
             width: 6px;
+        }
+
+        /* Result Actions */
+        .result-actions {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            display: flex;
+            gap: var(--spacing-sm);
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .result-item:hover .result-actions {
+            opacity: 1;
+        }
+
+        .result-action-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .result-action-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-color: var(--border-strong);
+        }
+
+        .result-action-btn.edit:hover {
+            color: var(--info);
+            border-color: var(--info);
+        }
+
+        .result-action-btn.delete:hover {
+            color: var(--danger);
+            border-color: var(--danger);
         }
 
         .result-title {
@@ -750,7 +787,7 @@
 
         .save-btn {
             background: var(--accent-primary);
-            color: white;
+            color: var(--bg-primary);
             border: none;
             padding: var(--spacing-md) var(--spacing-xl);
             border-radius: var(--radius-md);
@@ -834,13 +871,13 @@
         }
 
         .notification.success {
-            border-color: var(--success);
+            border-color: var(--info);
             background: var(--bg-tertiary);
         }
 
         .notification.success::before {
             content: '✓';
-            color: var(--success);
+            color: var(--info);
             font-weight: bold;
             font-size: 1rem;
         }
@@ -977,6 +1014,18 @@
                 height: 44px; /* Touch-friendly height */
             }
 
+            .result-item {
+                padding: var(--spacing-lg);
+                padding-right: var(--spacing-lg);
+            }
+
+            .result-actions {
+                position: static;
+                opacity: 1;
+                margin-bottom: var(--spacing-md);
+                justify-content: flex-start;
+            }
+
             .result-title {
                 font-size: 1.125rem;
             }
@@ -992,6 +1041,7 @@
                 justify-content: space-between;
                 align-items: center;
                 padding: var(--spacing-md);
+                padding-right: 60px;
                 text-align: left;
             }
 
@@ -1001,7 +1051,12 @@
             }
 
             .warehouse-name {
-                text-align: right;
+                text-align: left;
+                font-size: 0.7rem;
+            }
+
+            .warehouse-action-btn {
+                opacity: 1;
             }
 
             .modal-content {
@@ -1124,7 +1179,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="action-btn sync" onclick="app.syncFromCloud('hsn')" title="Sync with Google Drive">
+                <button class="action-btn sync" onclick="app.syncWithCloud('hsn')" title="Sync with Google Drive">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
@@ -1180,7 +1235,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="action-btn sync" onclick="app.syncFromCloud('client')" title="Sync with Google Drive">
+                <button class="action-btn sync" onclick="app.syncWithCloud('client')" title="Sync with Google Drive">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
@@ -1266,8 +1321,8 @@
                                 if (isSignedIn) {
                                     this.showNotification('Connected to Google Drive', 'success');
                                     // Initial sync when connected
-                                    this.syncFromCloud('hsn');
-                                    this.syncFromCloud('client');
+                                    this.syncWithCloud('hsn');
+                                    this.syncWithCloud('client');
                                 }
                             });
 
@@ -1292,7 +1347,7 @@
             },
 
             // Sync with Google Drive (merge only, never delete)
-            async syncFromCloud(type) {
+            async syncWithCloud(type) {
                 if (!this.googleDrive.isSignedIn) {
                     await this.signInToGoogleDrive();
                     if (!this.googleDrive.isSignedIn) return;
@@ -1795,10 +1850,30 @@
                 container.innerHTML = '';
 
                 if (type === 'hsn') {
-                    data.forEach(item => {
+                    data.forEach((item) => {
+                        // Find actual index in original data array
+                        const actualIndex = this.data.hsn.findIndex(h => h.code === item.code);
                         const div = document.createElement('div');
                         div.className = 'result-item';
                         div.innerHTML = `
+                            <div class="result-actions">
+                                <button class="result-action-btn edit" onclick="app.editItem('hsn', ${actualIndex}, '${item.code}')" title="Edit">
+                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                </button>
+                                <button class="result-action-btn delete" onclick="app.deleteItem('hsn', '${item.code}')" title="Delete">
+                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                                        <path d="M10 11v6"></path>
+                                        <path d="M14 11v6"></path>
+                                    </svg>
+                                    Delete
+                                </button>
+                            </div>
                             <div class="result-title" onclick="app.copyToClipboard('${item.code}', 'HSN Code')" title="Click to copy HSN code">
                                 ${this.escapeHtml(item.code || 'N/A')}
                                 <span class="copy-hint">📋 Copy</span>
@@ -1816,12 +1891,27 @@
                         const div = document.createElement('div');
                         div.className = 'result-item';
                         
-                        const warehouseChips = company.warehouses.map(wh => 
-                            `<div class="warehouse-chip" onclick="app.copyToClipboard('${wh.code}', 'Warehouse Code')" title="Click to copy warehouse code">
-                                <div class="warehouse-code">${this.escapeHtml(wh.code || 'N/A')}</div>
-                                <div class="warehouse-name">${this.escapeHtml(wh.name || 'N/A')}</div>
-                            </div>`
-                        ).join('');
+                        const warehouseChips = company.warehouses.map(wh => {
+                            const originalIndex = this.data.client.findIndex(c => c.tin === company.tin && c.warehouse === wh.code);
+                            return `<div class="warehouse-chip" style="position: relative;">
+                                <button class="warehouse-action-btn" onclick="event.stopPropagation(); app.editItem('client', ${originalIndex}, '${company.tin}-${wh.code}')" title="Edit">
+                                    <svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="warehouse-action-btn delete" onclick="event.stopPropagation(); app.deleteItem('client', '${company.tin}-${wh.code}')" title="Delete">
+                                    <svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                                <div onclick="app.copyToClipboard('${wh.code}', 'Warehouse Code')" title="Click to copy warehouse code" style="cursor: pointer; padding-top: 10px;">
+                                    <div class="warehouse-code">${this.escapeHtml(wh.code || 'N/A')}</div>
+                                    <div class="warehouse-name">${this.escapeHtml(wh.name || 'N/A')}</div>
+                                </div>
+                            </div>`;
+                        }).join('');
                         
                         div.innerHTML = `
                             <div class="result-title" onclick="app.copyToClipboard('${company.tin}', 'TIN')" title="Click to copy TIN">
@@ -2064,7 +2154,171 @@
                 }
             },
 
-            // Export data
+            // Edit item
+            editItem(type, index, identifier) {
+                const modal = document.getElementById('addModal');
+                const title = document.getElementById('modalTitle');
+                const form = document.getElementById('modalForm');
+                
+                if (type === 'hsn') {
+                    const item = this.data.hsn[index];
+                    title.textContent = 'Edit HSN Code';
+                    
+                    const categories = [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))];
+                    const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
+                    
+                    form.innerHTML = `
+                        <form onsubmit="app.updateHSN(event, ${index})">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <input type="text" class="form-input" id="editCategory" list="categoryList" value="${this.escapeHtml(item.category)}" required>
+                                <datalist id="categoryList">${categoryOptions}</datalist>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Product Name</label>
+                                <input type="text" class="form-input" id="editProduct" value="${this.escapeHtml(item.product)}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">HSN Code</label>
+                                <input type="text" class="form-input" id="editHSNCode" value="${this.escapeHtml(item.code)}" required pattern="[0-9]{8}" 
+                                       placeholder="8-digit HSN code" maxlength="8">
+                            </div>
+                            <button type="submit" class="save-btn">Update HSN Code</button>
+                        </form>
+                    `;
+                } else {
+                    const item = this.data.client[index];
+                    title.textContent = 'Edit Client';
+                    
+                    const companies = [...new Set(this.data.client.map(item => item.name).filter(Boolean))];
+                    const warehouses = [...new Set(this.data.client.map(item => item.warehouseName).filter(Boolean))];
+                    
+                    const companyOptions = companies.map(comp => `<option value="${comp}">`).join('');
+                    const warehouseOptions = warehouses.map(wh => `<option value="${wh}">`).join('');
+                    
+                    form.innerHTML = `
+                        <form onsubmit="app.updateClient(event, ${index})">
+                            <div class="form-group">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" class="form-input" id="editClientName" list="companyList" value="${this.escapeHtml(item.name)}" required>
+                                <datalist id="companyList">${companyOptions}</datalist>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TIN Code</label>
+                                <input type="text" class="form-input" id="editTIN" value="${this.escapeHtml(item.tin)}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Warehouse Name</label>
+                                <input type="text" class="form-input" id="editWarehouseName" list="warehouseList" value="${this.escapeHtml(item.warehouseName)}" required>
+                                <datalist id="warehouseList">${warehouseOptions}</datalist>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Warehouse Number</label>
+                                <input type="text" class="form-input" id="editWarehouse" value="${this.escapeHtml(item.warehouse)}" required>
+                            </div>
+                            <button type="submit" class="save-btn">Update Client</button>
+                        </form>
+                    `;
+                }
+                
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('active');
+                    // Focus first input
+                    const firstInput = form.querySelector('input');
+                    if (firstInput) firstInput.focus();
+                }, 10);
+            },
+
+            // Update HSN
+            updateHSN(event, index) {
+                event.preventDefault();
+                
+                const updatedItem = {
+                    category: document.getElementById('editCategory').value.trim(),
+                    product: document.getElementById('editProduct').value.trim(),
+                    code: document.getElementById('editHSNCode').value.trim()
+                };
+                
+                // Check for duplicate code (excluding current item)
+                const isDuplicate = this.data.hsn.some((item, i) => 
+                    i !== index && item.code === updatedItem.code
+                );
+                if (isDuplicate) {
+                    this.showNotification('HSN code already exists', 'error');
+                    return;
+                }
+                
+                this.data.hsn[index] = updatedItem;
+                this.saveData();
+                this.closeModal();
+                this.showNotification('HSN code updated successfully', 'success');
+                
+                // Refresh search if active
+                const searchQuery = document.getElementById('hsnSearch').value.trim();
+                if (searchQuery) {
+                    this.performSearch('hsn', searchQuery);
+                }
+            },
+
+            // Update Client
+            updateClient(event, index) {
+                event.preventDefault();
+                
+                const updatedItem = {
+                    name: document.getElementById('editClientName').value.trim(),
+                    tin: document.getElementById('editTIN').value.trim(),
+                    warehouseName: document.getElementById('editWarehouseName').value.trim(),
+                    warehouse: document.getElementById('editWarehouse').value.trim()
+                };
+                
+                // Check for duplicate warehouse (excluding current item)
+                const isDuplicate = this.data.client.some((item, i) => 
+                    i !== index && item.tin === updatedItem.tin && item.warehouse === updatedItem.warehouse
+                );
+                if (isDuplicate) {
+                    this.showNotification('This warehouse already exists for this TIN', 'error');
+                    return;
+                }
+                
+                this.data.client[index] = updatedItem;
+                this.saveData();
+                this.closeModal();
+                this.showNotification('Client updated successfully', 'success');
+                
+                // Refresh search if active
+                const searchQuery = document.getElementById('clientSearch').value.trim();
+                if (searchQuery) {
+                    this.performSearch('client', searchQuery);
+                }
+            },
+
+            // Delete item
+            deleteItem(type, identifier) {
+                const confirmDelete = confirm(`Are you sure you want to delete this ${type === 'hsn' ? 'HSN code' : 'warehouse'}?`);
+                if (!confirmDelete) return;
+
+                if (type === 'hsn') {
+                    // Delete by HSN code
+                    this.data.hsn = this.data.hsn.filter(item => item.code !== identifier);
+                    this.showNotification('HSN code deleted successfully', 'success');
+                } else {
+                    // Delete by TIN-Warehouse combination
+                    const [tin, warehouse] = identifier.split('-');
+                    this.data.client = this.data.client.filter(item => 
+                        !(item.tin === tin && item.warehouse === warehouse)
+                    );
+                    this.showNotification('Warehouse deleted successfully', 'success');
+                }
+                
+                this.saveData();
+                
+                // Refresh search if active
+                const searchInput = document.getElementById(type + 'Search');
+                if (searchInput && searchInput.value.trim()) {
+                    this.performSearch(type, searchInput.value);
+                }
+            },
             exportData(type) {
                 const data = type === 'hsn' ? this.data.hsn : this.data.client;
                 
