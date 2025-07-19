@@ -116,7 +116,6 @@
             margin-bottom: var(--spacing-2xl);
             padding: var(--spacing-xl) 0;
             position: relative;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
         }
 
         .header::after {
@@ -257,7 +256,7 @@
         /* Search Section */
         .search-section {
             display: none;
-            background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(26, 26, 26, 0.95) 100%);
+            background: var(--bg-secondary);
             border-radius: var(--radius-2xl);
             padding: var(--spacing-xl);
             margin: var(--spacing-lg) auto;
@@ -1058,10 +1057,11 @@
                 <div class="option-card" onclick="app.showSection('hsn')">
                     <div class="option-icon">
                         <svg class="icon icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
+                            <rect x="2" y="7" width="20" height="14" rx="2"></rect>
+                            <rect x="6" y="3" width="12" height="14" rx="2"></rect>
+                            <rect x="10" y="1" width="4" height="6" rx="1"></rect>
+                            <line x1="6" y1="12" x2="18" y2="12"></line>
+                            <line x1="6" y1="15" x2="18" y2="15"></line>
                         </svg>
                     </div>
                     <h2 class="option-title">HSN CODE FINDER</h2>
@@ -1070,9 +1070,10 @@
                 <div class="option-card" onclick="app.showSection('client')">
                     <div class="option-icon">
                         <svg class="icon icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                            <path d="M16 11h6m-3-3v6"></path>
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                         </svg>
                     </div>
                     <h2 class="option-title">TIN & WAREHOUSE</h2>
@@ -1123,14 +1124,14 @@
                     </svg>
                     Export
                 </button>
-                <button class="action-btn sync" onclick="app.syncFromCloud('hsn')" title="Sync from Google Drive">
+                <button class="action-btn sync" onclick="app.syncFromCloud('hsn')" title="Sync with Google Drive">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
                         <polyline points="22 2 22 12 12 12"></polyline>
                         <polyline points="2 22 2 12 12 12"></polyline>
                     </svg>
-                    Sync from Cloud
+                    Sync with Cloud
                 </button>
             </div>
             
@@ -1179,14 +1180,14 @@
                     </svg>
                     Export
                 </button>
-                <button class="action-btn sync" onclick="app.syncFromCloud('client')" title="Sync from Google Drive">
+                <button class="action-btn sync" onclick="app.syncFromCloud('client')" title="Sync with Google Drive">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
                         <polyline points="22 2 22 12 12 12"></polyline>
                         <polyline points="2 22 2 12 12 12"></polyline>
                     </svg>
-                    Sync from Cloud
+                    Sync with Cloud
                 </button>
             </div>
             
@@ -1290,7 +1291,7 @@
                 }
             },
 
-            // Sync from Google Drive (merge only, never delete)
+            // Sync with Google Drive (merge only, never delete)
             async syncFromCloud(type) {
                 if (!this.googleDrive.isSignedIn) {
                     await this.signInToGoogleDrive();
@@ -1303,7 +1304,7 @@
                 }
 
                 this.googleDrive.syncInProgress = true;
-                this.showNotification(`Syncing ${type} data from cloud...`, 'info');
+                this.showNotification(`Syncing ${type} data with cloud...`, 'info');
 
                 try {
                     const fileName = `cusdec_${type}_data.json`;
@@ -1471,114 +1472,138 @@
             loadDefaultData() {
                 this.data.hsn = [
                     // HAIR CARE
-                    { category: 'HAIR CARE', product: 'DRYER', code: '85163100' },
-                    { category: 'HAIR CARE', product: 'HAIR CLIPPER / GROOMER', code: '85102000' },
-                    { category: 'HAIR CARE', product: 'STRAIGHTNER', code: '85163200' },
-                    { category: 'HAIR CARE', product: 'SHAVER', code: '85101000' },
+                    { category: 'HAIR CARE', product: 'Hair Dryer', code: '85163100' },
+                    { category: 'HAIR CARE', product: 'Hair Clipper', code: '85102000' },
+                    { category: 'HAIR CARE', product: 'Hair Groomer', code: '85102000' },
+                    { category: 'HAIR CARE', product: 'Hair Straightener', code: '85163200' },
+                    { category: 'HAIR CARE', product: 'Shaver', code: '85101000' },
                     
                     // COSMETICS
-                    { category: 'COSMETICS', product: 'SHAMPOO', code: '33051000' },
-                    { category: 'COSMETICS', product: 'OTHER - HAIR COLOUR, HAIR CREAM, HAIR SPRAY', code: '33051000' },
-                    { category: 'COSMETICS', product: 'EYE MAKE-UP - EYESHADOW', code: '33042000' },
-                    { category: 'COSMETICS', product: 'LIP MAKE-UP - LIPSTICK, GLOSS', code: '33041000' },
-                    { category: 'COSMETICS', product: 'NAIL MAKE-UP - NAIL POLISH, MANICURE, PEDUCURE', code: '33043000' },
-                    { category: 'COSMETICS', product: 'POWDERS - TALCUMS', code: '33049100' },
+                    { category: 'COSMETICS', product: 'Shampoo', code: '33051000' },
+                    { category: 'COSMETICS', product: 'Hair Colour', code: '33051000' },
+                    { category: 'COSMETICS', product: 'Hair Cream', code: '33051000' },
+                    { category: 'COSMETICS', product: 'Hair Spray', code: '33051000' },
+                    { category: 'COSMETICS', product: 'Eye Shadow', code: '33042000' },
+                    { category: 'COSMETICS', product: 'Eye Makeup', code: '33042000' },
+                    { category: 'COSMETICS', product: 'Lipstick', code: '33041000' },
+                    { category: 'COSMETICS', product: 'Lip Gloss', code: '33041000' },
+                    { category: 'COSMETICS', product: 'Nail Polish', code: '33043000' },
+                    { category: 'COSMETICS', product: 'Manicure Set', code: '33043000' },
+                    { category: 'COSMETICS', product: 'Pedicure Set', code: '33043000' },
+                    { category: 'COSMETICS', product: 'Talcum Powder', code: '33049100' },
                     
                     // KITCHEN APPLIANCES
-                    { category: 'KITCHEN APPLIANCES', product: 'AIR FRYER', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'BLENDER', code: '85094000' },
-                    { category: 'KITCHEN APPLIANCES', product: 'COFFEE MAKER', code: '85167100' },
-                    { category: 'KITCHEN APPLIANCES', product: 'COOKER - OVEN (GAS/ELECTRIC)', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'COOKER', code: '73211100' },
-                    { category: 'KITCHEN APPLIANCES', product: 'COOKER HOOD', code: '84146000' },
-                    { category: 'KITCHEN APPLIANCES', product: 'COOKWARE SET', code: '73239300' },
-                    { category: 'KITCHEN APPLIANCES', product: 'ELECTRIC OVEN', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'FOOD STEAMER', code: '76151020' },
-                    { category: 'KITCHEN APPLIANCES', product: 'HOB', code: '73211100' },
-                    { category: 'KITCHEN APPLIANCES', product: 'BUILT-IN OVEN', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'KETTLE', code: '85167920' },
-                    { category: 'KITCHEN APPLIANCES', product: 'MICROWAVE OVEN', code: '85165000' },
-                    { category: 'KITCHEN APPLIANCES', product: 'PRESSURE COOKER', code: '76151020' },
-                    { category: 'KITCHEN APPLIANCES', product: 'RICE COOKER', code: '85166010' },
-                    { category: 'KITCHEN APPLIANCES', product: 'STAINLESS STEEL WATER BOTTLE', code: '73239900' },
-                    { category: 'KITCHEN APPLIANCES', product: 'TEA MAKER', code: '85167100' },
-                    { category: 'KITCHEN APPLIANCES', product: 'TOASTER / SANDWICH MAKER (WAFFLE)', code: '85167200' },
-                    { category: 'KITCHEN APPLIANCES', product: 'BBQ GRILL', code: '85167200' },
-                    { category: 'KITCHEN APPLIANCES', product: 'INDUCTION COOKER', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'NOODLE MAKER (SPAGHETTI / MACARONI)', code: '84381000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Air Fryer', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Blender', code: '85094000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Coffee Maker', code: '85167100' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Gas Cooker', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Electric Cooker', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Cooker', code: '73211100' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Cooker Hood', code: '84146000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Cookware Set', code: '73239300' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Electric Oven', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Built-in Oven', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Food Steamer', code: '76151020' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Hob', code: '73211100' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Kettle', code: '85167920' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Microwave Oven', code: '85165000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Pressure Cooker', code: '76151020' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Rice Cooker', code: '85166010' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Stainless Steel Water Bottle', code: '73239900' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Tea Maker', code: '85167100' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Toaster', code: '85167200' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Sandwich Maker', code: '85167200' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Waffle Maker', code: '85167200' },
+                    { category: 'KITCHEN APPLIANCES', product: 'BBQ Grill', code: '85167200' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Induction Cooker', code: '85166090' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Noodle Maker', code: '84381000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Spaghetti Maker', code: '84381000' },
+                    { category: 'KITCHEN APPLIANCES', product: 'Macaroni Maker', code: '84381000' },
                     
-                    // HOME APPLIANCES
-                    { category: 'HOME APPLIANCES', product: 'AIR COOLER', code: '84796000' },
-                    { category: 'HOME APPLIANCES', product: 'CD RCR', code: '85271900' },
-                    { category: 'HOME APPLIANCES', product: 'DVD', code: '85219000' },
-                    { category: 'HOME APPLIANCES', product: 'FRIDGE', code: '84181090' },
-                    { category: 'HOME APPLIANCES', product: 'HIFI SET / HOME THEATRE', code: '85279100' },
-                    { category: 'HOME APPLIANCES', product: 'IRON', code: '85164000' },
-                    { category: 'HOME APPLIANCES', product: 'GARMENT STEAMER', code: '84513000' },
-                    { category: 'HOME APPLIANCES', product: 'RADIO', code: '85271900' },
-                    { category: 'HOME APPLIANCES', product: 'SOUND BAR', code: '85182900' },
-                    { category: 'HOME APPLIANCES', product: 'SPEAKER', code: '85182900' },
-                    { category: 'HOME APPLIANCES', product: 'ORGAN - MUSIC', code: '92071000' },
-                    { category: 'HOME APPLIANCES', product: 'TV (OVER) 32"', code: '85287299' },
-                    { category: 'HOME APPLIANCES', product: 'TV 32"', code: '85287291' },
-                    { category: 'HOME APPLIANCES', product: 'TV WALL MOUNT', code: '83025000' },
-                    { category: 'HOME APPLIANCES', product: 'CAR STEREO SET (RADIO/PLAYER)', code: '85272900' },
-                    { category: 'HOME APPLIANCES', product: 'FAN', code: '84145100' },
-                    { category: 'HOME APPLIANCES', product: 'VACUUM CLEANER', code: '85081100' },
-                    { category: 'HOME APPLIANCES', product: 'MICROPHONE', code: '85181000' },
-                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE FRONT LOAD (5.5 KG TO 7.5 KG )', code: '84501143' },
-                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE FRONT LOAD (7.5 KG TO 9.5 KG)', code: '84501144' },
-                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE FRONT LOAD (OVER 10 KG)', code: '84501149' },
-                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE TOP LOAD (5.5 KG TO 7.5 KG )', code: '84501133' },
-                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE TOP LOAD (7.5 KG TO 9.5 KG)', code: '84501134' },
-                    { category: 'HOME APPLIANCES', product: 'WASHING MACHINE TOP LOAD (OVER 10 KG)', code: '84502000' },
-                    { category: 'HOME APPLIANCES', product: 'WATER DISPENSOR (FILTER/PURIFIER)', code: '84158190' },
+                    // HOME APPLIANCES - ENTERTAINMENT
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'CD Player', code: '85271900' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'DVD Player', code: '85219000' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Hi-Fi Set', code: '85279100' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Home Theatre', code: '85279100' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Radio', code: '85271900' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Sound Bar', code: '85182900' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Speaker', code: '85182900' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Music Organ', code: '92071000' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'TV 32"', code: '85287291' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'TV (Over 32")', code: '85287299' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'TV Wall Mount', code: '83025000' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Car Stereo Set', code: '85272900' },
+                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Microphone', code: '85181000' },
+                    
+                    // HOME APPLIANCES - HOUSEHOLD
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Air Cooler', code: '84796000' },
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Fridge/Refrigerator', code: '84181090' },
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Iron', code: '85164000' },
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Garment Steamer', code: '84513000' },
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Fan', code: '84145100' },
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Vacuum Cleaner', code: '85081100' },
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Water Dispenser', code: '84158190' },
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Water Filter', code: '84158190' },
+                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Water Purifier', code: '84158190' },
+                    
+                    // WASHING MACHINES
+                    { category: 'WASHING MACHINES', product: 'Washing Machine Front Load (5.5-7.5 KG)', code: '84501143' },
+                    { category: 'WASHING MACHINES', product: 'Washing Machine Front Load (7.5-9.5 KG)', code: '84501144' },
+                    { category: 'WASHING MACHINES', product: 'Washing Machine Front Load (Over 10 KG)', code: '84501149' },
+                    { category: 'WASHING MACHINES', product: 'Washing Machine Top Load (5.5-7.5 KG)', code: '84501133' },
+                    { category: 'WASHING MACHINES', product: 'Washing Machine Top Load (7.5-9.5 KG)', code: '84501134' },
+                    { category: 'WASHING MACHINES', product: 'Washing Machine Top Load (Over 10 KG)', code: '84502000' },
                     
                     // PERSONAL ITEMS
-                    { category: 'PERSONAL ITEMS', product: 'MOBILE PHONE', code: '85171390' },
-                    { category: 'PERSONAL ITEMS', product: 'WEIGHT SCALE', code: '84231010' },
-                    { category: 'PERSONAL ITEMS', product: 'LAPTOP / NOTEBOOK', code: '84713090' },
-                    { category: 'PERSONAL ITEMS', product: 'WATCH', code: '91021900' },
+                    { category: 'PERSONAL ITEMS', product: 'Mobile Phone', code: '85171390' },
+                    { category: 'PERSONAL ITEMS', product: 'Weight Scale', code: '84231010' },
+                    { category: 'PERSONAL ITEMS', product: 'Laptop', code: '84713090' },
+                    { category: 'PERSONAL ITEMS', product: 'Notebook', code: '84713090' },
+                    { category: 'PERSONAL ITEMS', product: 'Watch', code: '91021900' },
                     
                     // BATHROOM
-                    { category: 'BATHROOM', product: 'WATER HEATER / HOME SHOWER', code: '85161000' },
-                    { category: 'BATHROOM', product: 'HIGH PRESSURE WASHER', code: '84242000' },
+                    { category: 'BATHROOM', product: 'Water Heater', code: '85161000' },
+                    { category: 'BATHROOM', product: 'Home Shower', code: '85161000' },
+                    { category: 'BATHROOM', product: 'High Pressure Washer', code: '84242000' },
                     
                     // EMERGENCY LIGHTS & TORCHES
-                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'EMERGENCY LANTERN, TORCH, LIGHT', code: '85131090' },
-                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'EMERGENCY LIGHT LED', code: '85131090' },
-                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'TORCH', code: '85131090' },
+                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'Emergency Lantern', code: '85131090' },
+                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'Emergency Light LED', code: '85131090' },
+                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'Torch', code: '85131090' },
                     
-                    // SNACKS & OTHERS
-                    { category: 'SNACKS & OTHERS', product: 'CHOCOLATE', code: '18063100' },
-                    { category: 'SNACKS & OTHERS', product: 'NESCAFE', code: '21011200' },
-                    { category: 'SNACKS & OTHERS', product: 'PRINGLES', code: '19059020' },
+                    // FOOD & BEVERAGES
+                    { category: 'FOOD & BEVERAGES', product: 'Chocolate', code: '18063100' },
+                    { category: 'FOOD & BEVERAGES', product: 'Nescafe/Coffee', code: '21011200' },
+                    { category: 'FOOD & BEVERAGES', product: 'Pringles/Chips', code: '19059020' },
+                    { category: 'FOOD & BEVERAGES', product: 'Soft Drinks', code: '22021000' },
+                    { category: 'FOOD & BEVERAGES', product: 'Energy Drinks', code: '22029930' },
                     
-                    // PERFUMES
-                    { category: 'PERFUMES', product: 'BODY SPRAY', code: '33072000' },
-                    { category: 'PERFUMES', product: 'PERFUMES', code: '33030010' },
+                    // PERFUMES & FRAGRANCES
+                    { category: 'PERFUMES & FRAGRANCES', product: 'Body Spray', code: '33072000' },
+                    { category: 'PERFUMES & FRAGRANCES', product: 'Perfumes', code: '33030010' },
                     
                     // LIQUOR
-                    { category: 'LIQUOR', product: 'BRANDY VSOP', code: '22082000' },
-                    { category: 'LIQUOR', product: 'GIN', code: '22085000' },
-                    { category: 'LIQUOR', product: 'RUM', code: '22084010' },
-                    { category: 'LIQUOR', product: 'TEQUILA / LIQUEUR', code: '22087000' },
-                    { category: 'LIQUOR', product: 'VODKA', code: '22086000' },
-                    { category: 'LIQUOR', product: 'WHISKY', code: '22083000' },
-                    { category: 'LIQUOR', product: 'WINE (SWEET, RED, WHITE)', code: '22042100' },
+                    { category: 'LIQUOR', product: 'Brandy VSOP', code: '22082000' },
+                    { category: 'LIQUOR', product: 'Gin', code: '22085000' },
+                    { category: 'LIQUOR', product: 'Rum', code: '22084010' },
+                    { category: 'LIQUOR', product: 'Tequila', code: '22087000' },
+                    { category: 'LIQUOR', product: 'Liqueur', code: '22087000' },
+                    { category: 'LIQUOR', product: 'Vodka', code: '22086000' },
+                    { category: 'LIQUOR', product: 'Whisky', code: '22083000' },
+                    { category: 'LIQUOR', product: 'Wine (Sweet)', code: '22042100' },
+                    { category: 'LIQUOR', product: 'Wine (Red)', code: '22042100' },
+                    { category: 'LIQUOR', product: 'Wine (White)', code: '22042100' },
                     
                     // CIGARETTES
-                    { category: 'CIGARETTES', product: '74 MM TO 84 MM', code: '24022050' },
-                    { category: 'CIGARETTES', product: 'MORE THAN 99 MM', code: '24022060' },
+                    { category: 'CIGARETTES', product: 'Cigarettes (74-84 MM)', code: '24022050' },
+                    { category: 'CIGARETTES', product: 'Cigarettes (Over 99 MM)', code: '24022060' },
                     
                     // TOYS
-                    { category: 'TOYS', product: 'TOYS', code: '95030090' },
-                    { category: 'TOYS', product: 'TOY JEEP / CAR', code: '95030010' },
-                    { category: 'TOYS', product: 'TOY HELICOPTER / DOLL', code: '95030070' },
-                    
-                    // DRINKS
-                    { category: 'DRINKS', product: 'SOFT DRINKS', code: '22021000' },
-                    { category: 'DRINKS', product: 'ENERGY DRINKS', code: '22029930' }
+                    { category: 'TOYS', product: 'Toys (General)', code: '95030090' },
+                    { category: 'TOYS', product: 'Toy Jeep', code: '95030010' },
+                    { category: 'TOYS', product: 'Toy Car', code: '95030010' },
+                    { category: 'TOYS', product: 'Toy Helicopter', code: '95030070' },
+                    { category: 'TOYS', product: 'Doll', code: '95030070' }
                 ];
                 this.saveData();
             },
