@@ -436,6 +436,7 @@
         .result-item {
             background: var(--bg-tertiary);
             padding: var(--spacing-lg);
+            padding-right: calc(var(--spacing-lg) + 80px);
             border-radius: var(--radius-lg);
             border: 1px solid transparent;
             transition: all var(--transition-fast);
@@ -474,7 +475,7 @@
         /* Result Actions */
         .result-actions {
             position: absolute;
-            top: var(--spacing-md);
+            top: calc(var(--spacing-md) + 28px);
             right: var(--spacing-md);
             display: flex;
             gap: var(--spacing-sm);
@@ -1020,6 +1021,23 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Help text */
+        .help-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+
+        .help-link {
+            color: var(--accent-primary);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .help-link:hover {
+            color: var(--accent-hover);
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             :root {
@@ -1091,12 +1109,13 @@
 
             .result-item {
                 padding: var(--spacing-md);
+                padding-right: var(--spacing-md);
             }
 
             .result-actions {
                 position: static;
                 opacity: 1;
-                margin-top: var(--spacing-sm);
+                margin-top: var(--spacing-md);
             }
 
             .result-title {
@@ -1233,7 +1252,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="action-btn sync" onclick="app.syncWithCloud('hsn')" title="Click to connect and sync with Google Drive" id="hsnSyncBtn">
+                <button class="action-btn sync" onclick="app.syncWithCloud('hsn')" title="Click to sync with cloud" id="hsnSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
@@ -1289,7 +1308,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="action-btn sync" onclick="app.syncWithCloud('client')" title="Click to connect and sync with Google Drive" id="clientSyncBtn">
+                <button class="action-btn sync" onclick="app.syncWithCloud('client')" title="Click to sync with cloud" id="clientSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
@@ -1320,8 +1339,35 @@
         </div>
     </div>
 
+    <!-- API Key Modal -->
+    <div class="modal" id="apiKeyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>JSONBin.io API Setup</h3>
+                <button class="close-btn" onclick="app.closeApiKeyModal()">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="app.saveApiKey(event)">
+                <div class="form-group">
+                    <label class="form-label">JSONBin.io Master Key (X-Master-Key)</label>
+                    <input type="text" class="form-input" id="apiKeyInput" 
+                           placeholder="$2b$10$..." required>
+                    <div class="help-text">
+                        Don't have an API key? 
+                        <a href="https://jsonbin.io/" target="_blank" class="help-link">Sign up for free at JSONBin.io</a>
+                    </div>
+                </div>
+                <button type="submit" class="save-btn">Connect to JSONBin</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Modern CUSDEC Assistant Application with Google Drive Sync
+        // Modern CUSDEC Assistant Application with JSONBin.io Sync
         const app = {
             // Data storage with localStorage persistence
             data: {
@@ -1339,13 +1385,15 @@
             debounceTimer: null,
             syncDebounceTimer: null,
 
-            // Google Drive integration
-            googleDrive: {
-                CLIENT_ID: '743884461731-hjfbiee6j35ljc44rakgc5c4j1uaos85.apps.googleusercontent.com',
-                API_KEY: 'AIzaSyBnQnzVrOC6cJ-KnyBXIyrOlR7d7k6W-hc', // Your API key
-                DISCOVERY_DOCS: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-                SCOPES: 'https://www.googleapis.com/auth/drive.file',
-                isSignedIn: false,
+            // JSONBin.io integration
+            jsonBin: {
+                apiKey: localStorage.getItem('jsonbin_api_key') || null,
+                baseUrl: 'https://api.jsonbin.io/v3',
+                bins: {
+                    hsn: localStorage.getItem('jsonbin_hsn_id') || null,
+                    client: localStorage.getItem('jsonbin_client_id') || null
+                },
+                isConnected: false,
                 syncInProgress: false
             },
 
@@ -1354,60 +1402,13 @@
                 this.loadData();
                 this.attachEventListeners();
                 this.showDashboard();
-                
-                // Check if running on localhost and show warning
-                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                    console.warn('Running on localhost. Google Drive sync may not work. Add http://localhost to authorized JavaScript origins in Google Cloud Console.');
-                }
-                
-                this.initGoogleDrive();
+                this.checkJsonBinConnection();
             },
 
-            // Initialize Google Drive API
-            initGoogleDrive() {
-                const script = document.createElement('script');
-                script.src = 'https://apis.google.com/js/api.js';
-                script.onload = () => {
-                    gapi.load('client:auth2', () => {
-                        gapi.client.init({
-                            apiKey: this.googleDrive.API_KEY,
-                            clientId: this.googleDrive.CLIENT_ID,
-                            discoveryDocs: this.googleDrive.DISCOVERY_DOCS,
-                            scope: this.googleDrive.SCOPES,
-                            plugin_name: 'cusdec-assistant' // Add plugin name for new auth
-                        }).then(() => {
-                            // Listen for sign-in state changes
-                            gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn) => {
-                                this.googleDrive.isSignedIn = isSignedIn;
-                                this.updateSyncButtons(isSignedIn);
-                                if (isSignedIn) {
-                                    this.showNotification('Connected to Google Drive', 'success');
-                                    // Initial sync when connected
-                                    this.syncWithCloud('hsn');
-                                    this.syncWithCloud('client');
-                                }
-                            });
-
-                            // Handle initial sign-in state
-                            this.googleDrive.isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-                            this.updateSyncButtons(this.googleDrive.isSignedIn);
-                        }).catch(error => {
-                            console.error('Error initializing Google Drive:', error);
-                            if (error.error && error.error.includes('origin_mismatch')) {
-                                this.showNotification('Domain not authorized. Add this domain to Google Cloud Console.', 'error');
-                            } else if (error.error && error.error.includes('idpiframe_initialization_failed')) {
-                                this.showNotification('Third-party cookies might be blocked. Check browser settings.', 'error');
-                            } else {
-                                this.showNotification('Failed to initialize Google Drive. Check console for details.', 'error');
-                            }
-                        });
-                    });
-                };
-                script.onerror = () => {
-                    console.error('Failed to load Google API script');
-                    this.showNotification('Failed to load Google Drive API', 'error');
-                };
-                document.head.appendChild(script);
+            // Check JSONBin connection
+            checkJsonBinConnection() {
+                this.jsonBin.isConnected = !!(this.jsonBin.apiKey && this.jsonBin.bins.hsn && this.jsonBin.bins.client);
+                this.updateSyncButtons(this.jsonBin.isConnected);
             },
 
             // Update sync button status
@@ -1416,122 +1417,204 @@
                 syncButtons.forEach(btn => {
                     if (isConnected) {
                         btn.classList.add('connected');
-                        btn.title = 'Connected to Google Drive - Click to sync';
+                        btn.title = 'Connected to cloud - Click to sync';
                     } else {
                         btn.classList.remove('connected');
-                        btn.title = 'Click to connect and sync with Google Drive';
+                        btn.title = 'Click to connect and sync with cloud';
                     }
                 });
             },
 
-            // Sign in to Google Drive
-            async signInToGoogleDrive() {
-                try {
-                    const result = await gapi.auth2.getAuthInstance().signIn({
-                        prompt: 'select_account' // Force account selection
-                    });
-                    console.log('Sign in successful:', result);
-                } catch (error) {
-                    console.error('Sign in failed:', error);
-                    if (error.error === 'popup_closed_by_user') {
-                        this.showNotification('Sign in cancelled', 'info');
-                    } else if (error.error === 'access_denied') {
-                        this.showNotification('Access denied. Please grant permissions.', 'error');
-                    } else if (error.error === 'immediate_failed') {
-                        this.showNotification('Sign in required. Please try again.', 'error');
-                    } else {
-                        this.showNotification(`Sign in failed: ${error.error || 'Unknown error'}`, 'error');
-                    }
-                }
+            // Show API key modal
+            showApiKeyModal() {
+                const modal = document.getElementById('apiKeyModal');
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('active');
+                    document.getElementById('apiKeyInput').focus();
+                }, 10);
             },
 
-            // Sync with Google Drive (merge only, never delete)
-            async syncWithCloud(type) {
-                if (!this.googleDrive.API_KEY || this.googleDrive.API_KEY === 'YOUR_API_KEY_HERE') {
-                    this.showNotification('Google Drive API key not configured. Please add your API key.', 'error');
+            // Close API key modal
+            closeApiKeyModal() {
+                const modal = document.getElementById('apiKeyModal');
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            },
+
+            // Save API key
+            async saveApiKey(event) {
+                event.preventDefault();
+                const apiKey = document.getElementById('apiKeyInput').value.trim();
+                
+                if (!apiKey) {
+                    this.showNotification('Please enter your JSONBin.io API key', 'error');
                     return;
                 }
 
-                if (!this.googleDrive.isSignedIn) {
-                    try {
-                        await this.signInToGoogleDrive();
-                        if (!this.googleDrive.isSignedIn) return;
-                    } catch (error) {
-                        console.error('Sign in failed:', error);
-                        return;
+                this.showNotification('Connecting to JSONBin.io...', 'info');
+                
+                try {
+                    // Test the API key by creating bins
+                    const hsnBinId = await this.createJsonBin('hsn', apiKey);
+                    const clientBinId = await this.createJsonBin('client', apiKey);
+                    
+                    // Save credentials
+                    localStorage.setItem('jsonbin_api_key', apiKey);
+                    localStorage.setItem('jsonbin_hsn_id', hsnBinId);
+                    localStorage.setItem('jsonbin_client_id', clientBinId);
+                    
+                    this.jsonBin.apiKey = apiKey;
+                    this.jsonBin.bins.hsn = hsnBinId;
+                    this.jsonBin.bins.client = clientBinId;
+                    
+                    this.checkJsonBinConnection();
+                    this.closeApiKeyModal();
+                    this.showNotification('Connected to JSONBin.io successfully!', 'success');
+                    
+                    // Initial sync
+                    await this.syncWithCloud('hsn');
+                    await this.syncWithCloud('client');
+                } catch (error) {
+                    console.error('API key validation failed:', error);
+                    this.showNotification('Invalid API key or connection failed', 'error');
+                }
+            },
+
+            // Create JSONBin
+            async createJsonBin(type, apiKey) {
+                try {
+                    // First check if we already have a bin ID stored
+                    const existingBinId = localStorage.getItem(`jsonbin_${type}_id`);
+                    if (existingBinId) {
+                        // Try to access the existing bin
+                        try {
+                            const response = await fetch(`${this.jsonBin.baseUrl}/b/${existingBinId}/latest`, {
+                                headers: {
+                                    'X-Master-Key': apiKey
+                                }
+                            });
+                            
+                            if (response.ok) {
+                                return existingBinId; // Bin exists and is accessible
+                            }
+                        } catch (e) {
+                            // Bin doesn't exist or isn't accessible, create a new one
+                        }
                     }
+
+                    // Create new bin
+                    const response = await fetch(`${this.jsonBin.baseUrl}/b`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': apiKey,
+                            'X-Bin-Name': `cusdec_${type}_data`
+                        },
+                        body: JSON.stringify(this.data[type])
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to create bin');
+                    }
+
+                    const result = await response.json();
+                    return result.metadata.id;
+                } catch (error) {
+                    console.error(`Error creating ${type} bin:`, error);
+                    throw error;
+                }
+            },
+
+            // Sync with cloud (JSONBin.io)
+            async syncWithCloud(type) {
+                if (!this.jsonBin.apiKey) {
+                    this.showApiKeyModal();
+                    return;
                 }
 
-                if (this.googleDrive.syncInProgress) {
+                if (!this.jsonBin.bins[type]) {
+                    this.showNotification('Cloud storage not configured. Reconnecting...', 'error');
+                    this.showApiKeyModal();
+                    return;
+                }
+
+                if (this.jsonBin.syncInProgress) {
                     this.showNotification('Sync already in progress...', 'info');
                     return;
                 }
 
-                this.googleDrive.syncInProgress = true;
+                this.jsonBin.syncInProgress = true;
                 this.showNotification(`Syncing ${type} data with cloud...`, 'info');
 
                 try {
-                    const fileName = `cusdec_${type}_data.json`;
-                    
-                    // Search for the file
-                    const response = await gapi.client.drive.files.list({
-                        q: `name='${fileName}' and trashed=false`,
-                        spaces: 'drive',
-                        fields: 'files(id, name)'
+                    // Get data from JSONBin
+                    const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
+                        headers: {
+                            'X-Master-Key': this.jsonBin.apiKey
+                        }
                     });
 
-                    if (response.result.files && response.result.files.length > 0) {
-                        // File exists, download it
-                        const fileId = response.result.files[0].id;
-                        const fileContent = await gapi.client.drive.files.get({
-                            fileId: fileId,
-                            alt: 'media'
-                        });
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch ${type} data`);
+                    }
 
-                        const cloudData = JSON.parse(fileContent.body);
-                        
-                        // Merge with local data (never delete, only add missing)
-                        const mergedData = this.mergeData(type, this.data[type], cloudData);
-                        const addedCount = mergedData.length - this.data[type].length;
-                        
-                        this.data[type] = mergedData;
-                        this.saveData(false); // Save locally without triggering cloud sync
-                        
-                        // Refresh display if searching
-                        const searchInput = document.getElementById(type + 'Search');
-                        if (searchInput && searchInput.value.trim()) {
-                            this.performSearch(type, searchInput.value);
-                        }
-                        
-                        if (addedCount > 0) {
-                            this.showNotification(`Added ${addedCount} new ${type} records from cloud`, 'success');
-                        } else {
-                            this.showNotification(`${type} data is up to date`, 'success');
-                        }
+                    const result = await response.json();
+                    const cloudData = result.record;
+
+                    // Merge with local data (never delete, only add missing)
+                    const mergedData = this.mergeData(type, this.data[type], cloudData);
+                    const addedCount = mergedData.length - this.data[type].length;
+                    
+                    this.data[type] = mergedData;
+                    this.saveData(false); // Save locally without triggering cloud sync
+                    
+                    // If we added new data locally, update the cloud
+                    if (mergedData.length > cloudData.length) {
+                        await this.saveToJsonBin(type);
+                    }
+                    
+                    // Refresh display if searching
+                    const searchInput = document.getElementById(type + 'Search');
+                    if (searchInput && searchInput.value.trim()) {
+                        this.performSearch(type, searchInput.value);
+                    }
+                    
+                    if (addedCount > 0) {
+                        this.showNotification(`Added ${addedCount} new ${type} records from cloud`, 'success');
                     } else {
-                        // No file in cloud, create one with current data
-                        await this.saveToGoogleDrive(type);
-                        this.showNotification(`Created ${type} data in cloud`, 'success');
+                        this.showNotification(`${type} data is up to date`, 'success');
                     }
                 } catch (error) {
                     console.error('Sync error:', error);
-                    let errorMessage = `Failed to sync ${type} data`;
-                    
-                    if (error.status === 401) {
-                        errorMessage = 'Authentication failed. Please sign in again.';
-                        this.googleDrive.isSignedIn = false;
-                        this.updateSyncButtons(false);
-                    } else if (error.status === 403) {
-                        errorMessage = 'Access denied. Check Drive API is enabled in Google Cloud Console.';
-                    } else if (error.result && error.result.error) {
-                        errorMessage = error.result.error.message;
-                    } else if (error.message) {
-                        errorMessage = error.message;
-                    }
-                    
-                    this.showNotification(errorMessage, 'error');
+                    this.showNotification(`Failed to sync ${type} data: ${error.message}`, 'error');
                 } finally {
-                    this.googleDrive.syncInProgress = false;
+                    this.jsonBin.syncInProgress = false;
+                }
+            },
+
+            // Save to JSONBin
+            async saveToJsonBin(type) {
+                if (!this.jsonBin.apiKey || !this.jsonBin.bins[type]) return;
+
+                try {
+                    const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': this.jsonBin.apiKey
+                        },
+                        body: JSON.stringify(this.data[type])
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update bin');
+                    }
+                } catch (error) {
+                    console.error(`Save to JSONBin error (${type}):`, error);
+                    // Don't show error notification for auto-sync failures
                 }
             },
 
@@ -1547,69 +1630,6 @@
                     const localKeys = new Set(localData.map(item => `${item.tin}-${item.warehouse}`));
                     const newItems = cloudData.filter(item => !localKeys.has(`${item.tin}-${item.warehouse}`));
                     return [...localData, ...newItems];
-                }
-            },
-
-            // Save to Google Drive
-            async saveToGoogleDrive(type) {
-                if (!this.googleDrive.isSignedIn) return;
-
-                try {
-                    const fileName = `cusdec_${type}_data.json`;
-                    const fileContent = JSON.stringify(this.data[type], null, 2);
-                    
-                    // Search for existing file
-                    const searchResponse = await gapi.client.drive.files.list({
-                        q: `name='${fileName}' and trashed=false`,
-                        spaces: 'drive',
-                        fields: 'files(id)'
-                    });
-
-                    const boundary = '-------314159265358979323846';
-                    const delimiter = "\r\n--" + boundary + "\r\n";
-                    const close_delim = "\r\n--" + boundary + "--";
-
-                    const metadata = {
-                        'name': fileName,
-                        'mimeType': 'application/json'
-                    };
-
-                    const multipartRequestBody =
-                        delimiter +
-                        'Content-Type: application/json\r\n\r\n' +
-                        JSON.stringify(metadata) +
-                        delimiter +
-                        'Content-Type: application/json\r\n\r\n' +
-                        fileContent +
-                        close_delim;
-
-                    if (searchResponse.result.files && searchResponse.result.files.length > 0) {
-                        // Update existing file
-                        const fileId = searchResponse.result.files[0].id;
-                        await gapi.client.request({
-                            'path': `/upload/drive/v3/files/${fileId}`,
-                            'method': 'PATCH',
-                            'params': {'uploadType': 'multipart'},
-                            'headers': {
-                                'Content-Type': 'multipart/related; boundary="' + boundary + '"'
-                            },
-                            'body': multipartRequestBody
-                        });
-                    } else {
-                        // Create new file
-                        await gapi.client.request({
-                            'path': '/upload/drive/v3/files',
-                            'method': 'POST',
-                            'params': {'uploadType': 'multipart'},
-                            'headers': {
-                                'Content-Type': 'multipart/related; boundary="' + boundary + '"'
-                            },
-                            'body': multipartRequestBody
-                        });
-                    }
-                } catch (error) {
-                    console.error('Save to Google Drive error:', error);
-                    // Don't show error notification for auto-sync failures
                 }
             },
 
@@ -1631,17 +1651,17 @@
                 }
             },
 
-            // Save data to localStorage and Google Drive
+            // Save data to localStorage and JSONBin
             saveData(syncToCloud = true) {
                 localStorage.setItem('cusdec_hsn_data', JSON.stringify(this.data.hsn));
                 localStorage.setItem('cusdec_client_data', JSON.stringify(this.data.client));
                 
-                // Auto-sync to Google Drive with debouncing
-                if (syncToCloud && this.googleDrive.isSignedIn) {
+                // Auto-sync to JSONBin with debouncing
+                if (syncToCloud && this.jsonBin.isConnected) {
                     clearTimeout(this.syncDebounceTimer);
                     this.syncDebounceTimer = setTimeout(() => {
-                        this.saveToGoogleDrive('hsn');
-                        this.saveToGoogleDrive('client');
+                        this.saveToJsonBin('hsn');
+                        this.saveToJsonBin('client');
                     }, 2000); // Wait 2 seconds before syncing to batch changes
                 }
             },
@@ -1866,12 +1886,21 @@
                     }
                 });
 
+                document.getElementById('apiKeyModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'apiKeyModal') {
+                        this.closeApiKeyModal();
+                    }
+                });
+
                 // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
                         const modal = document.getElementById('addModal');
+                        const apiKeyModal = document.getElementById('apiKeyModal');
                         if (modal.classList.contains('active')) {
                             this.closeModal();
+                        } else if (apiKeyModal.classList.contains('active')) {
+                            this.closeApiKeyModal();
                         } else {
                             this.showDashboard();
                         }
