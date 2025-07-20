@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CUSDEC Assistant - Cloud Sync</title>
+    <title>Arrow Clearing Agency - Cloud Sync</title>
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5253/5253968.png">
     <link href="https://fonts.cdnfonts.com/css/dejavu-sans-mono" rel="stylesheet">
     <style>
@@ -91,7 +91,7 @@
             text-align: center;
         }
 
-        /* Modern Icons as SVG */
+        /* Modern Icons as SVG - NO EFFECTS */
         .icon {
             width: 24px;
             height: 24px;
@@ -117,10 +117,16 @@
             padding: var(--spacing-lg) 0;
         }
 
-        .company-logo {
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .logo-img {
             max-height: 80px;
             width: auto;
-            opacity: 0.9;
         }
 
         /* Dashboard Grid */
@@ -191,8 +197,9 @@
             justify-content: center;
         }
 
+        /* Remove icon hover effect */
         .option-card:hover .option-icon {
-            transform: scale(1.1);
+            transform: none;
         }
 
         .option-title {
@@ -355,8 +362,15 @@
             transform: translateY(0);
         }
 
+        /* Fix for white Add HSN button */
         .action-btn.primary {
-            background: var(--accent-primary);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--accent-primary);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--bg-hover);
             border-color: var(--accent-primary);
         }
 
@@ -391,10 +405,6 @@
             transform: translateY(0);
         }
 
-        .action-btn.sync:active {
-            transform: translateY(0);
-        }
-
         /* Results */
         .results {
             flex: 1;
@@ -402,7 +412,6 @@
             flex-direction: column;
             overflow-y: auto;
             padding-right: var(--spacing-sm);
-            padding-bottom: var(--spacing-md);
             align-content: start;
             scroll-behavior: smooth;
         }
@@ -542,7 +551,6 @@
         .result-details {
             color: var(--text-primary);
             font-size: 0.875rem;
-            margin-bottom: var(--spacing-xs);
             line-height: 1.5;
         }
 
@@ -1012,21 +1020,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Responsive */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--bg-tertiary);
-            border-radius: 50%;
-            border-top-color: var(--accent-primary);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         /* Mobile Responsive */
         @media (max-width: 768px) {
             :root {
@@ -1048,7 +1041,7 @@
                 margin-bottom: var(--spacing-lg);
             }
 
-            .company-logo {
+            .logo-img {
                 max-height: 60px;
             }
 
@@ -1101,14 +1094,14 @@
             }
 
             .result-actions {
-                position: absolute;
-                top: var(--spacing-sm);
-                right: var(--spacing-sm);
+                position: static;
                 opacity: 1;
+                margin-top: var(--spacing-sm);
             }
 
             .result-title {
-                font-size: 1.125rem;
+                font-size: 1rem;
+                margin-right: 0;
             }
 
             .warehouse-container {
@@ -1174,12 +1167,8 @@
         <!-- Header -->
         <div class="header">
             <div class="header-content">
-                <div class="logo-wrapper">
-                    <img src="https://i.ibb.co/BVzhDSVK/Untitled-1.png" alt="Sri Lanka Customs" class="logo-img">
-                </div>
-                <h1 class="logo">CUSDEC ASSISTANT</h1>
+                <img src="https://i.ibb.co/pJLFmm5/ARR.png" alt="Arrow Clearing Agency" class="logo-img">
             </div>
-            <p class="subtitle">Arrow Clearing Agency</p>
         </div>
 
         <!-- Dashboard -->
@@ -1353,7 +1342,7 @@
             // Google Drive integration
             googleDrive: {
                 CLIENT_ID: '743884461731-hjfbiee6j35ljc44rakgc5c4j1uaos85.apps.googleusercontent.com',
-                API_KEY: 'YOUR_API_KEY_HERE', // Replace with your API Key from Google Console
+                API_KEY: 'AIzaSyBnQnzVrOC6cJ-KnyBXIyrOlR7d7k6W-hc', // Your API key
                 DISCOVERY_DOCS: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
                 SCOPES: 'https://www.googleapis.com/auth/drive.file',
                 isSignedIn: false,
@@ -2570,6 +2559,8 @@
                     this.performSearch(type, searchInput.value);
                 }
             },
+
+            // Export data
             exportData(type) {
                 const data = type === 'hsn' ? this.data.hsn : this.data.client;
                 
@@ -2578,17 +2569,36 @@
                     return;
                 }
 
-                // Create workbook
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, type.toUpperCase());
+                // Create CSV content
+                let csvContent = '';
                 
-                // Generate filename with timestamp
+                if (type === 'hsn') {
+                    csvContent = 'Category,Product,HSN Code\n';
+                    data.forEach(item => {
+                        csvContent += `"${item.category}","${item.product}","${item.code}"\n`;
+                    });
+                } else {
+                    csvContent = 'Company Name,TIN,Warehouse Name,Warehouse Code\n';
+                    data.forEach(item => {
+                        csvContent += `"${item.name}","${item.tin}","${item.warehouseName}","${item.warehouse}"\n`;
+                    });
+                }
+                
+                // Create blob and download
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
                 const date = new Date().toISOString().split('T')[0];
-                const filename = `cusdec_${type}_${date}.xlsx`;
+                const filename = `cusdec_${type}_${date}.csv`;
                 
-                // Write file
-                XLSX.writeFile(wb, filename);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
                 this.showNotification('Data exported successfully', 'success');
             },
 
