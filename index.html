@@ -91,7 +91,7 @@
             text-align: center;
         }
 
-        /* Modern Icons as SVG - NO EFFECTS */
+        /* Modern Icons as SVG */
         .icon {
             width: 24px;
             height: 24px;
@@ -125,7 +125,7 @@
         }
 
         .logo-img {
-            max-height: 80px;
+            max-height: 120px;
             width: auto;
         }
 
@@ -195,11 +195,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform var(--transition-base);
         }
 
-        /* Remove icon hover effect */
         .option-card:hover .option-icon {
-            transform: none;
+            transform: scale(1.1);
         }
 
         .option-title {
@@ -1042,7 +1042,7 @@
             }
 
             .logo-img {
-                max-height: 60px;
+                max-height: 80px;
             }
 
             .main-options {
@@ -1354,6 +1354,12 @@
                 this.loadData();
                 this.attachEventListeners();
                 this.showDashboard();
+                
+                // Check if running on localhost and show warning
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    console.warn('Running on localhost. Google Drive sync may not work. Add http://localhost to authorized JavaScript origins in Google Cloud Console.');
+                }
+                
                 this.initGoogleDrive();
             },
 
@@ -1367,7 +1373,8 @@
                             apiKey: this.googleDrive.API_KEY,
                             clientId: this.googleDrive.CLIENT_ID,
                             discoveryDocs: this.googleDrive.DISCOVERY_DOCS,
-                            scope: this.googleDrive.SCOPES
+                            scope: this.googleDrive.SCOPES,
+                            plugin_name: 'cusdec-assistant' // Add plugin name for new auth
                         }).then(() => {
                             // Listen for sign-in state changes
                             gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn) => {
@@ -1386,7 +1393,13 @@
                             this.updateSyncButtons(this.googleDrive.isSignedIn);
                         }).catch(error => {
                             console.error('Error initializing Google Drive:', error);
-                            this.showNotification('Failed to initialize Google Drive. Check API configuration.', 'error');
+                            if (error.error && error.error.includes('origin_mismatch')) {
+                                this.showNotification('Domain not authorized. Add this domain to Google Cloud Console.', 'error');
+                            } else if (error.error && error.error.includes('idpiframe_initialization_failed')) {
+                                this.showNotification('Third-party cookies might be blocked. Check browser settings.', 'error');
+                            } else {
+                                this.showNotification('Failed to initialize Google Drive. Check console for details.', 'error');
+                            }
                         });
                     });
                 };
@@ -1414,10 +1427,21 @@
             // Sign in to Google Drive
             async signInToGoogleDrive() {
                 try {
-                    await gapi.auth2.getAuthInstance().signIn();
+                    const result = await gapi.auth2.getAuthInstance().signIn({
+                        prompt: 'select_account' // Force account selection
+                    });
+                    console.log('Sign in successful:', result);
                 } catch (error) {
                     console.error('Sign in failed:', error);
-                    this.showNotification('Failed to sign in to Google Drive', 'error');
+                    if (error.error === 'popup_closed_by_user') {
+                        this.showNotification('Sign in cancelled', 'info');
+                    } else if (error.error === 'access_denied') {
+                        this.showNotification('Access denied. Please grant permissions.', 'error');
+                    } else if (error.error === 'immediate_failed') {
+                        this.showNotification('Sign in required. Please try again.', 'error');
+                    } else {
+                        this.showNotification(`Sign in failed: ${error.error || 'Unknown error'}`, 'error');
+                    }
                 }
             },
 
@@ -1498,9 +1522,11 @@
                         this.googleDrive.isSignedIn = false;
                         this.updateSyncButtons(false);
                     } else if (error.status === 403) {
-                        errorMessage = 'Access denied. Check API permissions.';
+                        errorMessage = 'Access denied. Check Drive API is enabled in Google Cloud Console.';
                     } else if (error.result && error.result.error) {
                         errorMessage = error.result.error.message;
+                    } else if (error.message) {
+                        errorMessage = error.message;
                     }
                     
                     this.showNotification(errorMessage, 'error');
