@@ -8,159 +8,73 @@
     <link href="https://fonts.cdnfonts.com/css/dejavu-sans-mono" rel="stylesheet">
     <style>
         :root {
-            /* Color Palette */
             --bg-primary: #0a0a0a;
             --bg-secondary: #1a1a1a;
             --bg-tertiary: #252525;
-            --bg-elevated: #2a2a2a;
             --bg-hover: #303030;
-            
             --text-primary: #ffffff;
             --text-secondary: #b8b8b8;
             --text-muted: #888888;
-            
-            --accent-primary: #ffffff;
-            --accent-hover: #e0e0e0;
-            --accent-light: rgba(255, 255, 255, 0.1);
-            
+            --accent: #ffffff;
             --success: #43b581;
-            --warning: #faa61a;
             --danger: #f04747;
-            --info: #ffffff;
-            
-            --border-subtle: rgba(255, 255, 255, 0.06);
-            --border-default: rgba(255, 255, 255, 0.1);
-            --border-strong: rgba(255, 255, 255, 0.2);
-            
-            /* Spacing System */
-            --spacing-xs: 0.25rem;
-            --spacing-sm: 0.5rem;
-            --spacing-md: 1rem;
-            --spacing-lg: 1.5rem;
-            --spacing-xl: 2rem;
-            --spacing-2xl: 3rem;
-            --spacing-3xl: 4rem;
-            
-            /* Typography */
-            --font-sans: 'DejaVu Sans Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
-            --font-mono: 'DejaVu Sans Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
-            
-            /* Transitions */
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-            
-            /* Shadows */
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.4);
-            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.5);
-            
-            /* Border Radius */
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
-            --radius-full: 9999px;
+            --border: rgba(255, 255, 255, 0.1);
+            --spacing: 1rem;
+            --radius: 0.5rem;
+            --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --font: 'DejaVu Sans Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: var(--font-sans);
+            font-family: var(--font);
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: var(--spacing-md);
+            padding: var(--spacing);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            text-align: center;
-        }
+        .container { max-width: 1200px; width: 100%; text-align: center; }
+        
+        .icon { width: 24px; height: 24px; display: inline-block; vertical-align: middle; fill: currentColor; }
+        
+        .header { text-align: center; margin-bottom: calc(var(--spacing) * 2); padding: calc(var(--spacing) * 1.5) 0; }
+        .header-content { display: flex; justify-content: center; align-items: center; margin-bottom: var(--spacing); }
+        .logo-img { max-height: 120px; width: auto; }
 
-        /* Modern Icons as SVG */
-        .icon {
-            width: 24px;
-            height: 24px;
-            display: inline-block;
-            vertical-align: middle;
-            fill: currentColor;
-        }
-
-        .icon-lg {
-            width: 48px;
-            height: 48px;
-        }
-
-        .icon-xl {
-            width: 64px;
-            height: 64px;
-        }
-
-        /* Header Styles */
-        .header {
-            text-align: center;
-            margin-bottom: var(--spacing-2xl);
-            padding: var(--spacing-lg) 0;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .logo-img {
-            max-height: 120px;
-            width: auto;
-        }
-
-        /* Dashboard Grid */
-        .dashboard {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-            transition: all var(--transition-slow);
-        }
-
-        .dashboard.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .dashboard { display: block; opacity: 1; transform: translateY(0); transition: all var(--transition); }
+        .dashboard.hidden { display: none; }
 
         .main-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: var(--spacing-lg);
-            margin-bottom: var(--spacing-2xl);
+            gap: var(--spacing);
+            margin-bottom: calc(var(--spacing) * 2);
         }
 
         .option-card {
             background: var(--bg-secondary);
-            border-radius: var(--radius-xl);
-            padding: var(--spacing-2xl);
+            border-radius: calc(var(--radius) * 2);
+            padding: calc(var(--spacing) * 2);
             cursor: pointer;
-            transition: all var(--transition-base);
-            border: 1px solid var(--border-subtle);
+            transition: all var(--transition);
+            border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
-            transform: translateY(0);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .option-card:hover {
+            transform: translateY(-4px);
+            background: var(--bg-tertiary);
+            box-shadow: var(--shadow);
         }
 
         .option-card::before {
@@ -170,223 +84,130 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--info));
+            background: linear-gradient(90deg, var(--accent), var(--accent));
             opacity: 0;
-            transition: opacity var(--transition-base);
+            transition: opacity var(--transition);
         }
 
-        .option-card:hover {
-            transform: translateY(-4px);
-            background: var(--bg-tertiary);
-            border-color: var(--border-default);
-            box-shadow: var(--shadow-lg);
-        }
+        .option-card:hover::before { opacity: 1; }
 
-        .option-card:active {
-            transform: translateY(-2px);
-        }
+        .option-icon { margin-bottom: var(--spacing); display: flex; align-items: center; justify-content: center; }
+        .option-icon img { width: 64px; height: 64px; transition: transform var(--transition); }
+        .option-card:hover .option-icon img { transform: scale(1.1); }
 
-        .option-card:hover::before {
-            opacity: 1;
-        }
+        .option-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .option-desc { color: var(--text-secondary); font-size: 0.875rem; }
 
-        .option-icon {
-            margin-bottom: var(--spacing-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform var(--transition-base);
-        }
-
-        .option-card:hover .option-icon {
-            transform: scale(1.1);
-        }
-
-        .option-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: var(--spacing-sm);
-            letter-spacing: -0.01em;
-        }
-
-        .option-desc {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        /* Search Section */
         .search-section {
             display: none;
             background: var(--bg-secondary);
-            border-radius: var(--radius-2xl);
-            padding: var(--spacing-xl);
-            margin: var(--spacing-lg) auto;
-            border: 1px solid var(--border-subtle);
+            border-radius: calc(var(--radius) * 3);
+            padding: calc(var(--spacing) * 2);
+            margin: var(--spacing) auto;
+            border: 1px solid var(--border);
             max-width: 900px;
             width: 100%;
             min-height: 70vh;
             flex-direction: column;
-            opacity: 0;
-            transform: scale(0.95);
-            transition: all var(--transition-slow);
-            box-shadow: var(--shadow-xl);
+            box-shadow: var(--shadow);
         }
 
-        .search-section.active {
-            display: flex;
-            opacity: 1;
-            transform: scale(1);
-        }
+        .search-section.active { display: flex; }
 
         .search-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--spacing-xl);
-            padding-bottom: var(--spacing-lg);
-            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: calc(var(--spacing) * 2);
+            padding-bottom: var(--spacing);
+            border-bottom: 1px solid var(--border);
         }
 
-        .search-header h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
+        .search-header h2 { font-size: 1.5rem; font-weight: 600; }
 
-        .close-btn-header {
+        .close-btn {
             background: var(--bg-tertiary);
             color: var(--text-secondary);
             border: none;
-            padding: var(--spacing-sm);
-            border-radius: var(--radius-md);
+            padding: 0.5rem;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: all var(--transition);
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
         }
 
-        .close-btn-header:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
+        .close-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-        .close-btn-header:active {
-            transform: scale(0.95);
-        }
+        .search-controls { margin-bottom: var(--spacing); }
 
-        /* Search Input */
-        .search-controls {
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .search-input-wrapper {
-            position: relative;
-            width: 100%;
-        }
+        .search-input-wrapper { position: relative; width: 100%; }
 
         .search-icon {
             position: absolute;
-            left: var(--spacing-md);
+            left: var(--spacing);
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
             pointer-events: none;
-            transition: color var(--transition-fast);
         }
 
         .search-input {
             width: 100%;
-            padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) calc(var(--spacing-md) + 32px);
-            border: 2px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
+            padding: var(--spacing) var(--spacing) var(--spacing) calc(var(--spacing) + 32px);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
             background: var(--bg-primary);
             color: var(--text-primary);
             font-size: 1rem;
-            transition: all var(--transition-fast);
-            font-family: var(--font-sans);
-        }
-
-        .search-input::placeholder {
-            color: var(--text-muted);
+            transition: all var(--transition);
+            font-family: var(--font);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: var(--accent-primary);
+            border-color: var(--accent);
             background: var(--bg-tertiary);
-            box-shadow: 0 0 0 3px var(--accent-light);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
         }
 
-        .search-input-wrapper:focus-within .search-icon {
-            color: var(--accent-primary);
-        }
-
-        /* Action Buttons */
-        .action-buttons-container {
+        .action-buttons {
             display: flex;
-            gap: var(--spacing-sm);
-            margin-bottom: var(--spacing-xl);
+            gap: 0.5rem;
+            margin-bottom: calc(var(--spacing) * 2);
             justify-content: center;
             flex-wrap: wrap;
         }
 
-        .action-btn {
+        .btn {
             background: var(--bg-tertiary);
             color: var(--text-primary);
-            border: 1px solid var(--border-subtle);
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
             cursor: pointer;
             font-size: 0.875rem;
             font-weight: 500;
-            transition: all var(--transition-fast);
+            transition: all var(--transition);
             display: inline-flex;
             align-items: center;
-            gap: var(--spacing-sm);
-            font-family: var(--font-sans);
+            gap: 0.5rem;
+            font-family: var(--font);
             height: 40px;
             min-width: 120px;
             justify-content: center;
         }
 
-        .action-btn:hover {
-            background: var(--bg-hover);
-            border-color: var(--border-default);
-            transform: translateY(-1px);
-        }
+        .btn:hover { background: var(--bg-hover); transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
 
-        .action-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Fix for white Add HSN button */
-        .action-btn.primary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--accent-primary);
-        }
-
-        .action-btn.primary:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent-primary);
-        }
-
-        .action-btn.sync {
-            background: var(--bg-tertiary);
-            border-color: var(--border-strong);
-            color: var(--text-secondary);
-            position: relative;
-        }
-
-        .action-btn.sync.connected {
-            border-color: var(--success);
-            color: var(--success);
-        }
-
-        .action-btn.sync.connected::after {
+        .btn.primary { border-color: var(--accent); }
+        .btn.sync { position: relative; }
+        .btn.sync.connected { border-color: var(--success); color: var(--success); }
+        .btn.sync.connected::after {
             content: '●';
             position: absolute;
             top: 4px;
@@ -395,59 +216,28 @@
             font-size: 8px;
         }
 
-        .action-btn.sync:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent-primary);
-            color: var(--accent-primary);
-        }
-
-        .action-btn.sync:active {
-            transform: translateY(0);
-        }
-
-        /* Results */
         .results {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            padding-right: var(--spacing-sm);
-            align-content: start;
+            padding-right: 0.25rem;
             scroll-behavior: smooth;
         }
 
-        .results::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .results::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .results::-webkit-scrollbar-thumb {
-            background: var(--border-default);
-            border-radius: var(--radius-full);
-        }
-
-        .results::-webkit-scrollbar-thumb:hover {
-            background: var(--border-strong);
-        }
+        .results::-webkit-scrollbar { width: 4px; }
+        .results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
         .result-item {
             background: var(--bg-tertiary);
-            padding: var(--spacing-lg);
-            padding-right: calc(var(--spacing-lg) + 80px);
-            border-radius: var(--radius-lg);
-            border: 1px solid transparent;
-            transition: all var(--transition-fast);
+            padding: var(--spacing);
+            padding-right: calc(var(--spacing) + 80px);
+            border-radius: var(--radius);
+            transition: all var(--transition);
             text-align: left;
             position: relative;
-            overflow: visible;
-            box-shadow: 0 0 0 1px var(--border-subtle);
-        }
-
-        .result-item:not(:last-child) {
-            margin-bottom: var(--spacing-md);
+            box-shadow: 0 0 0 1px var(--border);
+            margin-bottom: 0.5rem;
         }
 
         .result-item::before {
@@ -457,149 +247,93 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: var(--accent-primary);
-            transition: width var(--transition-fast);
+            background: var(--accent);
+            transition: width var(--transition);
         }
 
         .result-item:hover {
-            background: var(--bg-elevated);
-            border-color: var(--border-default);
+            background: var(--bg-hover);
             transform: translateX(4px);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow);
         }
 
-        .result-item:hover::before {
-            width: 6px;
-        }
+        .result-item:hover::before { width: 6px; }
 
-        /* Result Actions */
         .result-actions {
             position: absolute;
-            top: calc(var(--spacing-md) + 28px);
-            right: var(--spacing-md);
+            top: calc(var(--spacing) + 28px);
+            right: var(--spacing);
             display: flex;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
             opacity: 0;
-            transition: opacity var(--transition-fast);
+            transition: opacity var(--transition);
         }
 
-        .result-item:hover .result-actions {
-            opacity: 1;
-        }
+        .result-item:hover .result-actions { opacity: 1; }
 
         .result-action-btn {
             background: var(--bg-tertiary);
-            border: 1px solid var(--border-default);
+            border: 1px solid var(--border);
             color: var(--text-secondary);
-            padding: var(--spacing-xs) var(--spacing-md);
-            border-radius: var(--radius-sm);
+            padding: 0.25rem 0.75rem;
+            border-radius: calc(var(--radius) * 0.5);
             cursor: pointer;
             font-size: 0.75rem;
-            transition: all var(--transition-fast);
-            display: inline-flex;
-            align-items: center;
-            gap: var(--spacing-xs);
+            transition: all var(--transition);
         }
 
-        .result-action-btn:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-            border-color: var(--border-strong);
-        }
+        .result-action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 
         .result-title {
             font-size: 1.125rem;
             font-weight: 600;
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
             cursor: pointer;
             color: var(--text-primary);
-            font-family: var(--font-mono);
+            font-family: var(--font);
             padding: 4px 8px;
             margin-left: -8px;
-            border-radius: var(--radius-sm);
-            transition: all var(--transition-fast);
+            border-radius: var(--radius);
+            transition: all var(--transition);
         }
 
-        .result-title:hover {
-            background: var(--accent-light);
-            color: var(--text-primary);
-        }
-
-        .result-title:active {
-            transform: scale(0.98);
-        }
+        .result-title:hover { background: rgba(255, 255, 255, 0.1); }
 
         .copy-hint {
             font-size: 0.7rem;
             color: var(--text-muted);
             opacity: 0;
-            transition: all var(--transition-fast);
-            font-family: var(--font-sans);
-            font-weight: 400;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            transition: opacity var(--transition);
             margin-left: auto;
         }
 
-        .result-title:hover .copy-hint {
-            opacity: 0.8;
-        }
+        .result-title:hover .copy-hint { opacity: 0.8; }
 
-        .result-details {
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
+        .result-details { color: var(--text-primary); font-size: 0.875rem; line-height: 1.5; }
+        .result-category { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; margin-top: 0.25rem; }
 
-        .result-category {
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 500;
-            margin-top: var(--spacing-xs);
-        }
+        .warehouse-label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
 
-        /* Warehouse Chips */
-        .warehouse-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-md);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 500;
-        }
-
-        .warehouse-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--spacing-sm);
-            margin-top: var(--spacing-md);
-        }
+        .warehouse-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
 
         .warehouse-chip {
             background: var(--bg-primary);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.5rem 1rem;
             min-width: 140px;
-            transition: all var(--transition-fast);
+            transition: all var(--transition);
             cursor: pointer;
             position: relative;
-            overflow: hidden;
         }
 
-        .warehouse-chip::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent, var(--accent-light));
-            opacity: 0;
-            transition: opacity var(--transition-fast);
+        .warehouse-chip:hover {
+            background: var(--bg-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .warehouse-chip::after {
@@ -609,45 +343,14 @@
             right: 8px;
             font-size: 0.75rem;
             opacity: 0;
-            transition: opacity var(--transition-fast);
+            transition: opacity var(--transition);
         }
 
-        .warehouse-chip:hover {
-            background: var(--bg-elevated);
-            border-color: var(--border-strong);
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
+        .warehouse-chip:hover::after { opacity: 0.7; }
 
-        .warehouse-chip:active {
-            transform: translateY(0);
-        }
+        .warehouse-code { font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 2px; font-family: var(--font); }
+        .warehouse-name { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.3; }
 
-        .warehouse-chip:hover::before {
-            opacity: 1;
-        }
-
-        .warehouse-chip:hover::after {
-            opacity: 0.7;
-        }
-
-        .warehouse-code {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--info);
-            margin-bottom: 2px;
-            font-family: var(--font-mono);
-            position: relative;
-        }
-
-        .warehouse-name {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            line-height: 1.3;
-            position: relative;
-        }
-
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -657,258 +360,120 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.9);
             z-index: 1000;
-            opacity: 0;
-            transition: opacity var(--transition-slow);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
         }
 
-        .modal.active {
-            opacity: 1;
-        }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
 
         .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
             background: var(--bg-secondary);
-            padding: var(--spacing-xl);
-            border-radius: var(--radius-xl);
+            padding: calc(var(--spacing) * 2);
+            border-radius: calc(var(--radius) * 2);
             width: 90%;
             max-width: 500px;
-            transition: transform var(--transition-slow);
-            border: 1px solid var(--border-default);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .modal.active .modal-content {
-            transform: translate(-50%, -50%) scale(1);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--spacing-xl);
-            padding-bottom: var(--spacing-md);
-            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: var(--spacing);
+            padding-bottom: var(--spacing);
+            border-bottom: 1px solid var(--border);
         }
 
-        .modal-header h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 600; }
 
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: var(--spacing-xs);
-            transition: color var(--transition-fast);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-md);
-        }
-
-        .close-btn:hover {
-            color: var(--text-primary);
-            background: var(--bg-tertiary);
-        }
-
-        .close-btn:active {
-            transform: scale(0.95);
-        }
-
-        .form-group {
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: var(--spacing-sm);
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
+        .form-group { margin-bottom: var(--spacing); }
+        .form-label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; }
 
         .form-input {
             width: 100%;
-            padding: var(--spacing-sm) var(--spacing-md);
-            border: 2px solid var(--border-subtle);
-            border-radius: var(--radius-md);
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
             background: var(--bg-primary);
             color: var(--text-primary);
             font-size: 1rem;
-            transition: all var(--transition-fast);
-            font-family: var(--font-sans);
+            transition: all var(--transition);
+            font-family: var(--font);
         }
 
         .form-input:focus {
             outline: none;
-            border-color: var(--accent-primary);
+            border-color: var(--accent);
             background: var(--bg-tertiary);
-            box-shadow: 0 0 0 3px var(--accent-light);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .save-btn, .delete-btn {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all var(--transition);
+            font-family: var(--font);
+            height: 48px;
+            margin-top: 0.5rem;
         }
 
         .save-btn {
             background: var(--bg-tertiary);
-            color: var(--accent-primary);
-            border: 1px solid var(--accent-primary);
-            padding: var(--spacing-md) var(--spacing-xl);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            width: 100%;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all var(--transition-fast);
-            font-family: var(--font-sans);
-            height: 48px;
+            color: var(--accent);
+            border: 1px solid var(--accent);
         }
 
-        .save-btn:hover {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
+        .save-btn:hover { background: var(--accent); color: var(--bg-primary); }
 
-        .save-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Delete Button */
         .delete-btn {
             background: transparent;
             color: var(--danger);
             border: 1px solid var(--danger);
-            padding: var(--spacing-md) var(--spacing-xl);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            width: 100%;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all var(--transition-fast);
-            font-family: var(--font-sans);
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--spacing-sm);
         }
 
-        .delete-btn:hover {
-            background: var(--danger);
-            color: var(--text-primary);
-        }
+        .delete-btn:hover { background: var(--danger); color: var(--text-primary); }
 
-        .delete-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Warehouse Edit Items */
         .warehouse-edit-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--spacing-md);
+            padding: var(--spacing);
             background: var(--bg-tertiary);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--spacing-sm);
-            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border);
         }
 
-        .warehouse-edit-actions {
-            display: flex;
-            gap: var(--spacing-sm);
-        }
+        .warehouse-edit-actions { display: flex; gap: 0.5rem; }
 
         .small-btn {
             background: var(--bg-tertiary);
-            border: 1px solid var(--border-default);
+            border: 1px solid var(--border);
             color: var(--text-secondary);
-            padding: var(--spacing-xs);
-            border-radius: var(--radius-sm);
+            padding: 0.25rem;
+            border-radius: calc(var(--radius) * 0.5);
             cursor: pointer;
             width: 32px;
             height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all var(--transition-fast);
+            transition: all var(--transition);
         }
 
-        .small-btn:hover {
-            background: var(--bg-hover);
-            border-color: var(--border-strong);
-        }
+        .small-btn:hover { background: var(--bg-hover); }
+        .small-btn.edit:hover { color: var(--accent); border-color: var(--accent); }
+        .small-btn.delete:hover { color: var(--danger); border-color: var(--danger); }
 
-        .small-btn.edit:hover {
-            color: var(--accent-primary);
-            border-color: var(--accent-primary);
-        }
+        .warehouses-list { max-height: 300px; overflow-y: auto; padding-right: 0.25rem; }
 
-        .small-btn.delete:hover {
-            color: var(--danger);
-            border-color: var(--danger);
-        }
-
-        .client-info {
-            background: var(--bg-tertiary);
-            padding: var(--spacing-md);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .info-value {
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-        }
-
-        .warehouses-list {
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: var(--spacing-sm);
-        }
-
-        .warehouses-list::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .warehouses-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .warehouses-list::-webkit-scrollbar-thumb {
-            background: var(--border-default);
-            border-radius: var(--radius-full);
-        }
-
-        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: var(--spacing-3xl) var(--spacing-xl);
+            padding: calc(var(--spacing) * 3);
             color: var(--text-muted);
             display: flex;
             flex-direction: column;
@@ -917,307 +482,99 @@
             min-height: 300px;
         }
 
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: var(--spacing-lg);
-            opacity: 0.2;
-            display: inline-block;
-            animation: pulse 3s infinite;
-        }
-
+        .empty-icon { font-size: 3rem; margin-bottom: var(--spacing); opacity: 0.2; animation: pulse 3s infinite; }
         @keyframes pulse {
             0%, 100% { opacity: 0.2; transform: scale(1); }
             50% { opacity: 0.3; transform: scale(1.02); }
         }
 
-        .empty-title {
-            font-size: 1.125rem;
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-sm);
-            font-weight: 600;
-        }
+        .empty-title { font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600; }
+        .empty-message { font-size: 0.875rem; color: var(--text-muted); }
 
-        .empty-message {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-
-        /* Notification */
         .notification {
             position: fixed;
-            top: var(--spacing-lg);
-            right: var(--spacing-lg);
-            background: var(--bg-elevated);
+            top: var(--spacing);
+            right: var(--spacing);
+            background: var(--bg-tertiary);
             color: var(--text-primary);
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-radius: var(--radius-lg);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
             font-size: 0.875rem;
             font-weight: 500;
             z-index: 10000;
             opacity: 0;
             transform: translateX(300px);
-            transition: all var(--transition-slow);
+            transition: all var(--transition);
             max-width: 320px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-default);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
         }
 
-        .notification.success {
-            border-color: var(--accent-primary);
-            background: var(--bg-tertiary);
-        }
+        .notification.show { opacity: 1; transform: translateX(0); }
+        .notification.success { border-color: var(--success); }
+        .notification.error { border-color: var(--danger); }
 
-        .notification.success::before {
-            content: '✓';
-            color: var(--success);
+        .notification::before {
             font-weight: bold;
             font-size: 1rem;
         }
 
-        .notification.error {
-            border-color: var(--danger);
-            background: var(--bg-tertiary);
-        }
+        .notification.success::before { content: '✓'; color: var(--success); }
+        .notification.error::before { content: '✕'; color: var(--danger); }
+        .notification.info::before { content: 'ℹ'; color: var(--accent); }
 
-        .notification.error::before {
-            content: '✕';
-            color: var(--danger);
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .notification.info {
-            border-color: var(--accent-primary);
-            background: var(--bg-tertiary);
-        }
-
-        .notification.info::before {
-            content: 'ℹ';
-            color: var(--accent-primary);
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Loading */
         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
             border: 2px solid var(--bg-tertiary);
             border-radius: 50%;
-            border-top-color: var(--accent-primary);
+            border-top-color: var(--accent);
             animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Help text */
-        .help-text {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: var(--spacing-xs);
-        }
+        .help-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .help-link { color: var(--accent); text-decoration: underline; cursor: pointer; }
+        .help-link:hover { opacity: 0.8; }
 
-        .help-link {
-            color: var(--accent-primary);
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        .help-link:hover {
-            color: var(--accent-hover);
-        }
-
-        /* Error Message */
-        .error-message {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            padding: var(--spacing-lg);
-            border-radius: var(--radius-lg);
-            margin: var(--spacing-xl) auto;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        /* Mobile Responsive */
         @media (max-width: 768px) {
-            :root {
-                --spacing-xs: 0.25rem;
-                --spacing-sm: 0.375rem;
-                --spacing-md: 0.75rem;
-                --spacing-lg: 1rem;
-                --spacing-xl: 1.5rem;
-                --spacing-2xl: 2rem;
-                --spacing-3xl: 3rem;
-            }
-
-            body {
-                padding: var(--spacing-sm);
-            }
-
-            .header {
-                padding: var(--spacing-md) 0;
-                margin-bottom: var(--spacing-lg);
-            }
-
-            .logo-img {
-                max-height: 80px;
-            }
-
-            .main-options {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-md);
-            }
-
-            .option-card {
-                padding: var(--spacing-lg);
-            }
-
-            .search-section {
-                padding: var(--spacing-md);
-                border-radius: var(--radius-xl);
-                min-height: calc(100vh - 2rem);
-            }
-
-            .search-header {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: var(--spacing-lg);
-            }
-
-            .search-header h2 {
-                font-size: 1.25rem;
-            }
-
-            .close-btn-header {
-                position: static;
-            }
-
-            .search-input {
-                font-size: 16px; /* Prevent zoom on iOS */
-            }
-
-            .action-buttons-container {
-                flex-direction: column;
-                gap: var(--spacing-sm);
-            }
-
-            .action-btn {
-                width: 100%;
-                height: 44px; /* Touch-friendly height */
-            }
-
-            .result-item {
-                padding: var(--spacing-md);
-                padding-right: var(--spacing-md);
-            }
-
-            .result-actions {
-                position: static;
-                opacity: 1;
-                margin-top: var(--spacing-md);
-            }
-
-            .result-title {
-                font-size: 1rem;
-                margin-right: 0;
-            }
-
-            .warehouse-container {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-md);
-            }
-
-            .warehouse-chip {
-                min-height: 56px;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                padding: var(--spacing-md);
-                text-align: left;
-            }
-
-            .warehouse-code {
-                font-size: 1rem;
-                margin-bottom: 0;
-            }
-
-            .warehouse-name {
-                text-align: left;
-                font-size: 0.7rem;
-            }
-
-            .modal-content {
-                padding: var(--spacing-lg);
-                margin: var(--spacing-md);
-                width: calc(100% - 2rem);
-            }
-
-            .empty-state {
-                padding: var(--spacing-2xl) var(--spacing-lg);
-            }
-        }
-
-        /* Tablet view */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .warehouse-container {
-                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            }
-        }
-
-        /* Large screens */
-        @media (min-width: 1025px) {
-            .warehouse-container {
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            }
-        }
-
-        /* High DPI Screens */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .search-input,
-            .form-input {
-                font-size: 16px;
-            }
+            :root { --spacing: 0.75rem; }
+            .logo-img { max-height: 80px; }
+            .main-options { grid-template-columns: 1fr; }
+            .search-section { min-height: calc(100vh - 2rem); }
+            .action-buttons { flex-direction: column; }
+            .btn { width: 100%; }
+            .result-actions { position: static; opacity: 1; margin-top: var(--spacing); }
+            .warehouse-container { grid-template-columns: 1fr; }
+            .modal-content { margin: var(--spacing); width: calc(100% - 2rem); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="header-content">
                 <img src="https://i.ibb.co/pJLFmm5/ARR.png" alt="Arrow Clearing Agency" class="logo-img">
             </div>
         </div>
 
-        <!-- Error Display (hidden by default) -->
-        <div id="errorDisplay" style="display: none;" class="error-message"></div>
-
-        <!-- Dashboard -->
         <div class="dashboard active" id="dashboard">
             <div class="main-options">
                 <div class="option-card" onclick="app.showSection('hsn')">
                     <div class="option-icon">
-                        <img src="https://i.ibb.co/DgSJRGbt/approval.png" alt="HSN Code" class="icon icon-xl">
+                        <img src="https://i.ibb.co/DgSJRGbt/approval.png" alt="HSN Code">
                     </div>
                     <h2 class="option-title">HSN CODE FINDER</h2>
                     <p class="option-desc">Search and manage Harmonized System codes</p>
                 </div>
                 <div class="option-card" onclick="app.showSection('client')">
                     <div class="option-icon">
-                        <img src="https://i.ibb.co/Qxx2462/information.png" alt="Client Info" class="icon icon-xl">
+                        <img src="https://i.ibb.co/Qxx2462/information.png" alt="Client Info">
                     </div>
                     <h2 class="option-title">TIN & WAREHOUSE</h2>
                     <p class="option-desc">Find client TIN codes and warehouse info</p>
@@ -1225,11 +582,10 @@
             </div>
         </div>
 
-        <!-- HSN Search Section -->
         <div class="search-section" id="hsnSection">
             <div class="search-header">
                 <h2>HSN Code Finder</h2>
-                <button class="close-btn-header" onclick="app.showDashboard()" title="Close">
+                <button class="close-btn" onclick="app.showDashboard()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1243,23 +599,20 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
-                    <input type="text" 
-                           class="search-input" 
-                           id="hsnSearch" 
-                           placeholder="Search by HSN code (e.g. 85163100) or product name (e.g. dryer, shampoo)..." 
-                           autocomplete="off">
+                    <input type="text" class="search-input" id="hsnSearch" 
+                           placeholder="Search by HSN code or product name..." autocomplete="off">
                 </div>
             </div>
             
-            <div class="action-buttons-container">
-                <button class="action-btn primary" onclick="app.showAddModal('hsn')" title="Add new HSN code">
+            <div class="action-buttons">
+                <button class="btn primary" onclick="app.showAddModal('hsn')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     Add HSN
                 </button>
-                <button class="action-btn" onclick="app.exportData('hsn')" title="Export data">
+                <button class="btn" onclick="app.exportData('hsn')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -1267,33 +620,32 @@
                     </svg>
                     Export
                 </button>
-                <button class="action-btn" onclick="app.loadFromCloud('hsn')" title="Load data from cloud">
+                <button class="btn" onclick="app.loadFromCloud('hsn')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    Load from Cloud
+                    Load
                 </button>
-                <button class="action-btn sync" onclick="app.syncWithCloud('hsn')" title="Click to sync with cloud" id="hsnSyncBtn">
+                <button class="btn sync" onclick="app.syncWithCloud('hsn')" id="hsnSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
                         <polyline points="22 2 22 12 12 12"></polyline>
                         <polyline points="2 22 2 12 12 12"></polyline>
                     </svg>
-                    Sync with Cloud
+                    Sync
                 </button>
             </div>
             
             <div class="results" id="hsnResults"></div>
         </div>
 
-        <!-- Client Search Section -->
         <div class="search-section" id="clientSection">
             <div class="search-header">
                 <h2>TIN & Warehouse Finder</h2>
-                <button class="close-btn-header" onclick="app.showDashboard()" title="Close">
+                <button class="close-btn" onclick="app.showDashboard()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1307,23 +659,20 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
-                    <input type="text" 
-                           class="search-input" 
-                           id="clientSearch" 
-                           placeholder="Search by TIN, company name, warehouse code or name..." 
-                           autocomplete="off">
+                    <input type="text" class="search-input" id="clientSearch" 
+                           placeholder="Search by TIN, company, or warehouse..." autocomplete="off">
                 </div>
             </div>
             
-            <div class="action-buttons-container">
-                <button class="action-btn primary" onclick="app.showAddModal('client')" title="Add new client">
+            <div class="action-buttons">
+                <button class="btn primary" onclick="app.showAddModal('client')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     Add Client
                 </button>
-                <button class="action-btn" onclick="app.exportData('client')" title="Export data">
+                <button class="btn" onclick="app.exportData('client')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -1331,22 +680,22 @@
                     </svg>
                     Export
                 </button>
-                <button class="action-btn" onclick="app.loadFromCloud('client')" title="Load data from cloud">
+                <button class="btn" onclick="app.loadFromCloud('client')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    Load from Cloud
+                    Load
                 </button>
-                <button class="action-btn sync" onclick="app.syncWithCloud('client')" title="Click to sync with cloud" id="clientSyncBtn">
+                <button class="btn sync" onclick="app.syncWithCloud('client')" id="clientSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
                         <polyline points="22 2 22 12 12 12"></polyline>
                         <polyline points="2 22 2 12 12 12"></polyline>
                     </svg>
-                    Sync with Cloud
+                    Sync
                 </button>
             </div>
             
@@ -1354,11 +703,10 @@
         </div>
     </div>
 
-    <!-- Add Modal -->
-    <div class="modal" id="addModal">
+    <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Add New Entry</h3>
+                <h3 id="modalTitle">Modal</h3>
                 <button class="close-btn" onclick="app.closeModal()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1366,68 +714,18 @@
                     </svg>
                 </button>
             </div>
-            <div id="modalForm"></div>
-        </div>
-    </div>
-
-    <!-- API Key Modal -->
-    <div class="modal" id="apiKeyModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>JSONBin.io API Setup</h3>
-                <button class="close-btn" onclick="app.closeApiKeyModal()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <form onsubmit="app.saveApiKey(event)">
-                <div class="form-group">
-                    <label class="form-label">JSONBin.io Master Key (X-Master-Key)</label>
-                    <input type="text" class="form-input" id="apiKeyInput" 
-                           placeholder="$2b$10$..." required>
-                    <div class="help-text">
-                        Don't have an API key? 
-                        <a href="https://jsonbin.io/" target="_blank" class="help-link">Sign up for free at JSONBin.io</a>
-                    </div>
-                </div>
-                <button type="submit" class="save-btn">Connect to JSONBin</button>
-            </form>
+            <div id="modalContent"></div>
         </div>
     </div>
 
     <script>
-        // Global error handler
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            console.error('Error occurred:', msg, 'at line:', lineNo);
-            const errorDisplay = document.getElementById('errorDisplay');
-            errorDisplay.textContent = `Error: ${msg} (Line: ${lineNo})`;
-            errorDisplay.style.display = 'block';
-            return false;
-        };
-
-        // Modern CUSDEC Assistant Application with JSONBin.io Sync
         const app = {
-            // Data storage with localStorage persistence
-            data: {
-                hsn: [],
-                client: []
-            },
-
-            // Search state
-            searchState: {
-                hsn: '',
-                client: ''
-            },
-
-            // Debounce timer
+            data: { hsn: [], client: [] },
+            searchState: { hsn: '', client: '' },
             debounceTimer: null,
             syncDebounceTimer: null,
-
-            // JSONBin.io integration
             jsonBin: {
-                apiKey: localStorage.getItem('jsonbin_api_key') || '$2a$10$qce2OfNWlB45nXTNyHdAHOcRIZDI9SVFMFgLbhizHjoMvCTby6Y8G', // Your Access Key
+                apiKey: localStorage.getItem('jsonbin_api_key') || '',
                 baseUrl: 'https://api.jsonbin.io/v3',
                 bins: {
                     hsn: localStorage.getItem('jsonbin_hsn_id') || null,
@@ -1437,657 +735,344 @@
                 syncInProgress: false
             },
 
-            // Initialize application
             init() {
-                console.log('Initializing application...');
-                try {
-                    this.loadData();
-                    this.attachEventListeners();
-                    this.checkJsonBinConnection();
-                    console.log('Application initialized successfully');
-                } catch (error) {
-                    console.error('Initialization error:', error);
-                    this.showError('Failed to initialize application: ' + error.message);
-                }
+                this.loadData();
+                this.attachEventListeners();
+                this.checkJsonBinConnection();
             },
 
-            // Show error to user
-            showError(message) {
-                const errorDisplay = document.getElementById('errorDisplay');
-                if (errorDisplay) {
-                    errorDisplay.textContent = message;
-                    errorDisplay.style.display = 'block';
-                }
-                console.error(message);
-            },
-
-            // Check JSONBin connection
             checkJsonBinConnection() {
-                console.log('Checking JSONBin connection...');
-                // Check if we have API key (either from localStorage or hardcoded)
                 this.jsonBin.isConnected = !!(this.jsonBin.apiKey);
                 this.updateSyncButtons(this.jsonBin.isConnected);
-                
-                // If using hardcoded key and no bins yet, try to find existing bins
                 if (this.jsonBin.apiKey && (!this.jsonBin.bins.hsn || !this.jsonBin.bins.client)) {
-                    console.log('API key found, looking for existing bins...');
                     this.findExistingBins();
                 }
             },
 
-            // Update sync button status
             updateSyncButtons(isConnected) {
-                const syncButtons = document.querySelectorAll('.action-btn.sync');
-                syncButtons.forEach(btn => {
-                    if (isConnected) {
-                        btn.classList.add('connected');
-                        btn.title = 'Connected to cloud - Click to sync';
-                    } else {
-                        btn.classList.remove('connected');
-                        btn.title = 'Click to connect and sync with cloud';
-                    }
+                document.querySelectorAll('.btn.sync').forEach(btn => {
+                    btn.classList.toggle('connected', isConnected);
+                    btn.title = isConnected ? 'Connected - Click to sync' : 'Click to setup cloud sync';
                 });
             },
 
-            // Find existing bins (for when using hardcoded key)
             async findExistingBins() {
-                try {
-                    console.log('Searching for existing bins...');
-                    // For Access Keys, we can't list bins, so try known bin IDs if stored
-                    // If no bin IDs are stored, we'll create new ones when needed
-                    
-                    if (!this.jsonBin.bins.hsn && !this.jsonBin.bins.client) {
-                        console.log('No bin IDs found in localStorage, bins will be created on first sync');
-                    } else {
-                        console.log('Found bin IDs:', {
-                            hsn: this.jsonBin.bins.hsn,
-                            client: this.jsonBin.bins.client
-                        });
-                    }
-                    
-                    this.checkJsonBinConnection();
-                } catch (error) {
-                    console.error('Error finding bins:', error);
+                if (!this.jsonBin.bins.hsn && !this.jsonBin.bins.client) {
+                    console.info('No bin IDs found, will create on first sync');
                 }
+                this.checkJsonBinConnection();
             },
 
-            // Get proper API headers based on key type
             getApiHeaders() {
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-                
-                // Check if it's an Access Key (starts with $2a$) or Master Key ($2b$)
-                if (this.jsonBin.apiKey.startsWith('$2a$')) {
-                    headers['X-Access-Key'] = this.jsonBin.apiKey;
-                } else {
-                    headers['X-Master-Key'] = this.jsonBin.apiKey;
-                }
-                
+                const headers = { 'Content-Type': 'application/json' };
+                const keyType = this.jsonBin.apiKey.startsWith('$2a$') ? 'X-Access-Key' : 'X-Master-Key';
+                headers[keyType] = this.jsonBin.apiKey;
                 return headers;
             },
 
-            // Load data from cloud (manual sync)
             async loadFromCloud(type) {
                 if (!this.jsonBin.apiKey) {
-                    this.showNotification('No API key configured', 'error');
+                    this.promptApiKey();
                     return;
                 }
 
-                this.showNotification(`Loading ${type} data from cloud...`, 'info');
+                this.showNotification(`Loading ${type} data...`, 'info');
 
                 try {
-                    // If we don't have bin ID, we can't load
                     if (!this.jsonBin.bins[type]) {
-                        this.showNotification(`No ${type} data found in cloud. Sync first to create cloud storage.`, 'error');
+                        this.showNotification(`No cloud data found. Sync first.`, 'error');
                         return;
                     }
 
-                    // Get data from JSONBin
                     const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
                         headers: this.getApiHeaders()
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`Failed to load ${type} data: ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`Failed to load: ${response.status}`);
 
                     const result = await response.json();
                     const cloudData = result.record || [];
 
-                    // Replace local data with cloud data
                     this.data[type] = cloudData;
-                    this.saveData(false); // Save locally without triggering cloud sync
+                    this.saveData(false);
                     
-                    // Refresh display
                     const searchInput = document.getElementById(type + 'Search');
-                    if (searchInput && searchInput.value.trim()) {
+                    if (searchInput?.value.trim()) {
                         this.performSearch(type, searchInput.value);
                     } else {
                         this.showEmptyState(type);
                     }
                     
-                    this.showNotification(`Loaded ${cloudData.length} ${type} records from cloud`, 'success');
+                    this.showNotification(`Loaded ${cloudData.length} records`, 'success');
                 } catch (error) {
-                    console.error('Load from cloud error:', error);
-                    this.showNotification(`Failed to load ${type} data from cloud`, 'error');
+                    this.showNotification(`Failed to load from cloud`, 'error');
                 }
             },
 
-            // Show API key modal
-            showApiKeyModal() {
-                // If we already have a working key, just show notification
-                if (this.jsonBin.apiKey && this.jsonBin.isConnected) {
-                    this.showNotification('Already connected to JSONBin.io', 'info');
-                    return;
-                }
-                
-                const modal = document.getElementById('apiKeyModal');
-                modal.style.display = 'block';
-                setTimeout(() => {
-                    modal.classList.add('active');
-                    document.getElementById('apiKeyInput').focus();
-                }, 10);
-            },
-
-            // Close API key modal
-            closeApiKeyModal() {
-                const modal = document.getElementById('apiKeyModal');
-                modal.classList.remove('active');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                }, 300);
-            },
-
-            // Save API key
-            async saveApiKey(event) {
-                event.preventDefault();
-                const apiKey = document.getElementById('apiKeyInput').value.trim();
-                
-                if (!apiKey) {
-                    this.showNotification('Please enter your JSONBin.io API key', 'error');
-                    return;
-                }
-
-                this.showNotification('Connecting to JSONBin.io...', 'info');
-                
-                try {
-                    // Save the key
+            promptApiKey() {
+                const apiKey = prompt('Enter your JSONBin.io API key:');
+                if (apiKey) {
                     localStorage.setItem('jsonbin_api_key', apiKey);
                     this.jsonBin.apiKey = apiKey;
-                    
-                    // For Access Keys, we can't test by creating bins immediately
-                    // Just mark as connected and bins will be created on first sync
                     this.checkJsonBinConnection();
-                    this.closeApiKeyModal();
-                    this.showNotification('Connected to JSONBin.io successfully!', 'success');
-                } catch (error) {
-                    console.error('API key validation failed:', error);
-                    this.showNotification('Failed to connect to JSONBin.io', 'error');
+                    this.showNotification('API key saved', 'success');
                 }
             },
 
-            // Create JSONBin
             async createJsonBin(type, apiKey) {
-                try {
-                    console.log(`Creating new bin for ${type}...`);
-                    
-                    // Create new bin
-                    const headers = apiKey.startsWith('$2a$') 
-                        ? { 
-                            'Content-Type': 'application/json',
-                            'X-Access-Key': apiKey,
-                            'X-Bin-Name': `cusdec_${type}_data`,
-                            'X-Collection-Id': 'uncategorized'
-                          }
-                        : { 
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': apiKey,
-                            'X-Bin-Name': `cusdec_${type}_data`
-                          };
-                    
-                    const response = await fetch(`${this.jsonBin.baseUrl}/b`, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(this.data[type] || [])
-                    });
+                const headers = apiKey.startsWith('$2a$') 
+                    ? { 
+                        'Content-Type': 'application/json',
+                        'X-Access-Key': apiKey,
+                        'X-Bin-Name': `cusdec_${type}_data`,
+                        'X-Collection-Id': 'uncategorized'
+                      }
+                    : { 
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': apiKey,
+                        'X-Bin-Name': `cusdec_${type}_data`
+                      };
+                
+                const response = await fetch(`${this.jsonBin.baseUrl}/b`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(this.data[type] || [])
+                });
 
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error('Create bin response:', errorText);
-                        throw new Error(`Failed to create bin: ${response.status}`);
-                    }
+                if (!response.ok) throw new Error(`Failed to create bin: ${response.status}`);
 
-                    const result = await response.json();
-                    console.log(`Created bin for ${type}:`, result.metadata.id);
-                    return result.metadata.id;
-                } catch (error) {
-                    console.error(`Error creating ${type} bin:`, error);
-                    throw error;
-                }
+                const result = await response.json();
+                return result.metadata.id;
             },
 
-            // Sync with cloud (JSONBin.io)
             async syncWithCloud(type) {
                 if (!this.jsonBin.apiKey) {
-                    this.showApiKeyModal();
+                    this.promptApiKey();
                     return;
                 }
 
                 if (this.jsonBin.syncInProgress) {
-                    this.showNotification('Sync already in progress...', 'info');
+                    this.showNotification('Sync in progress...', 'info');
                     return;
                 }
 
                 this.jsonBin.syncInProgress = true;
-                this.showNotification(`Syncing ${type} data with cloud...`, 'info');
+                this.showNotification(`Syncing ${type} data...`, 'info');
 
                 try {
-                    // If we don't have bin ID, create new bin
                     if (!this.jsonBin.bins[type]) {
-                        console.log(`No bin ID for ${type}, creating new bin...`);
                         const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
                         this.jsonBin.bins[type] = binId;
                         localStorage.setItem(`jsonbin_${type}_id`, binId);
-                        this.showNotification(`Created ${type} storage in cloud`, 'success');
+                        this.showNotification(`Created cloud storage`, 'success');
                     } else {
-                        // Bin exists, get data and merge
                         const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
                             headers: this.getApiHeaders()
                         });
 
                         if (!response.ok) {
                             if (response.status === 404) {
-                                // Bin doesn't exist anymore, create new one
-                                console.log(`Bin not found for ${type}, creating new bin...`);
                                 const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
                                 this.jsonBin.bins[type] = binId;
                                 localStorage.setItem(`jsonbin_${type}_id`, binId);
-                                this.showNotification(`Created ${type} storage in cloud`, 'success');
+                                this.showNotification(`Created cloud storage`, 'success');
                             } else {
-                                throw new Error(`Failed to fetch ${type} data: ${response.status}`);
+                                throw new Error(`Failed to fetch: ${response.status}`);
                             }
                         } else {
                             const result = await response.json();
                             const cloudData = result.record || [];
-
-                            // Merge with local data (never delete, only add missing)
                             const mergedData = this.mergeData(type, this.data[type], cloudData);
                             const addedCount = mergedData.length - this.data[type].length;
                             
                             this.data[type] = mergedData;
-                            this.saveData(false); // Save locally without triggering cloud sync
+                            this.saveData(false);
                             
-                            // If we added new data locally, update the cloud
                             if (mergedData.length > cloudData.length) {
                                 await this.saveToJsonBin(type);
                             }
                             
-                            // Refresh display if searching
                             const searchInput = document.getElementById(type + 'Search');
-                            if (searchInput && searchInput.value.trim()) {
+                            if (searchInput?.value.trim()) {
                                 this.performSearch(type, searchInput.value);
                             }
                             
-                            if (addedCount > 0) {
-                                this.showNotification(`Added ${addedCount} new ${type} records from cloud`, 'success');
-                            } else {
-                                this.showNotification(`${type} data is up to date`, 'success');
-                            }
+                            this.showNotification(
+                                addedCount > 0 ? `Added ${addedCount} new records` : `Data up to date`,
+                                'success'
+                            );
                         }
                     }
                 } catch (error) {
-                    console.error('Sync error:', error);
-                    this.showNotification(`Failed to sync ${type} data: ${error.message}`, 'error');
+                    this.showNotification(`Sync failed: ${error.message}`, 'error');
                 } finally {
                     this.jsonBin.syncInProgress = false;
                 }
             },
 
-            // Save to JSONBin
             async saveToJsonBin(type) {
                 if (!this.jsonBin.apiKey || !this.jsonBin.bins[type]) return;
 
                 try {
-                    console.log(`Saving ${type} data to cloud...`);
                     const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}`, {
                         method: 'PUT',
                         headers: this.getApiHeaders(),
                         body: JSON.stringify(this.data[type])
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`Failed to update bin: ${response.status}`);
-                    }
-                    console.log(`${type} data saved to cloud successfully`);
+                    if (!response.ok) throw new Error(`Failed to update: ${response.status}`);
                 } catch (error) {
-                    console.error(`Save to JSONBin error (${type}):`, error);
-                    // Don't show error notification for auto-sync failures
+                    console.error(`Save error:`, error);
                 }
             },
 
-            // Merge data (never delete, only add missing)
             mergeData(type, localData, cloudData) {
                 localData = localData || [];
                 cloudData = cloudData || [];
                 
                 if (type === 'hsn') {
-                    // For HSN, use code as unique identifier
                     const localCodes = new Set(localData.map(item => item.code));
                     const newItems = cloudData.filter(item => item.code && !localCodes.has(item.code));
                     return [...localData, ...newItems];
                 } else {
-                    // For clients, use tin+warehouse as unique identifier
                     const localKeys = new Set(localData.map(item => `${item.tin}-${item.warehouse}`));
-                    const newItems = cloudData.filter(item => item.tin && item.warehouse && !localKeys.has(`${item.tin}-${item.warehouse}`));
+                    const newItems = cloudData.filter(item => 
+                        item.tin && item.warehouse && !localKeys.has(`${item.tin}-${item.warehouse}`)
+                    );
                     return [...localData, ...newItems];
                 }
             },
 
-            // Load data from localStorage or defaults
             loadData() {
-                console.log('Loading data...');
-                const savedHSN = localStorage.getItem('cusdec_hsn_data');
-                const savedClient = localStorage.getItem('cusdec_client_data');
+                const hsnData = localStorage.getItem('cusdec_hsn_data');
+                const clientData = localStorage.getItem('cusdec_client_data');
 
-                if (savedHSN) {
-                    try {
-                        this.data.hsn = JSON.parse(savedHSN);
-                        console.log(`Loaded ${this.data.hsn.length} HSN records from localStorage`);
-                    } catch (e) {
-                        console.error('Error parsing HSN data:', e);
-                        this.loadDefaultData();
-                    }
-                } else {
-                    this.loadDefaultData();
-                }
-
-                if (savedClient) {
-                    try {
-                        this.data.client = JSON.parse(savedClient);
-                        console.log(`Loaded ${this.data.client.length} client records from localStorage`);
-                    } catch (e) {
-                        console.error('Error parsing client data:', e);
-                        this.loadDefaultClientData();
-                    }
-                } else {
-                    this.loadDefaultClientData();
-                }
+                this.data.hsn = hsnData ? JSON.parse(hsnData) : this.getDefaultHSN();
+                this.data.client = clientData ? JSON.parse(clientData) : this.getDefaultClients();
             },
 
-            // Save data to localStorage and JSONBin
+            getDefaultHSN() {
+                return [
+                    {c:'HAIR CARE',p:'Hair Dryer',code:'85163100'},{c:'HAIR CARE',p:'Hair Clipper',code:'85102000'},
+                    {c:'HAIR CARE',p:'Hair Groomer',code:'85102000'},{c:'HAIR CARE',p:'Hair Straightener',code:'85163200'},
+                    {c:'HAIR CARE',p:'Shaver',code:'85101000'},{c:'COSMETICS',p:'Shampoo',code:'33051000'},
+                    {c:'COSMETICS',p:'Hair Colour',code:'33051000'},{c:'COSMETICS',p:'Hair Cream',code:'33051000'},
+                    {c:'COSMETICS',p:'Hair Spray',code:'33051000'},{c:'COSMETICS',p:'Eye Shadow',code:'33042000'},
+                    {c:'COSMETICS',p:'Eye Makeup',code:'33042000'},{c:'COSMETICS',p:'Lipstick',code:'33041000'},
+                    {c:'COSMETICS',p:'Lip Gloss',code:'33041000'},{c:'COSMETICS',p:'Nail Polish',code:'33043000'},
+                    {c:'COSMETICS',p:'Manicure Set',code:'33043000'},{c:'COSMETICS',p:'Pedicure Set',code:'33043000'},
+                    {c:'COSMETICS',p:'Talcum Powder',code:'33049100'},{c:'KITCHEN APPLIANCES',p:'Air Fryer',code:'85166090'},
+                    {c:'KITCHEN APPLIANCES',p:'Blender',code:'85094000'},{c:'KITCHEN APPLIANCES',p:'Coffee Maker',code:'85167100'},
+                    {c:'KITCHEN APPLIANCES',p:'Gas Cooker',code:'85166090'},{c:'KITCHEN APPLIANCES',p:'Electric Cooker',code:'85166090'},
+                    {c:'KITCHEN APPLIANCES',p:'Cooker',code:'73211100'},{c:'KITCHEN APPLIANCES',p:'Cooker Hood',code:'84146000'},
+                    {c:'KITCHEN APPLIANCES',p:'Cookware Set',code:'73239300'},{c:'KITCHEN APPLIANCES',p:'Electric Oven',code:'85166090'},
+                    {c:'KITCHEN APPLIANCES',p:'Built-in Oven',code:'85166090'},{c:'KITCHEN APPLIANCES',p:'Food Steamer',code:'76151020'},
+                    {c:'KITCHEN APPLIANCES',p:'Hob',code:'73211100'},{c:'KITCHEN APPLIANCES',p:'Kettle',code:'85167920'},
+                    {c:'KITCHEN APPLIANCES',p:'Microwave Oven',code:'85165000'},{c:'KITCHEN APPLIANCES',p:'Pressure Cooker',code:'76151020'},
+                    {c:'KITCHEN APPLIANCES',p:'Rice Cooker',code:'85166010'},{c:'KITCHEN APPLIANCES',p:'Stainless Steel Water Bottle',code:'73239900'},
+                    {c:'KITCHEN APPLIANCES',p:'Tea Maker',code:'85167100'},{c:'KITCHEN APPLIANCES',p:'Toaster',code:'85167200'},
+                    {c:'KITCHEN APPLIANCES',p:'Sandwich Maker',code:'85167200'},{c:'KITCHEN APPLIANCES',p:'Waffle Maker',code:'85167200'},
+                    {c:'KITCHEN APPLIANCES',p:'BBQ Grill',code:'85167200'},{c:'KITCHEN APPLIANCES',p:'Induction Cooker',code:'85166090'},
+                    {c:'KITCHEN APPLIANCES',p:'Noodle Maker',code:'84381000'},{c:'KITCHEN APPLIANCES',p:'Spaghetti Maker',code:'84381000'},
+                    {c:'KITCHEN APPLIANCES',p:'Macaroni Maker',code:'84381000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'CD Player',code:'85271900'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'DVD Player',code:'85219000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Hi-Fi Set',code:'85279100'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Home Theatre',code:'85279100'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Radio',code:'85271900'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Sound Bar',code:'85182900'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Speaker',code:'85182900'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Music Organ',code:'92071000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV 32"',code:'85287291'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV (Over 32")',code:'85287299'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV Wall Mount',code:'83025000'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Car Stereo Set',code:'85272900'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Microphone',code:'85181000'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Air Cooler',code:'84796000'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Fridge/Refrigerator',code:'84181090'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Iron',code:'85164000'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Garment Steamer',code:'84513000'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Fan',code:'84145100'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Vacuum Cleaner',code:'85081100'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Dispenser',code:'84158190'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Filter',code:'84158190'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Purifier',code:'84158190'},{c:'WASHING MACHINES',p:'Washing Machine Front Load (5.5-7.5 KG)',code:'84501143'},
+                    {c:'WASHING MACHINES',p:'Washing Machine Front Load (7.5-9.5 KG)',code:'84501144'},{c:'WASHING MACHINES',p:'Washing Machine Front Load (Over 10 KG)',code:'84501149'},
+                    {c:'WASHING MACHINES',p:'Washing Machine Top Load (5.5-7.5 KG)',code:'84501133'},{c:'WASHING MACHINES',p:'Washing Machine Top Load (7.5-9.5 KG)',code:'84501134'},
+                    {c:'WASHING MACHINES',p:'Washing Machine Top Load (Over 10 KG)',code:'84502000'},{c:'PERSONAL ITEMS',p:'Mobile Phone',code:'85171390'},
+                    {c:'PERSONAL ITEMS',p:'Weight Scale',code:'84231010'},{c:'PERSONAL ITEMS',p:'Laptop',code:'84713090'},
+                    {c:'PERSONAL ITEMS',p:'Notebook',code:'84713090'},{c:'PERSONAL ITEMS',p:'Watch',code:'91021900'},
+                    {c:'BATHROOM',p:'Water Heater',code:'85161000'},{c:'BATHROOM',p:'Home Shower',code:'85161000'},
+                    {c:'BATHROOM',p:'High Pressure Washer',code:'84242000'},{c:'EMERGENCY LIGHTS & TORCHES',p:'Emergency Lantern',code:'85131090'},
+                    {c:'EMERGENCY LIGHTS & TORCHES',p:'Emergency Light LED',code:'85131090'},{c:'EMERGENCY LIGHTS & TORCHES',p:'Torch',code:'85131090'},
+                    {c:'FOOD & BEVERAGES',p:'Chocolate',code:'18063100'},{c:'FOOD & BEVERAGES',p:'Nescafe/Coffee',code:'21011200'},
+                    {c:'FOOD & BEVERAGES',p:'Pringles/Chips',code:'19059020'},{c:'FOOD & BEVERAGES',p:'Soft Drinks',code:'22021000'},
+                    {c:'FOOD & BEVERAGES',p:'Energy Drinks',code:'22029930'},{c:'PERFUMES & FRAGRANCES',p:'Body Spray',code:'33072000'},
+                    {c:'PERFUMES & FRAGRANCES',p:'Perfumes',code:'33030010'},{c:'LIQUOR',p:'Brandy VSOP',code:'22082000'},
+                    {c:'LIQUOR',p:'Gin',code:'22085000'},{c:'LIQUOR',p:'Rum',code:'22084010'},
+                    {c:'LIQUOR',p:'Tequila',code:'22087000'},{c:'LIQUOR',p:'Liqueur',code:'22087000'},
+                    {c:'LIQUOR',p:'Vodka',code:'22086000'},{c:'LIQUOR',p:'Whisky',code:'22083000'},
+                    {c:'LIQUOR',p:'Wine (Sweet)',code:'22042100'},{c:'LIQUOR',p:'Wine (Red)',code:'22042100'},
+                    {c:'LIQUOR',p:'Wine (White)',code:'22042100'},{c:'CIGARETTES',p:'Cigarettes (74-84 MM)',code:'24022050'},
+                    {c:'CIGARETTES',p:'Cigarettes (Over 99 MM)',code:'24022060'},{c:'TOYS',p:'Toys (General)',code:'95030090'},
+                    {c:'TOYS',p:'Toy Jeep',code:'95030010'},{c:'TOYS',p:'Toy Car',code:'95030010'},
+                    {c:'TOYS',p:'Toy Helicopter',code:'95030070'},{c:'TOYS',p:'Doll',code:'95030070'}
+                ].map(item => ({category: item.c, product: item.p, code: item.code}));
+            },
+
+            getDefaultClients() {
+                return [
+                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Colombo Harbour',w:'7501121'},
+                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Palaly Arrival',w:'7501302'},
+                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Palaly Departure',w:'7501303'},
+                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Service Bond',w:'7401172'},
+                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Colombo Harbour',w:'7501300'},
+                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Hambantota',w:'7501293'},
+                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Service Bond',w:'7400995'},
+                    {n:'AMF DUTY FREE',t:'1144513632525',wn:'Feeder Bond',w:'7500965'},
+                    {n:'METRO INTERNATIONAL',t:'1142987192525',wn:'Feeder Bond',w:'7501066'},
+                    {n:'METRO INTERNATIONAL',t:'1142987192525',wn:'CFS 5',w:'7101127'},
+                    {n:'MORICH TRADING',t:'1146083352525',wn:'Feeder Bond',w:'7501122'},
+                    {n:'MORICH TRADING',t:'1146083352525',wn:'CFS 5',w:'7101127'},
+                    {n:'VICTORY SILK STORES',t:'1040867722525',wn:'Feeder Bond',w:'7500941'},
+                    {n:'TELCEY SERVICES',t:'1147100327000',wn:'Feeder Bond',w:'7501138'},
+                    {n:'AVENTURA HOLDINGS',t:'1747968152525',wn:'Feeder Bond',w:'7501144'},
+                    {n:'ESWARAN BROTHERS',t:'1141272802525',wn:'FEEDER BOND (24A)',w:'7500803'},
+                    {n:'ESWARAN BROTHERS',t:'1141272802525',wn:'DFS (20A)',w:'7501332'},
+                    {n:'FREE LANKA TRADING',t:'1040318707000',wn:'Feeder Bond',w:'7500815'},
+                    {n:'INDIKA INTERNATIONAL DUTY FREE',t:'7622623712525-1',wn:'Feeder Bond',w:'7501059'},
+                    {n:'CROWN ELECTRONICS',t:'4091279912525',wn:'Feeder Bond',w:'7501050'},
+                    {n:'PROJECT PROSPECT',t:'1141861712525',wn:'Feeder Bond',w:'7501064'},
+                    {n:'S. N JAYASINGHE',t:'5229425882525-1',wn:'Feeder Bond',w:'7501009'},
+                    {n:'PACIFIC TRADERS',t:'5311335872525-1',wn:'Feeder Bond',w:'7501082'},
+                    {n:'D. M JEEWAN ( DMJ )',t:'1144007262525',wn:'Feeder Bond',w:'7501103'}
+                ].map(item => ({name: item.n, tin: item.t, warehouseName: item.wn, warehouse: item.w}));
+            },
+
             saveData(syncToCloud = true) {
                 try {
                     localStorage.setItem('cusdec_hsn_data', JSON.stringify(this.data.hsn));
                     localStorage.setItem('cusdec_client_data', JSON.stringify(this.data.client));
                     
-                    // Auto-sync to JSONBin with debouncing
                     if (syncToCloud && this.jsonBin.isConnected) {
                         clearTimeout(this.syncDebounceTimer);
                         this.syncDebounceTimer = setTimeout(() => {
                             this.saveToJsonBin('hsn');
                             this.saveToJsonBin('client');
-                        }, 2000); // Wait 2 seconds before syncing to batch changes
+                        }, 2000);
                     }
                 } catch (error) {
-                    console.error('Error saving data:', error);
                     this.showNotification('Failed to save data', 'error');
                 }
             },
 
-            // Load default HSN data
-            loadDefaultData() {
-                console.log('Loading default HSN data...');
-                this.data.hsn = [
-                    // HAIR CARE
-                    { category: 'HAIR CARE', product: 'Hair Dryer', code: '85163100' },
-                    { category: 'HAIR CARE', product: 'Hair Clipper', code: '85102000' },
-                    { category: 'HAIR CARE', product: 'Hair Groomer', code: '85102000' },
-                    { category: 'HAIR CARE', product: 'Hair Straightener', code: '85163200' },
-                    { category: 'HAIR CARE', product: 'Shaver', code: '85101000' },
-                    
-                    // COSMETICS
-                    { category: 'COSMETICS', product: 'Shampoo', code: '33051000' },
-                    { category: 'COSMETICS', product: 'Hair Colour', code: '33051000' },
-                    { category: 'COSMETICS', product: 'Hair Cream', code: '33051000' },
-                    { category: 'COSMETICS', product: 'Hair Spray', code: '33051000' },
-                    { category: 'COSMETICS', product: 'Eye Shadow', code: '33042000' },
-                    { category: 'COSMETICS', product: 'Eye Makeup', code: '33042000' },
-                    { category: 'COSMETICS', product: 'Lipstick', code: '33041000' },
-                    { category: 'COSMETICS', product: 'Lip Gloss', code: '33041000' },
-                    { category: 'COSMETICS', product: 'Nail Polish', code: '33043000' },
-                    { category: 'COSMETICS', product: 'Manicure Set', code: '33043000' },
-                    { category: 'COSMETICS', product: 'Pedicure Set', code: '33043000' },
-                    { category: 'COSMETICS', product: 'Talcum Powder', code: '33049100' },
-                    
-                    // KITCHEN APPLIANCES
-                    { category: 'KITCHEN APPLIANCES', product: 'Air Fryer', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Blender', code: '85094000' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Coffee Maker', code: '85167100' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Gas Cooker', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Electric Cooker', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Cooker', code: '73211100' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Cooker Hood', code: '84146000' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Cookware Set', code: '73239300' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Electric Oven', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Built-in Oven', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Food Steamer', code: '76151020' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Hob', code: '73211100' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Kettle', code: '85167920' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Microwave Oven', code: '85165000' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Pressure Cooker', code: '76151020' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Rice Cooker', code: '85166010' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Stainless Steel Water Bottle', code: '73239900' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Tea Maker', code: '85167100' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Toaster', code: '85167200' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Sandwich Maker', code: '85167200' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Waffle Maker', code: '85167200' },
-                    { category: 'KITCHEN APPLIANCES', product: 'BBQ Grill', code: '85167200' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Induction Cooker', code: '85166090' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Noodle Maker', code: '84381000' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Spaghetti Maker', code: '84381000' },
-                    { category: 'KITCHEN APPLIANCES', product: 'Macaroni Maker', code: '84381000' },
-                    
-                    // HOME APPLIANCES - ENTERTAINMENT
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'CD Player', code: '85271900' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'DVD Player', code: '85219000' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Hi-Fi Set', code: '85279100' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Home Theatre', code: '85279100' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Radio', code: '85271900' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Sound Bar', code: '85182900' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Speaker', code: '85182900' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Music Organ', code: '92071000' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'TV 32"', code: '85287291' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'TV (Over 32")', code: '85287299' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'TV Wall Mount', code: '83025000' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Car Stereo Set', code: '85272900' },
-                    { category: 'HOME APPLIANCES - ENTERTAINMENT', product: 'Microphone', code: '85181000' },
-                    
-                    // HOME APPLIANCES - HOUSEHOLD
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Air Cooler', code: '84796000' },
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Fridge/Refrigerator', code: '84181090' },
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Iron', code: '85164000' },
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Garment Steamer', code: '84513000' },
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Fan', code: '84145100' },
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Vacuum Cleaner', code: '85081100' },
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Water Dispenser', code: '84158190' },
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Water Filter', code: '84158190' },
-                    { category: 'HOME APPLIANCES - HOUSEHOLD', product: 'Water Purifier', code: '84158190' },
-                    
-                    // WASHING MACHINES
-                    { category: 'WASHING MACHINES', product: 'Washing Machine Front Load (5.5-7.5 KG)', code: '84501143' },
-                    { category: 'WASHING MACHINES', product: 'Washing Machine Front Load (7.5-9.5 KG)', code: '84501144' },
-                    { category: 'WASHING MACHINES', product: 'Washing Machine Front Load (Over 10 KG)', code: '84501149' },
-                    { category: 'WASHING MACHINES', product: 'Washing Machine Top Load (5.5-7.5 KG)', code: '84501133' },
-                    { category: 'WASHING MACHINES', product: 'Washing Machine Top Load (7.5-9.5 KG)', code: '84501134' },
-                    { category: 'WASHING MACHINES', product: 'Washing Machine Top Load (Over 10 KG)', code: '84502000' },
-                    
-                    // PERSONAL ITEMS
-                    { category: 'PERSONAL ITEMS', product: 'Mobile Phone', code: '85171390' },
-                    { category: 'PERSONAL ITEMS', product: 'Weight Scale', code: '84231010' },
-                    { category: 'PERSONAL ITEMS', product: 'Laptop', code: '84713090' },
-                    { category: 'PERSONAL ITEMS', product: 'Notebook', code: '84713090' },
-                    { category: 'PERSONAL ITEMS', product: 'Watch', code: '91021900' },
-                    
-                    // BATHROOM
-                    { category: 'BATHROOM', product: 'Water Heater', code: '85161000' },
-                    { category: 'BATHROOM', product: 'Home Shower', code: '85161000' },
-                    { category: 'BATHROOM', product: 'High Pressure Washer', code: '84242000' },
-                    
-                    // EMERGENCY LIGHTS & TORCHES
-                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'Emergency Lantern', code: '85131090' },
-                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'Emergency Light LED', code: '85131090' },
-                    { category: 'EMERGENCY LIGHTS & TORCHES', product: 'Torch', code: '85131090' },
-                    
-                    // FOOD & BEVERAGES
-                    { category: 'FOOD & BEVERAGES', product: 'Chocolate', code: '18063100' },
-                    { category: 'FOOD & BEVERAGES', product: 'Nescafe/Coffee', code: '21011200' },
-                    { category: 'FOOD & BEVERAGES', product: 'Pringles/Chips', code: '19059020' },
-                    { category: 'FOOD & BEVERAGES', product: 'Soft Drinks', code: '22021000' },
-                    { category: 'FOOD & BEVERAGES', product: 'Energy Drinks', code: '22029930' },
-                    
-                    // PERFUMES & FRAGRANCES
-                    { category: 'PERFUMES & FRAGRANCES', product: 'Body Spray', code: '33072000' },
-                    { category: 'PERFUMES & FRAGRANCES', product: 'Perfumes', code: '33030010' },
-                    
-                    // LIQUOR
-                    { category: 'LIQUOR', product: 'Brandy VSOP', code: '22082000' },
-                    { category: 'LIQUOR', product: 'Gin', code: '22085000' },
-                    { category: 'LIQUOR', product: 'Rum', code: '22084010' },
-                    { category: 'LIQUOR', product: 'Tequila', code: '22087000' },
-                    { category: 'LIQUOR', product: 'Liqueur', code: '22087000' },
-                    { category: 'LIQUOR', product: 'Vodka', code: '22086000' },
-                    { category: 'LIQUOR', product: 'Whisky', code: '22083000' },
-                    { category: 'LIQUOR', product: 'Wine (Sweet)', code: '22042100' },
-                    { category: 'LIQUOR', product: 'Wine (Red)', code: '22042100' },
-                    { category: 'LIQUOR', product: 'Wine (White)', code: '22042100' },
-                    
-                    // CIGARETTES
-                    { category: 'CIGARETTES', product: 'Cigarettes (74-84 MM)', code: '24022050' },
-                    { category: 'CIGARETTES', product: 'Cigarettes (Over 99 MM)', code: '24022060' },
-                    
-                    // TOYS
-                    { category: 'TOYS', product: 'Toys (General)', code: '95030090' },
-                    { category: 'TOYS', product: 'Toy Jeep', code: '95030010' },
-                    { category: 'TOYS', product: 'Toy Car', code: '95030010' },
-                    { category: 'TOYS', product: 'Toy Helicopter', code: '95030070' },
-                    { category: 'TOYS', product: 'Doll', code: '95030070' }
-                ];
-                this.saveData();
-            },
-
-            // Load default client data
-            loadDefaultClientData() {
-                console.log('Loading default client data...');
-                this.data.client = [
-                    // EDISON ELECTRICALS
-                    { name: 'EDISON ELECTRICALS', tin: '1144156182525', warehouseName: 'Colombo Harbour', warehouse: '7501121' },
-                    { name: 'EDISON ELECTRICALS', tin: '1144156182525', warehouseName: 'Palaly Arrival', warehouse: '7501302' },
-                    { name: 'EDISON ELECTRICALS', tin: '1144156182525', warehouseName: 'Palaly Departure', warehouse: '7501303' },
-                    { name: 'EDISON ELECTRICALS', tin: '1144156182525', warehouseName: 'Service Bond', warehouse: '7401172' },
-                    
-                    // ROYALE ELECTRONICS
-                    { name: 'ROYALE ELECTRONICS', tin: '1141827457000', warehouseName: 'Colombo Harbour', warehouse: '7501300' },
-                    { name: 'ROYALE ELECTRONICS', tin: '1141827457000', warehouseName: 'Hambantota', warehouse: '7501293' },
-                    { name: 'ROYALE ELECTRONICS', tin: '1141827457000', warehouseName: 'Service Bond', warehouse: '7400995' },
-                    
-                    // AMF DUTY FREE
-                    { name: 'AMF DUTY FREE', tin: '1144513632525', warehouseName: 'Feeder Bond', warehouse: '7500965' },
-                    
-                    // METRO INTERNATIONAL
-                    { name: 'METRO INTERNATIONAL', tin: '1142987192525', warehouseName: 'Feeder Bond', warehouse: '7501066' },
-                    { name: 'METRO INTERNATIONAL', tin: '1142987192525', warehouseName: 'CFS 5', warehouse: '7101127' },
-                    
-                    // MORICH TRADING
-                    { name: 'MORICH TRADING', tin: '1146083352525', warehouseName: 'Feeder Bond', warehouse: '7501122' },
-                    { name: 'MORICH TRADING', tin: '1146083352525', warehouseName: 'CFS 5', warehouse: '7101127' },
-                    
-                    // VICTORY SILK STORES
-                    { name: 'VICTORY SILK STORES', tin: '1040867722525', warehouseName: 'Feeder Bond', warehouse: '7500941' },
-                    
-                    // TELCEY SERVICES
-                    { name: 'TELCEY SERVICES', tin: '1147100327000', warehouseName: 'Feeder Bond', warehouse: '7501138' },
-                    
-                    // AVENTURA HOLDINGS
-                    { name: 'AVENTURA HOLDINGS', tin: '1747968152525', warehouseName: 'Feeder Bond', warehouse: '7501144' },
-                    
-                    // ESWARAN BROTHERS
-                    { name: 'ESWARAN BROTHERS', tin: '1141272802525', warehouseName: 'FEEDER BOND (24A)', warehouse: '7500803' },
-                    { name: 'ESWARAN BROTHERS', tin: '1141272802525', warehouseName: 'DFS (20A)', warehouse: '7501332' },
-                    
-                    // FREE LANKA TRADING
-                    { name: 'FREE LANKA TRADING', tin: '1040318707000', warehouseName: 'Feeder Bond', warehouse: '7500815' },
-                    
-                    // INDIKA INTERNATIONAL DUTY FREE
-                    { name: 'INDIKA INTERNATIONAL DUTY FREE', tin: '7622623712525-1', warehouseName: 'Feeder Bond', warehouse: '7501059' },
-                    
-                    // CROWN ELECTRONICS
-                    { name: 'CROWN ELECTRONICS', tin: '4091279912525', warehouseName: 'Feeder Bond', warehouse: '7501050' },
-                    
-                    // PROJECT PROSPECT
-                    { name: 'PROJECT PROSPECT', tin: '1141861712525', warehouseName: 'Feeder Bond', warehouse: '7501064' },
-                    
-                    // S. N JAYASINGHE
-                    { name: 'S. N JAYASINGHE', tin: '5229425882525-1', warehouseName: 'Feeder Bond', warehouse: '7501009' },
-                    
-                    // PACIFIC TRADERS
-                    { name: 'PACIFIC TRADERS', tin: '5311335872525-1', warehouseName: 'Feeder Bond', warehouse: '7501082' },
-                    
-                    // D. M JEEWAN ( DMJ )
-                    { name: 'D. M JEEWAN ( DMJ )', tin: '1144007262525', warehouseName: 'Feeder Bond', warehouse: '7501103' }
-                ];
-                this.saveData();
-            },
-
-            // Attach event listeners
             attachEventListeners() {
-                console.log('Attaching event listeners...');
-                
-                // Search inputs with debouncing
-                const hsnSearch = document.getElementById('hsnSearch');
-                const clientSearch = document.getElementById('clientSearch');
-                
-                if (hsnSearch) {
-                    hsnSearch.addEventListener('input', (e) => {
-                        this.debounceSearch('hsn', e.target.value);
-                    });
-                }
-                
-                if (clientSearch) {
-                    clientSearch.addEventListener('input', (e) => {
-                        this.debounceSearch('client', e.target.value);
-                    });
-                }
+                ['hsn', 'client'].forEach(type => {
+                    const input = document.getElementById(type + 'Search');
+                    if (input) {
+                        input.addEventListener('input', (e) => {
+                            this.debounceSearch(type, e.target.value);
+                        });
+                    }
+                });
 
-                // Modal backdrop click
-                const addModal = document.getElementById('addModal');
-                const apiKeyModal = document.getElementById('apiKeyModal');
-                
-                if (addModal) {
-                    addModal.addEventListener('click', (e) => {
-                        if (e.target.id === 'addModal') {
-                            this.closeModal();
-                        }
-                    });
-                }
-                
-                if (apiKeyModal) {
-                    apiKeyModal.addEventListener('click', (e) => {
-                        if (e.target.id === 'apiKeyModal') {
-                            this.closeApiKeyModal();
-                        }
-                    });
-                }
+                document.getElementById('modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'modal') this.closeModal();
+                });
 
-                // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
-                        const modal = document.getElementById('addModal');
-                        const apiKeyModal = document.getElementById('apiKeyModal');
-                        if (modal && modal.classList.contains('active')) {
+                        if (document.getElementById('modal').classList.contains('active')) {
                             this.closeModal();
-                        } else if (apiKeyModal && apiKeyModal.classList.contains('active')) {
-                            this.closeApiKeyModal();
                         } else {
                             this.showDashboard();
                         }
@@ -2095,17 +1080,14 @@
                 });
             },
 
-            // Debounced search
             debounceSearch(type, query) {
                 clearTimeout(this.debounceTimer);
                 this.searchState[type] = query;
-
                 this.debounceTimer = setTimeout(() => {
                     this.performSearch(type, query);
                 }, 300);
             },
 
-            // Perform search with smart matching
             performSearch(type, query) {
                 const trimmedQuery = query.toLowerCase().trim();
                 
@@ -2114,67 +1096,30 @@
                     return;
                 }
 
-                let filtered = [];
-                const searchTerms = trimmedQuery.split(/\s+/); // Split by spaces for multi-word search
+                const searchTerms = trimmedQuery.split(/\s+/);
+                
+                let filtered = this.data[type].filter(item => {
+                    const searchableText = type === 'hsn'
+                        ? [item.code || '', item.product || '', item.category || ''].join(' ').toLowerCase()
+                        : [item.tin || '', item.name || '', item.warehouse || '', item.warehouseName || ''].join(' ').toLowerCase();
+                    
+                    return searchTerms.every(term => searchableText.includes(term));
+                });
 
-                if (type === 'hsn') {
-                    filtered = this.data.hsn.filter(item => {
-                        const searchableText = [
-                            item.code || '',
-                            item.product || '',
-                            item.category || ''
-                        ].join(' ').toLowerCase();
-                        
-                        // Smart matching: All search terms must be found
-                        return searchTerms.every(term => searchableText.includes(term));
-                    });
-
-                    // Sort results by relevance
-                    filtered.sort((a, b) => {
-                        // Exact code match gets highest priority
-                        if (a.code && a.code.toLowerCase() === trimmedQuery) return -1;
-                        if (b.code && b.code.toLowerCase() === trimmedQuery) return 1;
-                        
-                        // Code starts with query
-                        if (a.code && a.code.toLowerCase().startsWith(trimmedQuery)) return -1;
-                        if (b.code && b.code.toLowerCase().startsWith(trimmedQuery)) return 1;
-                        
-                        // Product exact match
-                        if (a.product && a.product.toLowerCase().includes(trimmedQuery)) return -1;
-                        if (b.product && b.product.toLowerCase().includes(trimmedQuery)) return 1;
-                        
-                        return 0;
-                    });
-                } else {
-                    filtered = this.data.client.filter(item => {
-                        const searchableText = [
-                            item.tin || '',
-                            item.name || '',
-                            item.warehouse || '',
-                            item.warehouseName || ''
-                        ].join(' ').toLowerCase();
-                        
-                        // Smart matching: All search terms must be found
-                        return searchTerms.every(term => searchableText.includes(term));
-                    });
-
-                    // Sort results by relevance
-                    filtered.sort((a, b) => {
-                        // Exact TIN match gets highest priority
-                        if (a.tin && a.tin.toLowerCase() === trimmedQuery) return -1;
-                        if (b.tin && b.tin.toLowerCase() === trimmedQuery) return 1;
-                        
-                        // Exact warehouse code match
-                        if (a.warehouse && a.warehouse.toLowerCase() === trimmedQuery) return -1;
-                        if (b.warehouse && b.warehouse.toLowerCase() === trimmedQuery) return 1;
-                        
-                        // Company name starts with query
-                        if (a.name && a.name.toLowerCase().startsWith(trimmedQuery)) return -1;
-                        if (b.name && b.name.toLowerCase().startsWith(trimmedQuery)) return 1;
-                        
-                        return 0;
-                    });
-                }
+                filtered.sort((a, b) => {
+                    if (type === 'hsn') {
+                        if (a.code === trimmedQuery) return -1;
+                        if (b.code === trimmedQuery) return 1;
+                        if (a.code.startsWith(trimmedQuery)) return -1;
+                        if (b.code.startsWith(trimmedQuery)) return 1;
+                    } else {
+                        if (a.tin === trimmedQuery) return -1;
+                        if (b.tin === trimmedQuery) return 1;
+                        if (a.warehouse === trimmedQuery) return -1;
+                        if (b.warehouse === trimmedQuery) return 1;
+                    }
+                    return 0;
+                });
 
                 if (filtered.length === 0) {
                     this.showEmptyState(type, `No results found for "${query}"`);
@@ -2183,7 +1128,6 @@
                 }
             },
 
-            // Display search results
             displayResults(type, data) {
                 const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
                 if (!container) return;
@@ -2192,13 +1136,12 @@
 
                 if (type === 'hsn') {
                     data.forEach((item) => {
-                        // Find actual index in original data array
                         const actualIndex = this.data.hsn.findIndex(h => h.code === item.code);
                         const div = document.createElement('div');
                         div.className = 'result-item';
                         div.innerHTML = `
                             <div class="result-actions">
-                                <button class="result-action-btn edit" onclick="app.editItem('hsn', ${actualIndex}, '${item.code}')" title="Edit">
+                                <button class="result-action-btn edit" onclick="app.editItem('hsn', ${actualIndex})">
                                     <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -2206,33 +1149,32 @@
                                     Edit
                                 </button>
                             </div>
-                            <div class="result-title" onclick="app.copyToClipboard('${item.code}', 'HSN Code')" title="Click to copy HSN code">
-                                ${this.escapeHtml(item.code || 'N/A')}
+                            <div class="result-title" onclick="app.copyToClipboard('${item.code}', 'HSN Code')">
+                                ${this.h(item.code || 'N/A')}
                                 <span class="copy-hint">📋 Copy</span>
                             </div>
-                            <div class="result-details"><span style="color: var(--text-secondary);">Product:</span> ${this.escapeHtml(item.product || 'N/A')}</div>
-                            <div class="result-category">${this.escapeHtml(item.category || 'N/A')}</div>
+                            <div class="result-details"><span style="color: var(--text-secondary);">Product:</span> ${this.h(item.product || 'N/A')}</div>
+                            <div class="result-category">${this.h(item.category || 'N/A')}</div>
                         `;
                         container.appendChild(div);
                     });
                 } else {
-                    // Group clients by company
                     const grouped = this.groupClientData(data);
                     
                     Object.values(grouped).forEach(company => {
                         const div = document.createElement('div');
                         div.className = 'result-item';
                         
-                        const warehouseChips = company.warehouses.map(wh => {
-                            return `<div class="warehouse-chip" onclick="app.copyToClipboard('${wh.code}', 'Warehouse Code')" title="Click to copy warehouse code">
-                                <div class="warehouse-code">${this.escapeHtml(wh.code || 'N/A')}</div>
-                                <div class="warehouse-name">${this.escapeHtml(wh.name || 'N/A')}</div>
-                            </div>`;
-                        }).join('');
+                        const warehouseChips = company.warehouses.map(wh => `
+                            <div class="warehouse-chip" onclick="app.copyToClipboard('${wh.code}', 'Warehouse Code')">
+                                <div class="warehouse-code">${this.h(wh.code || 'N/A')}</div>
+                                <div class="warehouse-name">${this.h(wh.name || 'N/A')}</div>
+                            </div>
+                        `).join('');
                         
                         div.innerHTML = `
                             <div class="result-actions">
-                                <button class="result-action-btn edit" onclick="app.editClient('${company.tin}')" title="Edit">
+                                <button class="result-action-btn edit" onclick="app.editClient('${company.tin}')">
                                     <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -2240,16 +1182,14 @@
                                     Edit
                                 </button>
                             </div>
-                            <div class="result-title" onclick="app.copyToClipboard('${company.tin}', 'TIN')" title="Click to copy TIN">
-                                <span style="color: var(--text-secondary); font-weight: 400; font-size: 0.875rem;">TIN:</span> ${this.escapeHtml(company.tin || 'N/A')}
+                            <div class="result-title" onclick="app.copyToClipboard('${company.tin}', 'TIN')">
+                                <span style="color: var(--text-secondary); font-weight: 400; font-size: 0.875rem;">TIN:</span> ${this.h(company.tin || 'N/A')}
                                 <span class="copy-hint">📋 Copy</span>
                             </div>
-                            <div class="result-details"><span style="color: var(--text-secondary);">Company:</span> ${this.escapeHtml(company.name || 'N/A')}</div>
-                            <div style="margin-top: var(--spacing-md);">
+                            <div class="result-details"><span style="color: var(--text-secondary);">Company:</span> ${this.h(company.name || 'N/A')}</div>
+                            <div style="margin-top: var(--spacing);">
                                 <div class="warehouse-label">Warehouses</div>
-                                <div class="warehouse-container">
-                                    ${warehouseChips}
-                                </div>
+                                <div class="warehouse-container">${warehouseChips}</div>
                             </div>
                         `;
                         container.appendChild(div);
@@ -2257,26 +1197,17 @@
                 }
             },
 
-            // Group client data by company
             groupClientData(data) {
                 return data.reduce((acc, item) => {
                     const key = `${item.name}-${item.tin}`;
                     if (!acc[key]) {
-                        acc[key] = {
-                            name: item.name,
-                            tin: item.tin,
-                            warehouses: []
-                        };
+                        acc[key] = { name: item.name, tin: item.tin, warehouses: [] };
                     }
-                    acc[key].warehouses.push({
-                        name: item.warehouseName,
-                        code: item.warehouse
-                    });
+                    acc[key].warehouses.push({ name: item.warehouseName, code: item.warehouse });
                     return acc;
                 }, {});
             },
 
-            // Show empty state
             showEmptyState(type, message = null) {
                 const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
                 if (!container) return;
@@ -2294,340 +1225,207 @@
                 `;
             },
 
-            // Navigation methods
             showSection(section) {
-                console.log(`Showing ${section} section...`);
-                // Hide dashboard
-                const dashboard = document.getElementById('dashboard');
-                if (dashboard) {
-                    dashboard.classList.remove('active');
-                    
-                    setTimeout(() => {
-                        dashboard.style.display = 'none';
-                        
-                        // Show section
-                        const sectionEl = document.getElementById(section + 'Section');
-                        if (sectionEl) {
-                            sectionEl.style.display = 'flex';
-                            
-                            setTimeout(() => {
-                                sectionEl.classList.add('active');
-                                
-                                // Focus search input
-                                const searchInput = document.getElementById(section + 'Search');
-                                if (searchInput) {
-                                    searchInput.focus();
-                                }
-                                
-                                // Show appropriate empty state
-                                this.showEmptyState(section);
-                            }, 50);
-                        }
-                    }, 300);
+                document.getElementById('dashboard').classList.add('hidden');
+                const sectionEl = document.getElementById(section + 'Section');
+                if (sectionEl) {
+                    sectionEl.classList.add('active');
+                    const searchInput = document.getElementById(section + 'Search');
+                    if (searchInput) searchInput.focus();
+                    this.showEmptyState(section);
                 }
             },
 
             showDashboard() {
-                console.log('Showing dashboard...');
-                // Hide all sections
                 ['hsnSection', 'clientSection'].forEach(id => {
                     const section = document.getElementById(id);
-                    if (section) {
-                        section.classList.remove('active');
-                        setTimeout(() => {
-                            section.style.display = 'none';
-                        }, 300);
-                    }
+                    if (section) section.classList.remove('active');
                 });
-                
-                // Show dashboard
-                setTimeout(() => {
-                    const dashboard = document.getElementById('dashboard');
-                    if (dashboard) {
-                        dashboard.style.display = 'block';
-                        setTimeout(() => {
-                            dashboard.classList.add('active');
-                        }, 50);
-                    }
-                }, 300);
+                document.getElementById('dashboard').classList.remove('hidden');
             },
 
-            // Modal methods
-            showAddModal(type) {
-                const modal = document.getElementById('addModal');
-                const title = document.getElementById('modalTitle');
-                const form = document.getElementById('modalForm');
-                
-                if (!modal || !title || !form) return;
-                
-                if (type === 'hsn') {
-                    title.textContent = 'Add New HSN Code';
-                    
-                    const categories = [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))];
-                    const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
-                    
-                    form.innerHTML = `
-                        <form onsubmit="app.saveHSN(event)">
-                            <div class="form-group">
-                                <label class="form-label">Category</label>
-                                <input type="text" class="form-input" id="newCategory" list="categoryList" required>
-                                <datalist id="categoryList">${categoryOptions}</datalist>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Product Name</label>
-                                <input type="text" class="form-input" id="newProduct" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">HSN Code</label>
-                                <input type="text" class="form-input" id="newHSNCode" required pattern="[0-9]{8}" 
-                                       placeholder="8-digit HSN code" maxlength="8">
-                            </div>
-                            <button type="submit" class="save-btn">Save HSN Code</button>
-                        </form>
-                    `;
-                } else {
-                    title.textContent = 'Add New Client';
-                    
-                    const companies = [...new Set(this.data.client.map(item => item.name).filter(Boolean))];
-                    const warehouses = [...new Set(this.data.client.map(item => item.warehouseName).filter(Boolean))];
-                    
-                    const companyOptions = companies.map(comp => `<option value="${comp}">`).join('');
-                    const warehouseOptions = warehouses.map(wh => `<option value="${wh}">`).join('');
-                    
-                    form.innerHTML = `
-                        <form onsubmit="app.saveClient(event)">
-                            <div class="form-group">
-                                <label class="form-label">Company Name</label>
-                                <input type="text" class="form-input" id="newClientName" list="companyList" required>
-                                <datalist id="companyList">${companyOptions}</datalist>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">TIN Code</label>
-                                <input type="text" class="form-input" id="newTIN" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Warehouse Name</label>
-                                <input type="text" class="form-input" id="newWarehouseName" list="warehouseList" required>
-                                <datalist id="warehouseList">${warehouseOptions}</datalist>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Warehouse Number</label>
-                                <input type="text" class="form-input" id="newWarehouse" required>
-                            </div>
-                            <button type="submit" class="save-btn">Save Client</button>
-                        </form>
-                    `;
-                }
-                
-                modal.style.display = 'block';
-                setTimeout(() => {
-                    modal.classList.add('active');
-                    // Focus first input
-                    const firstInput = form.querySelector('input');
-                    if (firstInput) firstInput.focus();
-                }, 10);
+            showModal(title, content) {
+                const modal = document.getElementById('modal');
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalContent').innerHTML = content;
+                modal.classList.add('active');
             },
 
             closeModal() {
-                const modal = document.getElementById('addModal');
-                if (modal) {
-                    modal.classList.remove('active');
-                    setTimeout(() => {
-                        modal.style.display = 'none';
-                    }, 300);
-                }
+                document.getElementById('modal').classList.remove('active');
             },
 
-            // Save methods
-            saveHSN(event) {
+            showAddModal(type) {
+                const categories = type === 'hsn' 
+                    ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))]
+                    : [];
+                    
+                const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
+                
+                const content = type === 'hsn' ? `
+                    <form onsubmit="app.saveItem(event, 'hsn')">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-input" name="category" list="categoryList" required>
+                            <datalist id="categoryList">${categoryOptions}</datalist>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" class="form-input" name="product" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">HSN Code</label>
+                            <input type="text" class="form-input" name="code" required pattern="[0-9]{8}" 
+                                   placeholder="8-digit HSN code" maxlength="8">
+                        </div>
+                        <button type="submit" class="save-btn">Save HSN Code</button>
+                    </form>
+                ` : `
+                    <form onsubmit="app.saveItem(event, 'client')">
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-input" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">TIN Code</label>
+                            <input type="text" class="form-input" name="tin" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Warehouse Name</label>
+                            <input type="text" class="form-input" name="warehouseName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Warehouse Number</label>
+                            <input type="text" class="form-input" name="warehouse" required>
+                        </div>
+                        <button type="submit" class="save-btn">Save Client</button>
+                    </form>
+                `;
+                
+                this.showModal(type === 'hsn' ? 'Add New HSN Code' : 'Add New Client', content);
+                setTimeout(() => document.querySelector('.form-input').focus(), 100);
+            },
+
+            saveItem(event, type) {
                 event.preventDefault();
-                
-                const newItem = {
-                    category: document.getElementById('newCategory').value.trim(),
-                    product: document.getElementById('newProduct').value.trim(),
-                    code: document.getElementById('newHSNCode').value.trim()
-                };
-                
-                // Check for duplicates
-                const isDuplicate = this.data.hsn.some(item => item.code === newItem.code);
-                if (isDuplicate) {
-                    this.showNotification('HSN code already exists', 'error');
-                    return;
-                }
-                
-                this.data.hsn.push(newItem);
-                this.saveData();
-                this.closeModal();
-                this.showNotification('HSN code added successfully', 'success');
-                
-                // Refresh search if active
-                const searchQuery = document.getElementById('hsnSearch').value.trim();
-                if (searchQuery) {
-                    this.performSearch('hsn', searchQuery);
-                }
-            },
-
-            saveClient(event) {
-                event.preventDefault();
-                
-                const newItem = {
-                    name: document.getElementById('newClientName').value.trim(),
-                    tin: document.getElementById('newTIN').value.trim(),
-                    warehouseName: document.getElementById('newWarehouseName').value.trim(),
-                    warehouse: document.getElementById('newWarehouse').value.trim()
-                };
-                
-                // Check for duplicate warehouse
-                const isDuplicate = this.data.client.some(item => 
-                    item.tin === newItem.tin && item.warehouse === newItem.warehouse
-                );
-                if (isDuplicate) {
-                    this.showNotification('This warehouse already exists for this TIN', 'error');
-                    return;
-                }
-                
-                this.data.client.push(newItem);
-                this.saveData();
-                this.closeModal();
-                this.showNotification('Client added successfully', 'success');
-                
-                // Refresh search if active
-                const searchQuery = document.getElementById('clientSearch').value.trim();
-                if (searchQuery) {
-                    this.performSearch('client', searchQuery);
-                }
-            },
-
-            // Edit item
-            editItem(type, index, identifier) {
-                const modal = document.getElementById('addModal');
-                const title = document.getElementById('modalTitle');
-                const form = document.getElementById('modalForm');
-                
-                if (!modal || !title || !form) return;
+                const formData = new FormData(event.target);
+                const newItem = Object.fromEntries(formData);
                 
                 if (type === 'hsn') {
-                    const item = this.data.hsn[index];
-                    if (!item) return;
-                    
-                    title.textContent = 'Edit HSN Code';
-                    
-                    const categories = [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))];
-                    const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
-                    
-                    form.innerHTML = `
-                        <form onsubmit="app.updateHSN(event, ${index})">
-                            <div class="form-group">
-                                <label class="form-label">Category</label>
-                                <input type="text" class="form-input" id="editCategory" list="categoryList" value="${this.escapeHtml(item.category)}" required>
-                                <datalist id="categoryList">${categoryOptions}</datalist>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Product Name</label>
-                                <input type="text" class="form-input" id="editProduct" value="${this.escapeHtml(item.product)}" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">HSN Code</label>
-                                <input type="text" class="form-input" id="editHSNCode" value="${this.escapeHtml(item.code)}" required pattern="[0-9]{8}" 
-                                       placeholder="8-digit HSN code" maxlength="8">
-                            </div>
-                            <button type="submit" class="save-btn">Update HSN Code</button>
-                            <button type="button" class="delete-btn" onclick="app.deleteFromModal('hsn', '${item.code}', ${index})" style="margin-top: var(--spacing-md);">
-                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                                    <path d="M10 11v6"></path>
-                                    <path d="M14 11v6"></path>
-                                </svg>
-                                Delete HSN Code
-                            </button>
-                        </form>
-                    `;
+                    const isDuplicate = this.data.hsn.some(item => item.code === newItem.code);
+                    if (isDuplicate) {
+                        this.showNotification('HSN code already exists', 'error');
+                        return;
+                    }
                 } else {
-                    const item = this.data.client[index];
-                    if (!item) return;
-                    
-                    title.textContent = 'Edit Client';
-                    
-                    const companies = [...new Set(this.data.client.map(item => item.name).filter(Boolean))];
-                    const warehouses = [...new Set(this.data.client.map(item => item.warehouseName).filter(Boolean))];
-                    
-                    const companyOptions = companies.map(comp => `<option value="${comp}">`).join('');
-                    const warehouseOptions = warehouses.map(wh => `<option value="${wh}">`).join('');
-                    
-                    form.innerHTML = `
-                        <form onsubmit="app.updateClient(event, ${index})">
-                            <div class="form-group">
-                                <label class="form-label">Company Name</label>
-                                <input type="text" class="form-input" id="editClientName" list="companyList" value="${this.escapeHtml(item.name)}" required>
-                                <datalist id="companyList">${companyOptions}</datalist>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">TIN Code</label>
-                                <input type="text" class="form-input" id="editTIN" value="${this.escapeHtml(item.tin)}" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Warehouse Name</label>
-                                <input type="text" class="form-input" id="editWarehouseName" list="warehouseList" value="${this.escapeHtml(item.warehouseName)}" required>
-                                <datalist id="warehouseList">${warehouseOptions}</datalist>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Warehouse Number</label>
-                                <input type="text" class="form-input" id="editWarehouse" value="${this.escapeHtml(item.warehouse)}" required>
-                            </div>
-                            <button type="submit" class="save-btn">Update Client</button>
-                            <button type="button" class="delete-btn" onclick="app.deleteFromModal('client', '${item.tin}-${item.warehouse}', ${index})" style="margin-top: var(--spacing-md);">
-                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                                    <path d="M10 11v6"></path>
-                                    <path d="M14 11v6"></path>
-                                </svg>
-                                Delete Warehouse
-                            </button>
-                        </form>
-                    `;
+                    const isDuplicate = this.data.client.some(item => 
+                        item.tin === newItem.tin && item.warehouse === newItem.warehouse
+                    );
+                    if (isDuplicate) {
+                        this.showNotification('This warehouse already exists for this TIN', 'error');
+                        return;
+                    }
                 }
                 
-                modal.style.display = 'block';
-                setTimeout(() => {
-                    modal.classList.add('active');
-                    // Focus first input
-                    const firstInput = form.querySelector('input');
-                    if (firstInput) firstInput.focus();
-                }, 10);
+                this.data[type].push(newItem);
+                this.saveData();
+                this.closeModal();
+                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} added successfully`, 'success');
+                
+                const searchQuery = document.getElementById(type + 'Search').value.trim();
+                if (searchQuery) this.performSearch(type, searchQuery);
             },
 
-            // Edit client (show all warehouses)
+            editItem(type, index) {
+                const item = this.data[type][index];
+                if (!item) return;
+                
+                const categories = type === 'hsn' 
+                    ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))]
+                    : [];
+                    
+                const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
+                
+                const content = type === 'hsn' ? `
+                    <form onsubmit="app.updateItem(event, 'hsn', ${index})">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-input" name="category" list="categoryList" 
+                                   value="${this.h(item.category)}" required>
+                            <datalist id="categoryList">${categoryOptions}</datalist>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" class="form-input" name="product" 
+                                   value="${this.h(item.product)}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">HSN Code</label>
+                            <input type="text" class="form-input" name="code" 
+                                   value="${this.h(item.code)}" required pattern="[0-9]{8}" 
+                                   placeholder="8-digit HSN code" maxlength="8">
+                        </div>
+                        <button type="submit" class="save-btn">Update HSN Code</button>
+                        <button type="button" class="delete-btn" 
+                                onclick="app.deleteItem('hsn', ${index})">Delete HSN Code</button>
+                    </form>
+                ` : `
+                    <form onsubmit="app.updateItem(event, 'client', ${index})">
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-input" name="name" 
+                                   value="${this.h(item.name)}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">TIN Code</label>
+                            <input type="text" class="form-input" name="tin" 
+                                   value="${this.h(item.tin)}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Warehouse Name</label>
+                            <input type="text" class="form-input" name="warehouseName" 
+                                   value="${this.h(item.warehouseName)}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Warehouse Number</label>
+                            <input type="text" class="form-input" name="warehouse" 
+                                   value="${this.h(item.warehouse)}" required>
+                        </div>
+                        <button type="submit" class="save-btn">Update Client</button>
+                        <button type="button" class="delete-btn" 
+                                onclick="app.deleteItem('client', ${index})">Delete Warehouse</button>
+                    </form>
+                `;
+                
+                this.showModal(type === 'hsn' ? 'Edit HSN Code' : 'Edit Client', content);
+                setTimeout(() => document.querySelector('.form-input').focus(), 100);
+            },
+
             editClient(tin) {
-                const modal = document.getElementById('addModal');
-                const title = document.getElementById('modalTitle');
-                const form = document.getElementById('modalForm');
-                
-                if (!modal || !title || !form) return;
-                
-                // Get all warehouses for this TIN
                 const clientWarehouses = this.data.client.filter(c => c.tin === tin);
                 if (clientWarehouses.length === 0) return;
                 
                 const companyName = clientWarehouses[0].name;
-                title.textContent = `Edit Client: ${companyName}`;
                 
-                const warehousesList = clientWarehouses.map((item, idx) => {
-                    const actualIndex = this.data.client.findIndex(c => c.tin === item.tin && c.warehouse === item.warehouse);
+                const warehousesList = clientWarehouses.map((item) => {
+                    const actualIndex = this.data.client.findIndex(c => 
+                        c.tin === item.tin && c.warehouse === item.warehouse
+                    );
                     return `
                         <div class="warehouse-edit-item">
                             <div class="warehouse-edit-details">
-                                <strong>${this.escapeHtml(item.warehouse)}</strong> - ${this.escapeHtml(item.warehouseName)}
+                                <strong>${this.h(item.warehouse)}</strong> - ${this.h(item.warehouseName)}
                             </div>
                             <div class="warehouse-edit-actions">
-                                <button type="button" class="small-btn edit" onclick="app.editItem('client', ${actualIndex}, '${item.tin}-${item.warehouse}')">
+                                <button type="button" class="small-btn edit" 
+                                        onclick="app.editItem('client', ${actualIndex})">
                                     <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                     </svg>
                                 </button>
-                                <button type="button" class="small-btn delete" onclick="app.deleteFromModal('client', '${item.tin}-${item.warehouse}', ${actualIndex})">
+                                <button type="button" class="small-btn delete" 
+                                        onclick="app.deleteItem('client', ${actualIndex})">
                                     <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="18" y1="6" x2="6" y2="18"></line>
                                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -2638,202 +1436,132 @@
                     `;
                 }).join('');
                 
-                form.innerHTML = `
+                const content = `
                     <form onsubmit="app.updateClientInfo(event, '${tin}')">
                         <div class="form-group">
                             <label class="form-label">Company Name</label>
-                            <input type="text" class="form-input" id="editCompanyName" value="${this.escapeHtml(companyName)}" required>
+                            <input type="text" class="form-input" name="name" 
+                                   value="${this.h(companyName)}" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">TIN Code</label>
-                            <input type="text" class="form-input" id="editCompanyTIN" value="${this.escapeHtml(tin)}" required>
+                            <input type="text" class="form-input" name="tin" 
+                                   value="${this.h(tin)}" required>
                         </div>
                         <button type="submit" class="save-btn">Update Company Info</button>
                     </form>
-                    <div class="warehouses-list" style="margin-top: var(--spacing-lg);">
-                        <h4 style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Warehouses</h4>
+                    <div class="warehouses-list" style="margin-top: var(--spacing);">
+                        <h4 style="margin-bottom: var(--spacing); color: var(--text-secondary);">Warehouses</h4>
                         ${warehousesList}
                     </div>
-                    <button type="button" class="delete-btn" onclick="app.deleteEntireClient('${tin}')" style="margin-top: var(--spacing-lg);">
-                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                            <path d="M10 11v6"></path>
-                            <path d="M14 11v6"></path>
-                        </svg>
-                        Delete Entire Client
-                    </button>
+                    <button type="button" class="delete-btn" onclick="app.deleteEntireClient('${tin}')" 
+                            style="margin-top: var(--spacing);">Delete Entire Client</button>
                 `;
                 
-                modal.style.display = 'block';
-                setTimeout(() => {
-                    modal.classList.add('active');
-                }, 10);
+                this.showModal(`Edit Client: ${companyName}`, content);
             },
 
-            // Update client info (name and TIN)
             updateClientInfo(event, oldTin) {
                 event.preventDefault();
+                const formData = new FormData(event.target);
+                const { name, tin } = Object.fromEntries(formData);
                 
-                const newName = document.getElementById('editCompanyName').value.trim();
-                const newTin = document.getElementById('editCompanyTIN').value.trim();
-                
-                // Check if TIN changed and if new TIN already exists
-                if (oldTin !== newTin) {
-                    const exists = this.data.client.some(c => c.tin === newTin);
+                if (oldTin !== tin) {
+                    const exists = this.data.client.some(c => c.tin === tin);
                     if (exists) {
                         this.showNotification('A client with this TIN already exists', 'error');
                         return;
                     }
                 }
                 
-                // Update all warehouses for this client
                 this.data.client = this.data.client.map(client => {
                     if (client.tin === oldTin) {
-                        return { ...client, name: newName, tin: newTin };
+                        return { ...client, name, tin };
                     }
                     return client;
                 });
                 
                 this.saveData();
                 this.closeModal();
-                this.showNotification('Client information updated successfully', 'success');
+                this.showNotification('Client information updated', 'success');
                 
-                // Refresh search if active
                 const searchQuery = document.getElementById('clientSearch').value.trim();
-                if (searchQuery) {
-                    this.performSearch('client', searchQuery);
-                }
+                if (searchQuery) this.performSearch('client', searchQuery);
             },
 
-            // Delete entire client
-            deleteEntireClient(tin) {
-                const clientWarehouses = this.data.client.filter(c => c.tin === tin);
-                const companyName = clientWarehouses[0]?.name || 'this client';
+            updateItem(event, type, index) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const updatedItem = Object.fromEntries(formData);
                 
-                if (confirm(`Are you sure you want to delete ${companyName} and all ${clientWarehouses.length} warehouses?`)) {
-                    this.data.client = this.data.client.filter(c => c.tin !== tin);
+                if (type === 'hsn') {
+                    const isDuplicate = this.data.hsn.some((item, i) => 
+                        i !== index && item.code === updatedItem.code
+                    );
+                    if (isDuplicate) {
+                        this.showNotification('HSN code already exists', 'error');
+                        return;
+                    }
+                } else {
+                    const isDuplicate = this.data.client.some((item, i) => 
+                        i !== index && item.tin === updatedItem.tin && item.warehouse === updatedItem.warehouse
+                    );
+                    if (isDuplicate) {
+                        this.showNotification('This warehouse already exists for this TIN', 'error');
+                        return;
+                    }
+                }
+                
+                this.data[type][index] = updatedItem;
+                this.saveData();
+                this.closeModal();
+                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} updated`, 'success');
+                
+                const searchQuery = document.getElementById(type + 'Search').value.trim();
+                if (searchQuery) this.performSearch(type, searchQuery);
+            },
+
+            deleteItem(type, index) {
+                const confirmMessage = type === 'hsn' 
+                    ? 'Delete this HSN code?' 
+                    : 'Delete this warehouse?';
+                
+                if (confirm(confirmMessage)) {
+                    this.data[type].splice(index, 1);
                     this.saveData();
                     this.closeModal();
-                    this.showNotification('Client deleted successfully', 'success');
+                    this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Warehouse'} deleted`, 'success');
                     
-                    // Refresh search if active
-                    const searchQuery = document.getElementById('clientSearch').value.trim();
-                    if (searchQuery) {
-                        this.performSearch('client', searchQuery);
+                    const searchInput = document.getElementById(type + 'Search');
+                    if (searchInput && searchInput.value.trim()) {
+                        this.performSearch(type, searchInput.value);
                     }
                 }
             },
 
-            // Delete from modal with confirmation
-            deleteFromModal(type, identifier, index) {
-                const confirmMessage = type === 'hsn' 
-                    ? 'Are you sure you want to delete this HSN code?' 
-                    : 'Are you sure you want to delete this warehouse?';
+            deleteEntireClient(tin) {
+                const clientWarehouses = this.data.client.filter(c => c.tin === tin);
+                const companyName = clientWarehouses[0]?.name || 'this client';
                 
-                if (confirm(confirmMessage)) {
-                    this.deleteItem(type, identifier);
+                if (confirm(`Delete ${companyName} and all ${clientWarehouses.length} warehouses?`)) {
+                    this.data.client = this.data.client.filter(c => c.tin !== tin);
+                    this.saveData();
                     this.closeModal();
+                    this.showNotification('Client deleted', 'success');
+                    
+                    const searchQuery = document.getElementById('clientSearch').value.trim();
+                    if (searchQuery) this.performSearch('client', searchQuery);
                 }
             },
 
-            // Update HSN
-            updateHSN(event, index) {
-                event.preventDefault();
-                
-                const updatedItem = {
-                    category: document.getElementById('editCategory').value.trim(),
-                    product: document.getElementById('editProduct').value.trim(),
-                    code: document.getElementById('editHSNCode').value.trim()
-                };
-                
-                // Check for duplicate code (excluding current item)
-                const isDuplicate = this.data.hsn.some((item, i) => 
-                    i !== index && item.code === updatedItem.code
-                );
-                if (isDuplicate) {
-                    this.showNotification('HSN code already exists', 'error');
-                    return;
-                }
-                
-                this.data.hsn[index] = updatedItem;
-                this.saveData();
-                this.closeModal();
-                this.showNotification('HSN code updated successfully', 'success');
-                
-                // Refresh search if active
-                const searchQuery = document.getElementById('hsnSearch').value.trim();
-                if (searchQuery) {
-                    this.performSearch('hsn', searchQuery);
-                }
-            },
-
-            // Update Client
-            updateClient(event, index) {
-                event.preventDefault();
-                
-                const updatedItem = {
-                    name: document.getElementById('editClientName').value.trim(),
-                    tin: document.getElementById('editTIN').value.trim(),
-                    warehouseName: document.getElementById('editWarehouseName').value.trim(),
-                    warehouse: document.getElementById('editWarehouse').value.trim()
-                };
-                
-                // Check for duplicate warehouse (excluding current item)
-                const isDuplicate = this.data.client.some((item, i) => 
-                    i !== index && item.tin === updatedItem.tin && item.warehouse === updatedItem.warehouse
-                );
-                if (isDuplicate) {
-                    this.showNotification('This warehouse already exists for this TIN', 'error');
-                    return;
-                }
-                
-                this.data.client[index] = updatedItem;
-                this.saveData();
-                this.closeModal();
-                this.showNotification('Client updated successfully', 'success');
-                
-                // Refresh search if active
-                const searchQuery = document.getElementById('clientSearch').value.trim();
-                if (searchQuery) {
-                    this.performSearch('client', searchQuery);
-                }
-            },
-
-            // Delete item
-            deleteItem(type, identifier) {
-                if (type === 'hsn') {
-                    // Delete by HSN code
-                    this.data.hsn = this.data.hsn.filter(item => item.code !== identifier);
-                    this.showNotification('HSN code deleted successfully', 'success');
-                } else {
-                    // Delete by TIN-Warehouse combination
-                    const [tin, warehouse] = identifier.split('-');
-                    this.data.client = this.data.client.filter(item => 
-                        !(item.tin === tin && item.warehouse === warehouse)
-                    );
-                    this.showNotification('Warehouse deleted successfully', 'success');
-                }
-                
-                this.saveData();
-                
-                // Refresh search if active
-                const searchInput = document.getElementById(type + 'Search');
-                if (searchInput && searchInput.value.trim()) {
-                    this.performSearch(type, searchInput.value);
-                }
-            },
-
-            // Export data
             exportData(type) {
-                const data = type === 'hsn' ? this.data.hsn : this.data.client;
+                const data = this.data[type];
                 
                 if (data.length === 0) {
                     this.showNotification('No data to export', 'error');
                     return;
                 }
 
-                // Create CSV content
                 let csvContent = '';
                 
                 if (type === 'hsn') {
@@ -2848,31 +1576,26 @@
                     });
                 }
                 
-                // Create blob and download
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
-                
                 const date = new Date().toISOString().split('T')[0];
-                const filename = `cusdec_${type}_${date}.csv`;
                 
                 link.setAttribute('href', url);
-                link.setAttribute('download', filename);
+                link.setAttribute('download', `cusdec_${type}_${date}.csv`);
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 
-                this.showNotification('Data exported successfully', 'success');
+                this.showNotification('Data exported', 'success');
             },
 
-            // Copy to clipboard
             async copyToClipboard(text, type) {
                 try {
                     if (navigator.clipboard && window.isSecureContext) {
                         await navigator.clipboard.writeText(text);
                     } else {
-                        // Fallback method
                         const textArea = document.createElement('textarea');
                         textArea.value = text;
                         textArea.style.position = 'fixed';
@@ -2884,12 +1607,10 @@
                     }
                     this.showNotification(`${type} copied: ${text}`, 'success');
                 } catch (err) {
-                    console.error('Copy failed:', err);
                     this.showNotification('Failed to copy', 'error');
                 }
             },
 
-            // Show notification
             showNotification(message, type = 'info') {
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
@@ -2897,25 +1618,17 @@
                 
                 document.body.appendChild(notification);
                 
-                // Trigger animation
-                setTimeout(() => {
-                    notification.classList.add('show');
-                }, 10);
+                setTimeout(() => notification.classList.add('show'), 10);
                 
-                // Remove notification
                 setTimeout(() => {
                     notification.classList.remove('show');
-                    setTimeout(() => {
-                        document.body.removeChild(notification);
-                    }, 300);
+                    setTimeout(() => document.body.removeChild(notification), 300);
                 }, 3000);
             },
 
-            // Utility: Escape HTML
-            escapeHtml(unsafe) {
+            h(unsafe) {
                 if (!unsafe) return '';
-                return unsafe
-                    .toString()
+                return unsafe.toString()
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")
@@ -2924,11 +1637,7 @@
             }
         };
 
-        // Initialize app when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, initializing app...');
-            app.init();
-        });
+        document.addEventListener('DOMContentLoaded', () => app.init());
     </script>
 </body>
 </html>
