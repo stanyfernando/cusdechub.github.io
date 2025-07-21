@@ -131,9 +131,9 @@
 
         /* Dashboard Grid */
         .dashboard {
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
             transition: all var(--transition-slow);
         }
 
@@ -1415,10 +1415,16 @@
 
             // Initialize application
             init() {
-                this.loadData();
-                this.attachEventListeners();
-                this.showDashboard();
-                this.checkJsonBinConnection();
+                try {
+                    this.loadData();
+                    this.attachEventListeners();
+                    this.showDashboard();
+                    this.checkJsonBinConnection();
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    // Still try to show dashboard even if there's an error
+                    this.showDashboard();
+                }
             },
 
             // Check JSONBin connection
@@ -1445,7 +1451,8 @@
                     });
                     
                     if (response.ok) {
-                        const bins = await response.json();
+                        const result = await response.json();
+                        const bins = Array.isArray(result) ? result : (result.bins || []);
                         
                         // Look for our bins
                         bins.forEach(bin => {
@@ -1461,7 +1468,7 @@
                         this.checkJsonBinConnection();
                     }
                 } catch (error) {
-                    console.log('Could not find existing bins, will create new ones when needed');
+                    console.error('Error finding bins:', error);
                 }
             },
 
