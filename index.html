@@ -477,17 +477,23 @@
         .empty-title { font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600; }
         .empty-message { font-size: 0.875rem; color: var(--text-muted); }
 
-        .notification {
+        #notification-container {
             position: fixed;
             top: var(--spacing);
             right: var(--spacing);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .notification {
             background: var(--bg-tertiary);
             color: var(--text-primary);
             padding: 1rem 1.5rem;
             border-radius: var(--radius);
             font-size: 0.875rem;
             font-weight: 500;
-            z-index: 10000;
             opacity: 0;
             transform: translateX(300px);
             transition: all var(--transition);
@@ -507,7 +513,9 @@
         .notification.error::before { content: '✕'; color: var(--danger); }
         .notification.info::before { content: 'ℹ'; color: var(--accent); }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .help-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .help-link { color: var(--accent); text-decoration: underline; cursor: pointer; }
+        .help-link:hover { opacity: 0.8; }
 
         @media (max-width: 768px) {
             :root { --spacing: 0.75rem; }
@@ -604,7 +612,7 @@
                     </svg>
                     Load
                 </button>
-                <button class="btn sync" onclick="app.syncWithCloud('hsn')" id="hsnSyncBtn" oncontextmenu="app.promptApiKey(); return false;">
+                <button class="btn sync" onclick="app.syncWithCloud('hsn')" id="hsnSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
@@ -673,7 +681,7 @@
                     </svg>
                     Load
                 </button>
-                <button class="btn sync" onclick="app.syncWithCloud('client')" id="clientSyncBtn" oncontextmenu="app.promptApiKey(); return false;">
+                <button class="btn sync" onclick="app.syncWithCloud('client')" id="clientSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
                         <path d="M22 12A10 10 0 0 0 4 6"></path>
@@ -703,6 +711,8 @@
         </div>
     </div>
 
+    <div id="notification-container"></div>
+
     <script>
         const app = {
             data: { hsn: [], client: [] },
@@ -710,7 +720,7 @@
             debounceTimer: null,
             syncDebounceTimer: null,
             jsonBin: {
-                apiKey: localStorage.getItem('jsonbin_api_key') || '$2a$10$qce2OfNWlB45nXTNyHdAHOcRIZDI9SVFMFgLbhizHjoMvCTby6Y8G',
+                apiKey: localStorage.getItem('jsonbin_api_key') || '',
                 baseUrl: 'https://api.jsonbin.io/v3',
                 bins: {
                     hsn: localStorage.getItem('jsonbin_hsn_id') || null,
@@ -729,20 +739,13 @@
             checkJsonBinConnection() {
                 this.jsonBin.isConnected = !!(this.jsonBin.apiKey && this.jsonBin.apiKey.trim());
                 this.updateSyncButtons(this.jsonBin.isConnected);
-                if (this.jsonBin.apiKey && (!this.jsonBin.bins.hsn || !this.jsonBin.bins.client)) {
-                    this.findExistingBins();
-                }
             },
 
             updateSyncButtons(isConnected) {
                 document.querySelectorAll('.btn.sync').forEach(btn => {
                     btn.classList.toggle('connected', isConnected);
-                    btn.title = isConnected ? 'Connected - Click to sync (Right-click to change API key)' : 'Click to sync with cloud';
+                    btn.title = isConnected ? 'Connected - Click to sync' : 'Click to setup and sync';
                 });
-            },
-
-            async findExistingBins() {
-                this.checkJsonBinConnection();
             },
 
             getApiHeaders() {
@@ -752,9 +755,53 @@
                 return headers;
             },
 
+            showApiKeyModal(callback) {
+                const content = `
+                    <form onsubmit="app.saveApiKey(event)">
+                        <div class="form-group">
+                            <label class="form-label">JSONBin.io API Key</label>
+                            <input type="text" class="form-input" id="apiKeyInput" 
+                                   placeholder="$2a$10$..." 
+                                   value="${this.h(this.jsonBin.apiKey)}" required>
+                            <div class="help-text">
+                                Don't have an API key? 
+                                <a href="https://jsonbin.io/" target="_blank" class="help-link">Sign up at JSONBin.io</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="save-btn">Connect to JSONBin</button>
+                    </form>
+                `;
+                
+                this.showModal('JSONBin.io API Setup', content);
+                this.currentApiKeyCallback = callback;
+                setTimeout(() => document.getElementById('apiKeyInput').focus(), 100);
+            },
+
+            saveApiKey(event) {
+                event.preventDefault();
+                const apiKey = document.getElementById('apiKeyInput').value.trim();
+                
+                if (!apiKey) {
+                    this.showNotification('Please enter an API key', 'error');
+                    return;
+                }
+                
+                localStorage.setItem('jsonbin_api_key', apiKey);
+                this.jsonBin.apiKey = apiKey;
+                this.checkJsonBinConnection();
+                this.closeModal();
+                this.showNotification('API key saved successfully', 'success');
+                
+                if (this.currentApiKeyCallback) {
+                    this.currentApiKeyCallback();
+                    this.currentApiKeyCallback = null;
+                }
+            },
+
             async loadFromCloud(type) {
                 if (!this.jsonBin.apiKey) {
-                    if (!this.promptApiKey()) return;
+                    this.showApiKeyModal(() => this.loadFromCloud(type));
+                    return;
                 }
 
                 this.showNotification(`Loading ${type} data...`, 'info');
@@ -769,7 +816,14 @@
                         headers: this.getApiHeaders()
                     });
 
-                    if (!response.ok) throw new Error(`Failed to load: ${response.status}`);
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            this.showNotification('Invalid API key. Please update it.', 'error');
+                            this.showApiKeyModal(() => this.loadFromCloud(type));
+                            return;
+                        }
+                        throw new Error(`Failed to load: ${response.status}`);
+                    }
 
                     const result = await response.json();
                     const cloudData = result.record || [];
@@ -788,23 +842,6 @@
                 } catch (error) {
                     this.showNotification(`Failed to load from cloud`, 'error');
                 }
-            },
-
-            promptApiKey() {
-                const apiKey = prompt('Enter your JSONBin.io API key (or leave empty to use default):');
-                if (apiKey !== null) {
-                    if (apiKey.trim()) {
-                        localStorage.setItem('jsonbin_api_key', apiKey.trim());
-                        this.jsonBin.apiKey = apiKey.trim();
-                    } else {
-                        localStorage.removeItem('jsonbin_api_key');
-                        this.jsonBin.apiKey = '$2a$10$qce2OfNWlB45nXTNyHdAHOcRIZDI9SVFMFgLbhizHjoMvCTby6Y8G';
-                    }
-                    this.checkJsonBinConnection();
-                    this.showNotification('API key updated', 'success');
-                    return true;
-                }
-                return false;
             },
 
             async createJsonBin(type, apiKey) {
@@ -835,7 +872,8 @@
 
             async syncWithCloud(type) {
                 if (!this.jsonBin.apiKey) {
-                    if (!this.promptApiKey()) return;
+                    this.showApiKeyModal(() => this.syncWithCloud(type));
+                    return;
                 }
 
                 if (this.jsonBin.syncInProgress) {
@@ -858,7 +896,12 @@
                         });
 
                         if (!response.ok) {
-                            if (response.status === 404) {
+                            if (response.status === 401) {
+                                this.showNotification('Invalid API key. Please update it.', 'error');
+                                this.jsonBin.syncInProgress = false;
+                                this.showApiKeyModal(() => this.syncWithCloud(type));
+                                return;
+                            } else if (response.status === 404) {
                                 const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
                                 this.jsonBin.bins[type] = binId;
                                 localStorage.setItem(`jsonbin_${type}_id`, binId);
@@ -901,13 +944,11 @@
                 if (!this.jsonBin.apiKey || !this.jsonBin.bins[type]) return;
 
                 try {
-                    const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}`, {
+                    await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}`, {
                         method: 'PUT',
                         headers: this.getApiHeaders(),
                         body: JSON.stringify(this.data[type])
                     });
-
-                    if (!response.ok) throw new Error(`Failed to update: ${response.status}`);
                 } catch (error) {}
             },
 
@@ -1674,17 +1715,24 @@
             },
 
             showNotification(message, type = 'info') {
+                let container = document.getElementById('notification-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'notification-container';
+                    document.body.appendChild(container);
+                }
+                
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
                 notification.textContent = message;
                 
-                document.body.appendChild(notification);
+                container.appendChild(notification);
                 
                 setTimeout(() => notification.classList.add('show'), 10);
                 
                 setTimeout(() => {
                     notification.classList.remove('show');
-                    setTimeout(() => document.body.removeChild(notification), 300);
+                    setTimeout(() => container.removeChild(notification), 300);
                 }, 3000);
             },
 
