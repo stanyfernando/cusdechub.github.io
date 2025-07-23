@@ -57,10 +57,8 @@
             display: none;
         }
         
-        .bin-info-bar.active { 
-            display: block; 
-            animation: slideDown 0.3s ease-out;
-        }
+        .bin-info-bar.active { display: block; animation: slideDown 0.3s ease-out; }
+        .bin-info-bar.highlight { animation: slideDown 0.3s ease-out, highlight 2s ease-in-out; }
         
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-10px); }
@@ -68,13 +66,8 @@
         }
         
         @keyframes highlight {
-            0% { border-color: var(--border); }
+            0%, 100% { border-color: var(--border); }
             50% { border-color: var(--success); box-shadow: 0 0 10px rgba(67, 181, 129, 0.3); }
-            100% { border-color: var(--border); }
-        }
-        
-        .bin-info-bar.highlight {
-            animation: slideDown 0.3s ease-out, highlight 2s ease-in-out;
         }
         
         .bin-info-content {
@@ -96,31 +89,19 @@
             font-size: 0.875rem;
         }
         
-        .bin-info-item strong {
-            color: var(--text-secondary);
-        }
+        .bin-info-item strong { color: var(--text-secondary); }
         
         .bin-info-item code {
             font-family: var(--font);
             color: var(--accent);
-            cursor: pointer;
             padding: 2px 4px;
             border-radius: 3px;
             transition: background var(--transition), transform 0.1s ease;
             position: relative;
         }
         
-        .bin-info-item code:hover {
-            background: var(--bg-hover);
-        }
-        
-        .bin-info-item code[onclick]:not(:empty) {
-            cursor: pointer;
-        }
-        
-        .bin-info-item code:not([style*="cursor: pointer"]) {
-            cursor: default;
-        }
+        .bin-info-item code[style*="cursor: pointer"] { cursor: pointer; }
+        .bin-info-item code[style*="cursor: pointer"]:hover { background: var(--bg-hover); }
         
         .bin-info-item code[style*="cursor: pointer"]::after {
             content: 'Click to copy';
@@ -141,9 +122,7 @@
             border: 1px solid var(--border);
         }
         
-        .bin-info-item code[style*="cursor: pointer"]:hover::after {
-            opacity: 1;
-        }
+        .bin-info-item code[style*="cursor: pointer"]:hover::after { opacity: 1; }
         
         .dashboard { display: block; opacity: 1; transform: translateY(0); transition: all var(--transition); }
         .dashboard.hidden { display: none; }
@@ -180,7 +159,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--accent));
+            background: var(--accent);
             opacity: 0;
             transition: opacity var(--transition);
         }
@@ -753,14 +732,6 @@
                     </svg>
                     Sync
                 </button>
-                <button class="btn" onclick="app.showBinInfo()" title="View your bin IDs" style="display: none;" id="hsnInfoBtn">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                    IDs
-                </button>
             </div>
             
             <div class="results" id="hsnResults"></div>
@@ -885,12 +856,8 @@
             updateSyncButtons(isConnected) {
                 document.querySelectorAll('.btn.sync').forEach(btn => {
                     btn.classList.toggle('connected', isConnected);
-                    btn.title = isConnected 
-                        ? 'Connected - Click to sync' 
-                        : 'Click to setup and sync';
+                    btn.title = isConnected ? 'Connected - Click to sync' : 'Click to setup and sync';
                 });
-                
-                this.updateBinInfoBar();
             },
             
             updateBinInfoBar(highlight = false) {
@@ -949,13 +916,10 @@
                     }
                     this.showNotification(`${type.toUpperCase()} bin ID copied: ${binId}`, 'success');
                     
-                    // Visual feedback
                     const element = document.getElementById(type + 'BinDisplay');
                     if (element) {
                         element.style.transform = 'scale(0.95)';
-                        setTimeout(() => {
-                            element.style.transform = 'scale(1)';
-                        }, 100);
+                        setTimeout(() => element.style.transform = 'scale(1)', 100);
                     }
                 } catch (err) {
                     this.showNotification('Failed to copy', 'error');
@@ -963,10 +927,10 @@
             },
 
             getApiHeaders() {
-                const headers = { 'Content-Type': 'application/json' };
-                const keyType = this.jsonBin.apiKey.startsWith('$2a$') ? 'X-Access-Key' : 'X-Master-Key';
-                headers[keyType] = this.jsonBin.apiKey;
-                return headers;
+                return {
+                    'Content-Type': 'application/json',
+                    [this.jsonBin.apiKey.startsWith('$2a$') ? 'X-Access-Key' : 'X-Master-Key']: this.jsonBin.apiKey
+                };
             },
 
             showApiKeyModal(callback) {
@@ -1098,7 +1062,73 @@
             },
 
             async createJsonBin(type, apiKey) {
-                const headers = apiKey.startsWith('$2a
+                const headers = apiKey.startsWith('$2a$') 
+                    ? { 
+                        'Content-Type': 'application/json',
+                        'X-Access-Key': apiKey,
+                        'X-Bin-Name': `cusdec_${type}_data`,
+                        'X-Collection-Id': 'uncategorized'
+                      }
+                    : { 
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': apiKey,
+                        'X-Bin-Name': `cusdec_${type}_data`
+                      };
+                
+                const response = await fetch(`${this.jsonBin.baseUrl}/b`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(this.data[type] || [])
+                });
+
+                if (!response.ok) throw new Error(`Failed to create bin: ${response.status}`);
+
+                const result = await response.json();
+                const binId = result.metadata.id;
+                
+                this.showNotification(`Created ${type} bin: ${binId} - Check top of page!`, 'success');
+                
+                return binId;
+            },
+
+            showBinInfo() {
+                if (!this.jsonBin.bins.hsn && !this.jsonBin.bins.client) {
+                    this.showNotification('No bin IDs found. Sync first to create cloud storage.', 'info');
+                    return;
+                }
+                
+                const hsnBin = this.jsonBin.bins.hsn || 'Not created yet';
+                const clientBin = this.jsonBin.bins.client || 'Not created yet';
+                
+                const content = `
+                    <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing); border: 2px solid var(--success);">
+                        <h4 style="margin-bottom: var(--spacing); color: var(--success);">⚠️ Your Cloud Storage is Ready!</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
+                            Your bin IDs are now displayed at the top of the page for easy access.
+                            You can click on any ID to copy it.
+                        </p>
+                        <div class="form-group">
+                            <label class="form-label">HSN Bin ID:</label>
+                            <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Client Bin ID:</label>
+                            <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                        </div>
+                        <div class="help-text" style="background: var(--bg-secondary); padding: var(--spacing); border-radius: var(--radius); margin-top: var(--spacing);">
+                            <strong>To access your data on another device:</strong><br>
+                            1. Open the app on the new device<br>
+                            2. Click Sync or Load button<br>
+                            3. Enter your API key AND these Bin IDs<br>
+                            4. Your data will load immediately<br><br>
+                            <strong>Note:</strong> Your bin IDs are always visible at the top of the page when connected. Click any ID to copy it.
+                        </div>
+                    </div>
+                    <button class="save-btn" onclick="app.closeModal()">Got It!</button>
+                `;
+                
+                this.showModal('Your Cloud Storage IDs', content);
+            },
 
             async syncWithCloud(type) {
                 if (!this.jsonBin.apiKey) {
@@ -1328,9 +1358,7 @@
                 ['hsn', 'client'].forEach(type => {
                     const input = document.getElementById(type + 'Search');
                     if (input) {
-                        input.addEventListener('input', (e) => {
-                            this.debounceSearch(type, e.target.value);
-                        });
+                        input.addEventListener('input', (e) => this.debounceSearch(type, e.target.value));
                     }
                 });
 
@@ -1355,9 +1383,7 @@
             debounceSearch(type, query) {
                 clearTimeout(this.debounceTimer);
                 this.searchState[type] = query;
-                this.debounceTimer = setTimeout(() => {
-                    this.performSearch(type, query);
-                }, 300);
+                this.debounceTimer = setTimeout(() => this.performSearch(type, query), 300);
             },
 
             performSearch(type, query) {
@@ -1372,8 +1398,8 @@
                 
                 let filtered = this.data[type].filter(item => {
                     const searchableText = type === 'hsn'
-                        ? [item.code || '', item.product || '', item.category || ''].join(' ').toLowerCase()
-                        : [item.tin || '', item.name || '', item.warehouse || '', item.warehouseName || ''].join(' ').toLowerCase();
+                        ? `${item.code || ''} ${item.product || ''} ${item.category || ''}`.toLowerCase()
+                        : `${item.tin || ''} ${item.name || ''} ${item.warehouse || ''} ${item.warehouseName || ''}`.toLowerCase();
                     
                     return searchTerms.every(term => searchableText.includes(term));
                 });
@@ -1510,17 +1536,15 @@
 
             showDashboard() {
                 ['hsnSection', 'clientSection'].forEach(id => {
-                    const section = document.getElementById(id);
-                    if (section) section.classList.remove('active');
+                    document.getElementById(id)?.classList.remove('active');
                 });
                 document.getElementById('dashboard').classList.remove('hidden');
             },
 
             showModal(title, content) {
-                const modal = document.getElementById('modal');
                 document.getElementById('modalTitle').textContent = title;
                 document.getElementById('modalContent').innerHTML = content;
-                modal.classList.add('active');
+                document.getElementById('modal').classList.add('active');
             },
 
             closeModal() {
@@ -1532,14 +1556,12 @@
                     ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))]
                     : [];
                     
-                const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
-                
                 const content = type === 'hsn' ? `
                     <form onsubmit="app.saveItem(event, 'hsn')">
                         <div class="form-group">
                             <label class="form-label">Category</label>
                             <input type="text" class="form-input" name="category" list="categoryList" required>
-                            <datalist id="categoryList">${categoryOptions}</datalist>
+                            <datalist id="categoryList">${categories.map(cat => `<option value="${cat}">`).join('')}</datalist>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Product Name</label>
@@ -1583,20 +1605,16 @@
                 const formData = new FormData(event.target);
                 const newItem = Object.fromEntries(formData);
                 
-                if (type === 'hsn') {
-                    const isDuplicate = this.data.hsn.some(item => item.code === newItem.code);
-                    if (isDuplicate) {
-                        this.showNotification('HSN code already exists', 'error');
-                        return;
-                    }
-                } else {
-                    const isDuplicate = this.data.client.some(item => 
-                        item.tin === newItem.tin && item.warehouse === newItem.warehouse
+                const isDuplicate = type === 'hsn'
+                    ? this.data.hsn.some(item => item.code === newItem.code)
+                    : this.data.client.some(item => item.tin === newItem.tin && item.warehouse === newItem.warehouse);
+                
+                if (isDuplicate) {
+                    this.showNotification(
+                        type === 'hsn' ? 'HSN code already exists' : 'This warehouse already exists for this TIN',
+                        'error'
                     );
-                    if (isDuplicate) {
-                        this.showNotification('This warehouse already exists for this TIN', 'error');
-                        return;
-                    }
+                    return;
                 }
                 
                 this.data[type].push(newItem);
@@ -1616,15 +1634,13 @@
                     ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))]
                     : [];
                     
-                const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
-                
                 const content = type === 'hsn' ? `
                     <form onsubmit="app.updateItem(event, 'hsn', ${index})">
                         <div class="form-group">
                             <label class="form-label">Category</label>
                             <input type="text" class="form-input" name="category" list="categoryList" 
                                    value="${this.h(item.category)}" required>
-                            <datalist id="categoryList">${categoryOptions}</datalist>
+                            <datalist id="categoryList">${categories.map(cat => `<option value="${cat}">`).join('')}</datalist>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Product Name</label>
@@ -1709,53 +1725,66 @@
                 }).join('');
                 
                 const content = `
-                    <form onsubmit="app.updateClientInfo(event, '${tin}')">
+                    <div style="margin-bottom: var(--spacing);">
+                        <strong>Company:</strong> ${this.h(companyName)}<br>
+                        <strong>TIN:</strong> ${this.h(tin)}
+                    </div>
+                    <div class="warehouses-list">${warehousesList}</div>
+                    <button type="button" class="save-btn" style="margin-top: var(--spacing)" 
+                            onclick="app.showAddWarehouseModal('${tin}', '${companyName}')">
+                        Add New Warehouse
+                    </button>
+                `;
+                
+                this.showModal('Edit Client Warehouses', content);
+            },
+
+            showAddWarehouseModal(tin, companyName) {
+                const content = `
+                    <form onsubmit="app.saveWarehouse(event, '${tin}', '${companyName}')">
                         <div class="form-group">
                             <label class="form-label">Company Name</label>
-                            <input type="text" class="form-input" name="name" 
-                                   value="${this.h(companyName)}" required>
+                            <input type="text" class="form-input" value="${this.h(companyName)}" readonly>
                         </div>
                         <div class="form-group">
                             <label class="form-label">TIN Code</label>
-                            <input type="text" class="form-input" name="tin" 
-                                   value="${this.h(tin)}" required>
+                            <input type="text" class="form-input" value="${this.h(tin)}" readonly>
                         </div>
-                        <button type="submit" class="save-btn">Update Company Info</button>
+                        <div class="form-group">
+                            <label class="form-label">Warehouse Name</label>
+                            <input type="text" class="form-input" name="warehouseName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Warehouse Number</label>
+                            <input type="text" class="form-input" name="warehouse" required>
+                        </div>
+                        <button type="submit" class="save-btn">Add Warehouse</button>
                     </form>
-                    <div class="warehouses-list" style="margin-top: var(--spacing);">
-                        <h4 style="margin-bottom: var(--spacing); color: var(--text-secondary);">Warehouses</h4>
-                        ${warehousesList}
-                    </div>
-                    <button type="button" class="delete-btn" onclick="app.deleteEntireClient('${tin}')" 
-                            style="margin-top: var(--spacing);">Delete Entire Client</button>
                 `;
                 
-                this.showModal(`Edit Client: ${companyName}`, content);
+                this.showModal('Add New Warehouse', content);
+                setTimeout(() => document.querySelector('input[name="warehouseName"]').focus(), 100);
             },
 
-            updateClientInfo(event, oldTin) {
+            saveWarehouse(event, tin, companyName) {
                 event.preventDefault();
                 const formData = new FormData(event.target);
-                const { name, tin } = Object.fromEntries(formData);
+                const warehouseName = formData.get('warehouseName');
+                const warehouse = formData.get('warehouse');
                 
-                if (oldTin !== tin) {
-                    const exists = this.data.client.some(c => c.tin === tin);
-                    if (exists) {
-                        this.showNotification('A client with this TIN already exists', 'error');
-                        return;
-                    }
+                const isDuplicate = this.data.client.some(item => 
+                    item.tin === tin && item.warehouse === warehouse
+                );
+                
+                if (isDuplicate) {
+                    this.showNotification('This warehouse already exists for this TIN', 'error');
+                    return;
                 }
                 
-                this.data.client = this.data.client.map(client => {
-                    if (client.tin === oldTin) {
-                        return { ...client, name, tin };
-                    }
-                    return client;
-                });
-                
+                this.data.client.push({ name: companyName, tin, warehouseName, warehouse });
                 this.saveData();
-                this.closeModal();
-                this.showNotification('Client information updated', 'success');
+                this.editClient(tin);
+                this.showNotification('Warehouse added successfully', 'success');
                 
                 const searchQuery = document.getElementById('clientSearch').value.trim();
                 if (searchQuery) this.performSearch('client', searchQuery);
@@ -1766,1130 +1795,167 @@
                 const formData = new FormData(event.target);
                 const updatedItem = Object.fromEntries(formData);
                 
-                if (type === 'hsn') {
-                    const isDuplicate = this.data.hsn.some((item, i) => 
-                        i !== index && item.code === updatedItem.code
-                    );
-                    if (isDuplicate) {
-                        this.showNotification('HSN code already exists', 'error');
-                        return;
-                    }
-                } else {
-                    const isDuplicate = this.data.client.some((item, i) => 
+                const isDuplicate = type === 'hsn'
+                    ? this.data.hsn.some((item, i) => i !== index && item.code === updatedItem.code)
+                    : this.data.client.some((item, i) => 
                         i !== index && item.tin === updatedItem.tin && item.warehouse === updatedItem.warehouse
+                      );
+                
+                if (isDuplicate) {
+                    this.showNotification(
+                        type === 'hsn' ? 'HSN code already exists' : 'This warehouse already exists for this TIN',
+                        'error'
                     );
-                    if (isDuplicate) {
-                        this.showNotification('This warehouse already exists for this TIN', 'error');
-                        return;
-                    }
+                    return;
                 }
                 
                 this.data[type][index] = updatedItem;
                 this.saveData();
                 this.closeModal();
-                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} updated`, 'success');
+                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} updated successfully`, 'success');
                 
                 const searchQuery = document.getElementById(type + 'Search').value.trim();
                 if (searchQuery) this.performSearch(type, searchQuery);
             },
 
             deleteItem(type, index) {
-                const confirmMessage = type === 'hsn' 
-                    ? 'Delete this HSN code?' 
-                    : 'Delete this warehouse?';
-                
-                if (confirm(confirmMessage)) {
+                if (confirm(`Are you sure you want to delete this ${type === 'hsn' ? 'HSN code' : 'warehouse'}?`)) {
                     this.data[type].splice(index, 1);
                     this.saveData();
                     this.closeModal();
-                    this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Warehouse'} deleted`, 'success');
+                    this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Warehouse'} deleted successfully`, 'success');
                     
-                    const searchInput = document.getElementById(type + 'Search');
-                    if (searchInput && searchInput.value.trim()) {
-                        this.performSearch(type, searchInput.value);
-                    }
-                }
-            },
-
-            deleteEntireClient(tin) {
-                const clientWarehouses = this.data.client.filter(c => c.tin === tin);
-                const companyName = clientWarehouses[0]?.name || 'this client';
-                
-                if (confirm(`Delete ${companyName} and all ${clientWarehouses.length} warehouses?`)) {
-                    this.data.client = this.data.client.filter(c => c.tin !== tin);
-                    this.saveData();
-                    this.closeModal();
-                    this.showNotification('Client deleted', 'success');
-                    
-                    const searchQuery = document.getElementById('clientSearch').value.trim();
-                    if (searchQuery) this.performSearch('client', searchQuery);
+                    const searchQuery = document.getElementById(type + 'Search').value.trim();
+                    if (searchQuery) this.performSearch(type, searchQuery);
                 }
             },
 
             exportData(type) {
+                const filename = `cusdec_${type}_export_${new Date().toISOString().split('T')[0]}.csv`;
                 const data = this.data[type];
                 
                 if (data.length === 0) {
                     this.showNotification('No data to export', 'error');
                     return;
                 }
-
-                let htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
-                htmlContent += '<head><meta charset="utf-8"><title>Export</title></head><body><table border="1">';
                 
-                if (type === 'hsn') {
-                    htmlContent += '<tr><th>Category</th><th>Product</th><th>HSN Code</th></tr>';
-                    data.forEach(item => {
-                        htmlContent += `<tr><td>${this.h(item.category)}</td><td>${this.h(item.product)}</td><td>${this.h(item.code)}</td></tr>`;
-                    });
-                } else {
-                    htmlContent += '<tr><th>Company Name</th><th>TIN</th><th>Warehouse Name</th><th>Warehouse Code</th></tr>';
-                    data.forEach(item => {
-                        htmlContent += `<tr><td>${this.h(item.name)}</td><td>${this.h(item.tin)}</td><td>${this.h(item.warehouseName)}</td><td>${this.h(item.warehouse)}</td></tr>`;
-                    });
-                }
+                let csv = type === 'hsn' 
+                    ? 'Category,Product,HSN Code\n'
+                    : 'Company Name,TIN,Warehouse Name,Warehouse Number\n';
                 
-                htmlContent += '</table></body></html>';
-                
-                const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
-                const link = document.createElement('a');
-                const url = URL.createObjectURL(blob);
-                const date = new Date().toISOString().split('T')[0];
-                
-                link.setAttribute('href', url);
-                link.setAttribute('download', `cusdec_${type}_${date}.xls`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                this.showNotification('Data exported to Excel', 'success');
-            },
-
-            async importData(type, fileInput) {
-                const file = fileInput.files[0];
-                if (!file) return;
-                
-                try {
-                    const text = await file.text();
-                    let data = [];
-                    
-                    if (file.name.endsWith('.csv')) {
-                        const lines = text.split('\n').filter(line => line.trim());
-                        const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
-                        
-                        for (let i = 1; i < lines.length; i++) {
-                            const values = lines[i].match(/(".*?"|[^,]+)/g) || [];
-                            const row = {};
-                            
-                            if (type === 'hsn') {
-                                row.category = values[0]?.replace(/"/g, '').trim() || '';
-                                row.product = values[1]?.replace(/"/g, '').trim() || '';
-                                row.code = values[2]?.replace(/"/g, '').trim() || '';
-                                if (row.code) data.push(row);
-                            } else {
-                                row.name = values[0]?.replace(/"/g, '').trim() || '';
-                                row.tin = values[1]?.replace(/"/g, '').trim() || '';
-                                row.warehouseName = values[2]?.replace(/"/g, '').trim() || '';
-                                row.warehouse = values[3]?.replace(/"/g, '').trim() || '';
-                                if (row.tin && row.warehouse) data.push(row);
-                            }
-                        }
-                    } else {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = text;
-                        const rows = tempDiv.querySelectorAll('tr');
-                        
-                        for (let i = 1; i < rows.length; i++) {
-                            const cells = rows[i].querySelectorAll('td');
-                            if (cells.length > 0) {
-                                const row = {};
-                                
-                                if (type === 'hsn') {
-                                    row.category = cells[0]?.textContent.trim() || '';
-                                    row.product = cells[1]?.textContent.trim() || '';
-                                    row.code = cells[2]?.textContent.trim() || '';
-                                    if (row.code) data.push(row);
-                                } else {
-                                    row.name = cells[0]?.textContent.trim() || '';
-                                    row.tin = cells[1]?.textContent.trim() || '';
-                                    row.warehouseName = cells[2]?.textContent.trim() || '';
-                                    row.warehouse = cells[3]?.textContent.trim() || '';
-                                    if (row.tin && row.warehouse) data.push(row);
-                                }
-                            }
-                        }
-                    }
-                    
-                    if (data.length > 0) {
-                        const mergedData = this.mergeData(type, this.data[type], data);
-                        const addedCount = mergedData.length - this.data[type].length;
-                        this.data[type] = mergedData;
-                        this.saveData();
-                        this.showNotification(`Imported ${addedCount} new ${type} records`, 'success');
-                        
-                        const searchQuery = document.getElementById(type + 'Search').value.trim();
-                        if (searchQuery) this.performSearch(type, searchQuery);
-                    } else {
-                        this.showNotification('No valid data found in file', 'error');
-                    }
-                } catch (error) {
-                    this.showNotification('Failed to import file', 'error');
-                }
-                
-                fileInput.value = '';
-            },
-
-            async copyToClipboard(text, type) {
-                try {
-                    if (navigator.clipboard && window.isSecureContext) {
-                        await navigator.clipboard.writeText(text);
-                    } else {
-                        const textArea = document.createElement('textarea');
-                        textArea.value = text;
-                        textArea.style.position = 'fixed';
-                        textArea.style.opacity = '0';
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                    }
-                    this.showNotification(`${type} copied: ${text}`, 'success');
-                } catch (err) {
-                    this.showNotification('Failed to copy', 'error');
-                }
-            },
-
-            showNotification(message, type = 'info') {
-                let container = document.getElementById('notification-container');
-                if (!container) {
-                    container = document.createElement('div');
-                    container.id = 'notification-container';
-                    document.body.appendChild(container);
-                }
-                
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.textContent = message;
-                
-                container.appendChild(notification);
-                
-                setTimeout(() => notification.classList.add('show'), 10);
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => container.removeChild(notification), 300);
-                }, 3000);
-            },
-
-            h(unsafe) {
-                if (!unsafe) return '';
-                return unsafe.toString()
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', () => app.init());
-    </script>
-</body>
-</html>) 
-                    ? { 
-                        'Content-Type': 'application/json',
-                        'X-Access-Key': apiKey,
-                        'X-Bin-Name': `cusdec_${type}_data`,
-                        'X-Collection-Id': 'uncategorized'
-                      }
-                    : { 
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': apiKey,
-                        'X-Bin-Name': `cusdec_${type}_data`
-                      };
-                
-                const response = await fetch(`${this.jsonBin.baseUrl}/b`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(this.data[type] || [])
-                });
-
-                if (!response.ok) throw new Error(`Failed to create bin: ${response.status}`);
-
-                const result = await response.json();
-                const binId = result.metadata.id;
-                
-                this.showNotification(`Created ${type} bin: ${binId}`, 'success');
-                this.showBinInfo();
-                
-                return binId;
-            },
-
-            showBinInfo() {
-                if (!this.jsonBin.bins.hsn && !this.jsonBin.bins.client) {
-                    this.showNotification('No bin IDs found. Sync first to create cloud storage.', 'info');
-                    return;
-                }
-                
-                const hsnBin = this.jsonBin.bins.hsn || 'Not created yet';
-                const clientBin = this.jsonBin.bins.client || 'Not created yet';
-                
-                const content = `
-                        <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing); border: 2px solid var(--success);">
-                            <h4 style="margin-bottom: var(--spacing); color: var(--success);">⚠️ IMPORTANT: Save these Bin IDs!</h4>
-                            <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
-                                You need these IDs to access your data from other devices/browsers.
-                                JSONBin.io Access Keys cannot list bins, so you must save these IDs!
-                            </p>
-                            <div class="form-group">
-                                <label class="form-label">HSN Bin ID:</label>
-                                <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Client Bin ID:</label>
-                                <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
-                            </div>
-                            <div class="help-text" style="background: var(--bg-secondary); padding: var(--spacing); border-radius: var(--radius); margin-top: var(--spacing);">
-                                <strong>To access your data on another device:</strong><br>
-                                1. Open the app on the new device<br>
-                                2. Click Sync or Load button<br>
-                                3. Enter your API key AND these Bin IDs<br>
-                                4. Your data will load immediately<br><br>
-                                <strong>Tip:</strong> Press Ctrl+I anytime to view these IDs again.
-                            </div>
-                        </div>
-                        <button class="save-btn" onclick="app.closeModal()">I've Saved These IDs</button>
-                    `;
-                    
-                    this.showModal('Your Cloud Storage IDs', content);
-            },
-
-            async syncWithCloud(type) {
-                if (!this.jsonBin.apiKey) {
-                    this.showApiKeyModal(() => this.syncWithCloud(type));
-                    return;
-                }
-
-                if (this.jsonBin.syncInProgress) {
-                    this.showNotification('Sync in progress...', 'info');
-                    return;
-                }
-
-                this.jsonBin.syncInProgress = true;
-                this.showNotification(`Syncing ${type} data...`, 'info');
-
-                try {
-                    if (!this.jsonBin.bins[type]) {
-                        const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
-                        this.jsonBin.bins[type] = binId;
-                        localStorage.setItem(`jsonbin_${type}_id`, binId);
-                        this.showNotification(`Created cloud storage`, 'success');
-                    } else {
-                        const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
-                            headers: this.getApiHeaders()
-                        });
-
-                        if (!response.ok) {
-                            if (response.status === 401) {
-                                this.showNotification('Invalid API key. Please update it.', 'error');
-                                this.jsonBin.syncInProgress = false;
-                                this.showApiKeyModal(() => this.syncWithCloud(type));
-                                return;
-                            } else if (response.status === 404) {
-                                const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
-                                this.jsonBin.bins[type] = binId;
-                                localStorage.setItem(`jsonbin_${type}_id`, binId);
-                                this.showNotification(`Created cloud storage`, 'success');
-                            } else {
-                                throw new Error(`Failed to fetch: ${response.status}`);
-                            }
-                        } else {
-                            const result = await response.json();
-                            const cloudData = result.record || [];
-                            const mergedData = this.mergeData(type, this.data[type], cloudData);
-                            const addedCount = mergedData.length - this.data[type].length;
-                            
-                            this.data[type] = mergedData;
-                            this.saveData(false);
-                            
-                            if (mergedData.length > cloudData.length) {
-                                await this.saveToJsonBin(type);
-                            }
-                            
-                            const searchInput = document.getElementById(type + 'Search');
-                            if (searchInput?.value.trim()) {
-                                this.performSearch(type, searchInput.value);
-                            }
-                            
-                            this.showNotification(
-                                addedCount > 0 ? `Added ${addedCount} new records` : `Data up to date`,
-                                'success'
-                            );
-                        }
-                    }
-                } catch (error) {
-                    this.showNotification(`Sync failed: ${error.message}`, 'error');
-                } finally {
-                    this.jsonBin.syncInProgress = false;
-                }
-            },
-
-            async saveToJsonBin(type) {
-                if (!this.jsonBin.apiKey || !this.jsonBin.bins[type]) return;
-
-                try {
-                    await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}`, {
-                        method: 'PUT',
-                        headers: this.getApiHeaders(),
-                        body: JSON.stringify(this.data[type])
-                    });
-                } catch (error) {}
-            },
-
-            mergeData(type, localData, cloudData) {
-                localData = localData || [];
-                cloudData = cloudData || [];
-                
-                if (type === 'hsn') {
-                    const localCodes = new Set(localData.map(item => item.code));
-                    const newItems = cloudData.filter(item => item.code && !localCodes.has(item.code));
-                    return [...localData, ...newItems];
-                } else {
-                    const localKeys = new Set(localData.map(item => `${item.tin}-${item.warehouse}`));
-                    const newItems = cloudData.filter(item => 
-                        item.tin && item.warehouse && !localKeys.has(`${item.tin}-${item.warehouse}`)
-                    );
-                    return [...localData, ...newItems];
-                }
-            },
-
-            loadData() {
-                const hsnData = localStorage.getItem('cusdec_hsn_data');
-                const clientData = localStorage.getItem('cusdec_client_data');
-
-                this.data.hsn = hsnData ? JSON.parse(hsnData) : this.getDefaultHSN();
-                this.data.client = clientData ? JSON.parse(clientData) : this.getDefaultClients();
-            },
-
-            getDefaultHSN() {
-                return [
-                    {c:'HAIR CARE',p:'Hair Dryer',code:'85163100'},{c:'HAIR CARE',p:'Hair Clipper',code:'85102000'},
-                    {c:'HAIR CARE',p:'Hair Groomer',code:'85102000'},{c:'HAIR CARE',p:'Hair Straightener',code:'85163200'},
-                    {c:'HAIR CARE',p:'Shaver',code:'85101000'},{c:'COSMETICS',p:'Shampoo',code:'33051000'},
-                    {c:'COSMETICS',p:'Hair Colour',code:'33051000'},{c:'COSMETICS',p:'Hair Cream',code:'33051000'},
-                    {c:'COSMETICS',p:'Hair Spray',code:'33051000'},{c:'COSMETICS',p:'Eye Shadow',code:'33042000'},
-                    {c:'COSMETICS',p:'Eye Makeup',code:'33042000'},{c:'COSMETICS',p:'Lipstick',code:'33041000'},
-                    {c:'COSMETICS',p:'Lip Gloss',code:'33041000'},{c:'COSMETICS',p:'Nail Polish',code:'33043000'},
-                    {c:'COSMETICS',p:'Manicure Set',code:'33043000'},{c:'COSMETICS',p:'Pedicure Set',code:'33043000'},
-                    {c:'COSMETICS',p:'Talcum Powder',code:'33049100'},{c:'KITCHEN APPLIANCES',p:'Air Fryer',code:'85166090'},
-                    {c:'KITCHEN APPLIANCES',p:'Blender',code:'85094000'},{c:'KITCHEN APPLIANCES',p:'Coffee Maker',code:'85167100'},
-                    {c:'KITCHEN APPLIANCES',p:'Gas Cooker',code:'85166090'},{c:'KITCHEN APPLIANCES',p:'Electric Cooker',code:'85166090'},
-                    {c:'KITCHEN APPLIANCES',p:'Cooker',code:'73211100'},{c:'KITCHEN APPLIANCES',p:'Cooker Hood',code:'84146000'},
-                    {c:'KITCHEN APPLIANCES',p:'Cookware Set',code:'73239300'},{c:'KITCHEN APPLIANCES',p:'Electric Oven',code:'85166090'},
-                    {c:'KITCHEN APPLIANCES',p:'Built-in Oven',code:'85166090'},{c:'KITCHEN APPLIANCES',p:'Food Steamer',code:'76151020'},
-                    {c:'KITCHEN APPLIANCES',p:'Hob',code:'73211100'},{c:'KITCHEN APPLIANCES',p:'Kettle',code:'85167920'},
-                    {c:'KITCHEN APPLIANCES',p:'Microwave Oven',code:'85165000'},{c:'KITCHEN APPLIANCES',p:'Pressure Cooker',code:'76151020'},
-                    {c:'KITCHEN APPLIANCES',p:'Rice Cooker',code:'85166010'},{c:'KITCHEN APPLIANCES',p:'Stainless Steel Water Bottle',code:'73239900'},
-                    {c:'KITCHEN APPLIANCES',p:'Tea Maker',code:'85167100'},{c:'KITCHEN APPLIANCES',p:'Toaster',code:'85167200'},
-                    {c:'KITCHEN APPLIANCES',p:'Sandwich Maker',code:'85167200'},{c:'KITCHEN APPLIANCES',p:'Waffle Maker',code:'85167200'},
-                    {c:'KITCHEN APPLIANCES',p:'BBQ Grill',code:'85167200'},{c:'KITCHEN APPLIANCES',p:'Induction Cooker',code:'85166090'},
-                    {c:'KITCHEN APPLIANCES',p:'Noodle Maker',code:'84381000'},{c:'KITCHEN APPLIANCES',p:'Spaghetti Maker',code:'84381000'},
-                    {c:'KITCHEN APPLIANCES',p:'Macaroni Maker',code:'84381000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'CD Player',code:'85271900'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'DVD Player',code:'85219000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Hi-Fi Set',code:'85279100'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Home Theatre',code:'85279100'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Radio',code:'85271900'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Sound Bar',code:'85182900'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Speaker',code:'85182900'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Music Organ',code:'92071000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV 32"',code:'85287291'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV (Over 32")',code:'85287299'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV Wall Mount',code:'83025000'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Car Stereo Set',code:'85272900'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Microphone',code:'85181000'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Air Cooler',code:'84796000'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Fridge/Refrigerator',code:'84181090'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Iron',code:'85164000'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Garment Steamer',code:'84513000'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Fan',code:'84145100'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Vacuum Cleaner',code:'85081100'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Dispenser',code:'84158190'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Filter',code:'84158190'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Purifier',code:'84158190'},{c:'WASHING MACHINES',p:'Washing Machine Front Load (5.5-7.5 KG)',code:'84501143'},
-                    {c:'WASHING MACHINES',p:'Washing Machine Front Load (7.5-9.5 KG)',code:'84501144'},{c:'WASHING MACHINES',p:'Washing Machine Front Load (Over 10 KG)',code:'84501149'},
-                    {c:'WASHING MACHINES',p:'Washing Machine Top Load (5.5-7.5 KG)',code:'84501133'},{c:'WASHING MACHINES',p:'Washing Machine Top Load (7.5-9.5 KG)',code:'84501134'},
-                    {c:'WASHING MACHINES',p:'Washing Machine Top Load (Over 10 KG)',code:'84502000'},{c:'PERSONAL ITEMS',p:'Mobile Phone',code:'85171390'},
-                    {c:'PERSONAL ITEMS',p:'Weight Scale',code:'84231010'},{c:'PERSONAL ITEMS',p:'Laptop',code:'84713090'},
-                    {c:'PERSONAL ITEMS',p:'Notebook',code:'84713090'},{c:'PERSONAL ITEMS',p:'Watch',code:'91021900'},
-                    {c:'BATHROOM',p:'Water Heater',code:'85161000'},{c:'BATHROOM',p:'Home Shower',code:'85161000'},
-                    {c:'BATHROOM',p:'High Pressure Washer',code:'84242000'},{c:'EMERGENCY LIGHTS & TORCHES',p:'Emergency Lantern',code:'85131090'},
-                    {c:'EMERGENCY LIGHTS & TORCHES',p:'Emergency Light LED',code:'85131090'},{c:'EMERGENCY LIGHTS & TORCHES',p:'Torch',code:'85131090'},
-                    {c:'FOOD & BEVERAGES',p:'Chocolate',code:'18063100'},{c:'FOOD & BEVERAGES',p:'Nescafe/Coffee',code:'21011200'},
-                    {c:'FOOD & BEVERAGES',p:'Pringles/Chips',code:'19059020'},{c:'FOOD & BEVERAGES',p:'Soft Drinks',code:'22021000'},
-                    {c:'FOOD & BEVERAGES',p:'Energy Drinks',code:'22029930'},{c:'PERFUMES & FRAGRANCES',p:'Body Spray',code:'33072000'},
-                    {c:'PERFUMES & FRAGRANCES',p:'Perfumes',code:'33030010'},{c:'LIQUOR',p:'Brandy VSOP',code:'22082000'},
-                    {c:'LIQUOR',p:'Gin',code:'22085000'},{c:'LIQUOR',p:'Rum',code:'22084010'},
-                    {c:'LIQUOR',p:'Tequila',code:'22087000'},{c:'LIQUOR',p:'Liqueur',code:'22087000'},
-                    {c:'LIQUOR',p:'Vodka',code:'22086000'},{c:'LIQUOR',p:'Whisky',code:'22083000'},
-                    {c:'LIQUOR',p:'Wine (Sweet)',code:'22042100'},{c:'LIQUOR',p:'Wine (Red)',code:'22042100'},
-                    {c:'LIQUOR',p:'Wine (White)',code:'22042100'},{c:'CIGARETTES',p:'Cigarettes (74-84 MM)',code:'24022050'},
-                    {c:'CIGARETTES',p:'Cigarettes (Over 99 MM)',code:'24022060'},{c:'TOYS',p:'Toys (General)',code:'95030090'},
-                    {c:'TOYS',p:'Toy Jeep',code:'95030010'},{c:'TOYS',p:'Toy Car',code:'95030010'},
-                    {c:'TOYS',p:'Toy Helicopter',code:'95030070'},{c:'TOYS',p:'Doll',code:'95030070'}
-                ].map(item => ({category: item.c, product: item.p, code: item.code}));
-            },
-
-            getDefaultClients() {
-                return [
-                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Colombo Harbour',w:'7501121'},
-                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Palaly Arrival',w:'7501302'},
-                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Palaly Departure',w:'7501303'},
-                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Service Bond',w:'7401172'},
-                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Colombo Harbour',w:'7501300'},
-                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Hambantota',w:'7501293'},
-                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Service Bond',w:'7400995'},
-                    {n:'AMF DUTY FREE',t:'1144513632525',wn:'Feeder Bond',w:'7500965'},
-                    {n:'METRO INTERNATIONAL',t:'1142987192525',wn:'Feeder Bond',w:'7501066'},
-                    {n:'METRO INTERNATIONAL',t:'1142987192525',wn:'CFS 5',w:'7101127'},
-                    {n:'MORICH TRADING',t:'1146083352525',wn:'Feeder Bond',w:'7501122'},
-                    {n:'MORICH TRADING',t:'1146083352525',wn:'CFS 5',w:'7101127'},
-                    {n:'VICTORY SILK STORES',t:'1040867722525',wn:'Feeder Bond',w:'7500941'},
-                    {n:'TELCEY SERVICES',t:'1147100327000',wn:'Feeder Bond',w:'7501138'},
-                    {n:'AVENTURA HOLDINGS',t:'1747968152525',wn:'Feeder Bond',w:'7501144'},
-                    {n:'ESWARAN BROTHERS',t:'1141272802525',wn:'FEEDER BOND (24A)',w:'7500803'},
-                    {n:'ESWARAN BROTHERS',t:'1141272802525',wn:'DFS (20A)',w:'7501332'},
-                    {n:'FREE LANKA TRADING',t:'1040318707000',wn:'Feeder Bond',w:'7500815'},
-                    {n:'INDIKA INTERNATIONAL DUTY FREE',t:'7622623712525-1',wn:'Feeder Bond',w:'7501059'},
-                    {n:'CROWN ELECTRONICS',t:'4091279912525',wn:'Feeder Bond',w:'7501050'},
-                    {n:'PROJECT PROSPECT',t:'1141861712525',wn:'Feeder Bond',w:'7501064'},
-                    {n:'S. N JAYASINGHE',t:'5229425882525-1',wn:'Feeder Bond',w:'7501009'},
-                    {n:'PACIFIC TRADERS',t:'5311335872525-1',wn:'Feeder Bond',w:'7501082'},
-                    {n:'D. M JEEWAN ( DMJ )',t:'1144007262525',wn:'Feeder Bond',w:'7501103'}
-                ].map(item => ({name: item.n, tin: item.t, warehouseName: item.wn, warehouse: item.w}));
-            },
-
-            saveData(syncToCloud = true) {
-                try {
-                    localStorage.setItem('cusdec_hsn_data', JSON.stringify(this.data.hsn));
-                    localStorage.setItem('cusdec_client_data', JSON.stringify(this.data.client));
-                    
-                    if (syncToCloud && this.jsonBin.isConnected) {
-                        clearTimeout(this.syncDebounceTimer);
-                        this.syncDebounceTimer = setTimeout(() => {
-                            this.saveToJsonBin('hsn');
-                            this.saveToJsonBin('client');
-                        }, 2000);
-                    }
-                } catch (error) {
-                    this.showNotification('Failed to save data', 'error');
-                }
-            },
-
-            attachEventListeners() {
-                ['hsn', 'client'].forEach(type => {
-                    const input = document.getElementById(type + 'Search');
-                    if (input) {
-                        input.addEventListener('input', (e) => {
-                            this.debounceSearch(type, e.target.value);
-                        });
-                    }
-                });
-
-                document.getElementById('modal').addEventListener('click', (e) => {
-                    if (e.target.id === 'modal') this.closeModal();
-                });
-
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        if (document.getElementById('modal').classList.contains('active')) {
-                            this.closeModal();
-                        } else {
-                            this.showDashboard();
-                        }
-                    }
-                });
-            },
-
-            debounceSearch(type, query) {
-                clearTimeout(this.debounceTimer);
-                this.searchState[type] = query;
-                this.debounceTimer = setTimeout(() => {
-                    this.performSearch(type, query);
-                }, 300);
-            },
-
-            performSearch(type, query) {
-                const trimmedQuery = query.toLowerCase().trim();
-                
-                if (!trimmedQuery) {
-                    this.showEmptyState(type);
-                    return;
-                }
-
-                const searchTerms = trimmedQuery.split(/\s+/);
-                
-                let filtered = this.data[type].filter(item => {
-                    const searchableText = type === 'hsn'
-                        ? [item.code || '', item.product || '', item.category || ''].join(' ').toLowerCase()
-                        : [item.tin || '', item.name || '', item.warehouse || '', item.warehouseName || ''].join(' ').toLowerCase();
-                    
-                    return searchTerms.every(term => searchableText.includes(term));
-                });
-
-                filtered.sort((a, b) => {
+                data.forEach(item => {
                     if (type === 'hsn') {
-                        if (a.code === trimmedQuery) return -1;
-                        if (b.code === trimmedQuery) return 1;
-                        if (a.code.startsWith(trimmedQuery)) return -1;
-                        if (b.code.startsWith(trimmedQuery)) return 1;
+                        csv += `"${item.category}","${item.product}","${item.code}"\n`;
                     } else {
-                        if (a.tin === trimmedQuery) return -1;
-                        if (b.tin === trimmedQuery) return 1;
-                        if (a.warehouse === trimmedQuery) return -1;
-                        if (b.warehouse === trimmedQuery) return 1;
+                        csv += `"${item.name}","${item.tin}","${item.warehouseName}","${item.warehouse}"\n`;
                     }
-                    return 0;
-                });
-
-                if (filtered.length === 0) {
-                    this.showEmptyState(type, `No results found for "${query}"`);
-                } else {
-                    this.displayResults(type, filtered);
-                }
-            },
-
-            displayResults(type, data) {
-                const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
-                if (!container) return;
-                
-                container.innerHTML = '';
-
-                if (type === 'hsn') {
-                    data.forEach((item) => {
-                        const actualIndex = this.data.hsn.findIndex(h => h.code === item.code);
-                        const div = document.createElement('div');
-                        div.className = 'result-item';
-                        div.innerHTML = `
-                            <div class="result-actions">
-                                <button class="result-action-btn edit" onclick="app.editItem('hsn', ${actualIndex})">
-                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
-                                    Edit
-                                </button>
-                            </div>
-                            <div class="result-title" onclick="app.copyToClipboard('${item.code}', 'HSN Code')">
-                                ${this.h(item.code || 'N/A')}
-                                <span class="copy-hint">📋 Copy</span>
-                            </div>
-                            <div class="result-details"><span style="color: var(--text-secondary);">Product:</span> ${this.h(item.product || 'N/A')}</div>
-                            <div class="result-category">${this.h(item.category || 'N/A')}</div>
-                        `;
-                        container.appendChild(div);
-                    });
-                } else {
-                    const grouped = this.groupClientData(data);
-                    
-                    Object.values(grouped).forEach(company => {
-                        const div = document.createElement('div');
-                        div.className = 'result-item';
-                        
-                        const warehouseChips = company.warehouses.map(wh => `
-                            <div class="warehouse-chip" onclick="app.copyToClipboard('${wh.code}', 'Warehouse Code')">
-                                <div class="warehouse-code">${this.h(wh.code || 'N/A')}</div>
-                                <div class="warehouse-name">${this.h(wh.name || 'N/A')}</div>
-                            </div>
-                        `).join('');
-                        
-                        div.innerHTML = `
-                            <div class="result-actions">
-                                <button class="result-action-btn edit" onclick="app.editClient('${company.tin}')">
-                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
-                                    Edit
-                                </button>
-                            </div>
-                            <div class="result-title" onclick="app.copyToClipboard('${company.tin}', 'TIN')">
-                                <span style="color: var(--text-secondary); font-weight: 400; font-size: 0.875rem;">TIN:</span> ${this.h(company.tin || 'N/A')}
-                                <span class="copy-hint">📋 Copy</span>
-                            </div>
-                            <div class="result-details"><span style="color: var(--text-secondary);">Company:</span> ${this.h(company.name || 'N/A')}</div>
-                            <div style="margin-top: var(--spacing);">
-                                <div class="warehouse-label">Warehouses</div>
-                                <div class="warehouse-container">${warehouseChips}</div>
-                            </div>
-                        `;
-                        container.appendChild(div);
-                    });
-                }
-            },
-
-            groupClientData(data) {
-                return data.reduce((acc, item) => {
-                    const key = `${item.name}-${item.tin}`;
-                    if (!acc[key]) {
-                        acc[key] = { name: item.name, tin: item.tin, warehouses: [] };
-                    }
-                    acc[key].warehouses.push({ name: item.warehouseName, code: item.warehouse });
-                    return acc;
-                }, {});
-            },
-
-            showEmptyState(type, message = null) {
-                const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
-                if (!container) return;
-                
-                const defaultMessage = type === 'hsn' 
-                    ? 'Start typing to search HSN codes...' 
-                    : 'Start typing to search client information...';
-                
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🔍</div>
-                        <div class="empty-title">${message ? 'No Results' : 'Ready to Search'}</div>
-                        <div class="empty-message">${message || defaultMessage}</div>
-                    </div>
-                `;
-            },
-
-            showSection(section) {
-                document.getElementById('dashboard').classList.add('hidden');
-                const sectionEl = document.getElementById(section + 'Section');
-                if (sectionEl) {
-                    sectionEl.classList.add('active');
-                    const searchInput = document.getElementById(section + 'Search');
-                    if (searchInput) searchInput.focus();
-                    this.showEmptyState(section);
-                }
-            },
-
-            showDashboard() {
-                ['hsnSection', 'clientSection'].forEach(id => {
-                    const section = document.getElementById(id);
-                    if (section) section.classList.remove('active');
-                });
-                document.getElementById('dashboard').classList.remove('hidden');
-            },
-
-            showModal(title, content) {
-                const modal = document.getElementById('modal');
-                document.getElementById('modalTitle').textContent = title;
-                document.getElementById('modalContent').innerHTML = content;
-                modal.classList.add('active');
-            },
-
-            closeModal() {
-                document.getElementById('modal').classList.remove('active');
-            },
-
-            showAddModal(type) {
-                const categories = type === 'hsn' 
-                    ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))]
-                    : [];
-                    
-                const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
-                
-                const content = type === 'hsn' ? `
-                    <form onsubmit="app.saveItem(event, 'hsn')">
-                        <div class="form-group">
-                            <label class="form-label">Category</label>
-                            <input type="text" class="form-input" name="category" list="categoryList" required>
-                            <datalist id="categoryList">${categoryOptions}</datalist>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Product Name</label>
-                            <input type="text" class="form-input" name="product" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">HSN Code</label>
-                            <input type="text" class="form-input" name="code" required pattern="[0-9]{8}" 
-                                   placeholder="8-digit HSN code" maxlength="8">
-                        </div>
-                        <button type="submit" class="save-btn">Save HSN Code</button>
-                    </form>
-                ` : `
-                    <form onsubmit="app.saveItem(event, 'client')">
-                        <div class="form-group">
-                            <label class="form-label">Company Name</label>
-                            <input type="text" class="form-input" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">TIN Code</label>
-                            <input type="text" class="form-input" name="tin" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Warehouse Name</label>
-                            <input type="text" class="form-input" name="warehouseName" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Warehouse Number</label>
-                            <input type="text" class="form-input" name="warehouse" required>
-                        </div>
-                        <button type="submit" class="save-btn">Save Client</button>
-                    </form>
-                `;
-                
-                this.showModal(type === 'hsn' ? 'Add New HSN Code' : 'Add New Client', content);
-                setTimeout(() => document.querySelector('.form-input').focus(), 100);
-            },
-
-            saveItem(event, type) {
-                event.preventDefault();
-                const formData = new FormData(event.target);
-                const newItem = Object.fromEntries(formData);
-                
-                if (type === 'hsn') {
-                    const isDuplicate = this.data.hsn.some(item => item.code === newItem.code);
-                    if (isDuplicate) {
-                        this.showNotification('HSN code already exists', 'error');
-                        return;
-                    }
-                } else {
-                    const isDuplicate = this.data.client.some(item => 
-                        item.tin === newItem.tin && item.warehouse === newItem.warehouse
-                    );
-                    if (isDuplicate) {
-                        this.showNotification('This warehouse already exists for this TIN', 'error');
-                        return;
-                    }
-                }
-                
-                this.data[type].push(newItem);
-                this.saveData();
-                this.closeModal();
-                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} added successfully`, 'success');
-                
-                const searchQuery = document.getElementById(type + 'Search').value.trim();
-                if (searchQuery) this.performSearch(type, searchQuery);
-            },
-
-            editItem(type, index) {
-                const item = this.data[type][index];
-                if (!item) return;
-                
-                const categories = type === 'hsn' 
-                    ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))]
-                    : [];
-                    
-                const categoryOptions = categories.map(cat => `<option value="${cat}">`).join('');
-                
-                const content = type === 'hsn' ? `
-                    <form onsubmit="app.updateItem(event, 'hsn', ${index})">
-                        <div class="form-group">
-                            <label class="form-label">Category</label>
-                            <input type="text" class="form-input" name="category" list="categoryList" 
-                                   value="${this.h(item.category)}" required>
-                            <datalist id="categoryList">${categoryOptions}</datalist>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Product Name</label>
-                            <input type="text" class="form-input" name="product" 
-                                   value="${this.h(item.product)}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">HSN Code</label>
-                            <input type="text" class="form-input" name="code" 
-                                   value="${this.h(item.code)}" required pattern="[0-9]{8}" 
-                                   placeholder="8-digit HSN code" maxlength="8">
-                        </div>
-                        <button type="submit" class="save-btn">Update HSN Code</button>
-                        <button type="button" class="delete-btn" 
-                                onclick="app.deleteItem('hsn', ${index})">Delete HSN Code</button>
-                    </form>
-                ` : `
-                    <form onsubmit="app.updateItem(event, 'client', ${index})">
-                        <div class="form-group">
-                            <label class="form-label">Company Name</label>
-                            <input type="text" class="form-input" name="name" 
-                                   value="${this.h(item.name)}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">TIN Code</label>
-                            <input type="text" class="form-input" name="tin" 
-                                   value="${this.h(item.tin)}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Warehouse Name</label>
-                            <input type="text" class="form-input" name="warehouseName" 
-                                   value="${this.h(item.warehouseName)}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Warehouse Number</label>
-                            <input type="text" class="form-input" name="warehouse" 
-                                   value="${this.h(item.warehouse)}" required>
-                        </div>
-                        <button type="submit" class="save-btn">Update Client</button>
-                        <button type="button" class="delete-btn" 
-                                onclick="app.deleteItem('client', ${index})">Delete Warehouse</button>
-                    </form>
-                `;
-                
-                this.showModal(type === 'hsn' ? 'Edit HSN Code' : 'Edit Client', content);
-                setTimeout(() => document.querySelector('.form-input').focus(), 100);
-            },
-
-            editClient(tin) {
-                const clientWarehouses = this.data.client.filter(c => c.tin === tin);
-                if (clientWarehouses.length === 0) return;
-                
-                const companyName = clientWarehouses[0].name;
-                
-                const warehousesList = clientWarehouses.map((item) => {
-                    const actualIndex = this.data.client.findIndex(c => 
-                        c.tin === item.tin && c.warehouse === item.warehouse
-                    );
-                    return `
-                        <div class="warehouse-edit-item">
-                            <div class="warehouse-edit-details">
-                                <strong>${this.h(item.warehouse)}</strong> - ${this.h(item.warehouseName)}
-                            </div>
-                            <div class="warehouse-edit-actions">
-                                <button type="button" class="small-btn edit" 
-                                        onclick="app.editItem('client', ${actualIndex})">
-                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
-                                </button>
-                                <button type="button" class="small-btn delete" 
-                                        onclick="app.deleteItem('client', ${actualIndex})">
-                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                const content = `
-                    <form onsubmit="app.updateClientInfo(event, '${tin}')">
-                        <div class="form-group">
-                            <label class="form-label">Company Name</label>
-                            <input type="text" class="form-input" name="name" 
-                                   value="${this.h(companyName)}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">TIN Code</label>
-                            <input type="text" class="form-input" name="tin" 
-                                   value="${this.h(tin)}" required>
-                        </div>
-                        <button type="submit" class="save-btn">Update Company Info</button>
-                    </form>
-                    <div class="warehouses-list" style="margin-top: var(--spacing);">
-                        <h4 style="margin-bottom: var(--spacing); color: var(--text-secondary);">Warehouses</h4>
-                        ${warehousesList}
-                    </div>
-                    <button type="button" class="delete-btn" onclick="app.deleteEntireClient('${tin}')" 
-                            style="margin-top: var(--spacing);">Delete Entire Client</button>
-                `;
-                
-                this.showModal(`Edit Client: ${companyName}`, content);
-            },
-
-            updateClientInfo(event, oldTin) {
-                event.preventDefault();
-                const formData = new FormData(event.target);
-                const { name, tin } = Object.fromEntries(formData);
-                
-                if (oldTin !== tin) {
-                    const exists = this.data.client.some(c => c.tin === tin);
-                    if (exists) {
-                        this.showNotification('A client with this TIN already exists', 'error');
-                        return;
-                    }
-                }
-                
-                this.data.client = this.data.client.map(client => {
-                    if (client.tin === oldTin) {
-                        return { ...client, name, tin };
-                    }
-                    return client;
                 });
                 
-                this.saveData();
-                this.closeModal();
-                this.showNotification('Client information updated', 'success');
-                
-                const searchQuery = document.getElementById('clientSearch').value.trim();
-                if (searchQuery) this.performSearch('client', searchQuery);
-            },
-
-            updateItem(event, type, index) {
-                event.preventDefault();
-                const formData = new FormData(event.target);
-                const updatedItem = Object.fromEntries(formData);
-                
-                if (type === 'hsn') {
-                    const isDuplicate = this.data.hsn.some((item, i) => 
-                        i !== index && item.code === updatedItem.code
-                    );
-                    if (isDuplicate) {
-                        this.showNotification('HSN code already exists', 'error');
-                        return;
-                    }
-                } else {
-                    const isDuplicate = this.data.client.some((item, i) => 
-                        i !== index && item.tin === updatedItem.tin && item.warehouse === updatedItem.warehouse
-                    );
-                    if (isDuplicate) {
-                        this.showNotification('This warehouse already exists for this TIN', 'error');
-                        return;
-                    }
-                }
-                
-                this.data[type][index] = updatedItem;
-                this.saveData();
-                this.closeModal();
-                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} updated`, 'success');
-                
-                const searchQuery = document.getElementById(type + 'Search').value.trim();
-                if (searchQuery) this.performSearch(type, searchQuery);
-            },
-
-            deleteItem(type, index) {
-                const confirmMessage = type === 'hsn' 
-                    ? 'Delete this HSN code?' 
-                    : 'Delete this warehouse?';
-                
-                if (confirm(confirmMessage)) {
-                    this.data[type].splice(index, 1);
-                    this.saveData();
-                    this.closeModal();
-                    this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Warehouse'} deleted`, 'success');
-                    
-                    const searchInput = document.getElementById(type + 'Search');
-                    if (searchInput && searchInput.value.trim()) {
-                        this.performSearch(type, searchInput.value);
-                    }
-                }
-            },
-
-            deleteEntireClient(tin) {
-                const clientWarehouses = this.data.client.filter(c => c.tin === tin);
-                const companyName = clientWarehouses[0]?.name || 'this client';
-                
-                if (confirm(`Delete ${companyName} and all ${clientWarehouses.length} warehouses?`)) {
-                    this.data.client = this.data.client.filter(c => c.tin !== tin);
-                    this.saveData();
-                    this.closeModal();
-                    this.showNotification('Client deleted', 'success');
-                    
-                    const searchQuery = document.getElementById('clientSearch').value.trim();
-                    if (searchQuery) this.performSearch('client', searchQuery);
-                }
-            },
-
-            exportData(type) {
-                const data = this.data[type];
-                
-                if (data.length === 0) {
-                    this.showNotification('No data to export', 'error');
-                    return;
-                }
-
-                let htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
-                htmlContent += '<head><meta charset="utf-8"><title>Export</title></head><body><table border="1">';
-                
-                if (type === 'hsn') {
-                    htmlContent += '<tr><th>Category</th><th>Product</th><th>HSN Code</th></tr>';
-                    data.forEach(item => {
-                        htmlContent += `<tr><td>${this.h(item.category)}</td><td>${this.h(item.product)}</td><td>${this.h(item.code)}</td></tr>`;
-                    });
-                } else {
-                    htmlContent += '<tr><th>Company Name</th><th>TIN</th><th>Warehouse Name</th><th>Warehouse Code</th></tr>';
-                    data.forEach(item => {
-                        htmlContent += `<tr><td>${this.h(item.name)}</td><td>${this.h(item.tin)}</td><td>${this.h(item.warehouseName)}</td><td>${this.h(item.warehouse)}</td></tr>`;
-                    });
-                }
-                
-                htmlContent += '</table></body></html>';
-                
-                const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
-                const link = document.createElement('a');
+                const blob = new Blob([csv], { type: 'text/csv' });
                 const url = URL.createObjectURL(blob);
-                const date = new Date().toISOString().split('T')[0];
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
                 
-                link.setAttribute('href', url);
-                link.setAttribute('download', `cusdec_${type}_${date}.xls`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                this.showNotification('Data exported to Excel', 'success');
+                this.showNotification(`Exported ${data.length} records`, 'success');
             },
 
-            async importData(type, fileInput) {
-                const file = fileInput.files[0];
+            async importData(type, input) {
+                const file = input.files[0];
                 if (!file) return;
-                
+
                 try {
                     const text = await file.text();
-                    let data = [];
+                    const lines = text.trim().split('\n');
+                    const headers = lines[0].toLowerCase();
                     
-                    if (file.name.endsWith('.csv')) {
-                        const lines = text.split('\n').filter(line => line.trim());
-                        const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+                    const expectedHeaders = type === 'hsn' 
+                        ? ['category', 'product', 'hsn code']
+                        : ['company name', 'tin', 'warehouse name', 'warehouse number'];
+                    
+                    const hasValidHeaders = expectedHeaders.every(header => 
+                        headers.includes(header.toLowerCase())
+                    );
+                    
+                    if (!hasValidHeaders) {
+                        this.showNotification('Invalid file format. Check column headers.', 'error');
+                        input.value = '';
+                        return;
+                    }
+                    
+                    const imported = [];
+                    let duplicates = 0;
+                    
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = this.parseCSVLine(lines[i]);
+                        if (values.length < expectedHeaders.length) continue;
                         
-                        for (let i = 1; i < lines.length; i++) {
-                            const values = lines[i].match(/(".*?"|[^,]+)/g) || [];
-                            const row = {};
-                            
-                            if (type === 'hsn') {
-                                row.category = values[0]?.replace(/"/g, '').trim() || '';
-                                row.product = values[1]?.replace(/"/g, '').trim() || '';
-                                row.code = values[2]?.replace(/"/g, '').trim() || '';
-                                if (row.code) data.push(row);
-                            } else {
-                                row.name = values[0]?.replace(/"/g, '').trim() || '';
-                                row.tin = values[1]?.replace(/"/g, '').trim() || '';
-                                row.warehouseName = values[2]?.replace(/"/g, '').trim() || '';
-                                row.warehouse = values[3]?.replace(/"/g, '').trim() || '';
-                                if (row.tin && row.warehouse) data.push(row);
-                            }
-                        }
-                    } else {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = text;
-                        const rows = tempDiv.querySelectorAll('tr');
+                        const item = type === 'hsn' 
+                            ? { category: values[0], product: values[1], code: values[2] }
+                            : { name: values[0], tin: values[1], warehouseName: values[2], warehouse: values[3] };
                         
-                        for (let i = 1; i < rows.length; i++) {
-                            const cells = rows[i].querySelectorAll('td');
-                            if (cells.length > 0) {
-                                const row = {};
-                                
-                                if (type === 'hsn') {
-                                    row.category = cells[0]?.textContent.trim() || '';
-                                    row.product = cells[1]?.textContent.trim() || '';
-                                    row.code = cells[2]?.textContent.trim() || '';
-                                    if (row.code) data.push(row);
-                                } else {
-                                    row.name = cells[0]?.textContent.trim() || '';
-                                    row.tin = cells[1]?.textContent.trim() || '';
-                                    row.warehouseName = cells[2]?.textContent.trim() || '';
-                                    row.warehouse = cells[3]?.textContent.trim() || '';
-                                    if (row.tin && row.warehouse) data.push(row);
-                                }
-                            }
+                        const isDuplicate = type === 'hsn'
+                            ? this.data.hsn.some(existing => existing.code === item.code)
+                            : this.data.client.some(existing => 
+                                existing.tin === item.tin && existing.warehouse === item.warehouse
+                              );
+                        
+                        if (!isDuplicate) {
+                            imported.push(item);
+                        } else {
+                            duplicates++;
                         }
                     }
                     
-                    if (data.length > 0) {
-                        const mergedData = this.mergeData(type, this.data[type], data);
-                        const addedCount = mergedData.length - this.data[type].length;
-                        this.data[type] = mergedData;
+                    if (imported.length > 0) {
+                        this.data[type].push(...imported);
                         this.saveData();
-                        this.showNotification(`Imported ${addedCount} new ${type} records`, 'success');
+                        this.showNotification(
+                            `Imported ${imported.length} records${duplicates > 0 ? ` (${duplicates} duplicates skipped)` : ''}`, 
+                            'success'
+                        );
                         
                         const searchQuery = document.getElementById(type + 'Search').value.trim();
                         if (searchQuery) this.performSearch(type, searchQuery);
                     } else {
-                        this.showNotification('No valid data found in file', 'error');
+                        this.showNotification('No new records to import', 'info');
                     }
                 } catch (error) {
                     this.showNotification('Failed to import file', 'error');
                 }
                 
-                fileInput.value = '';
+                input.value = '';
             },
 
-            async copyToClipboard(text, type) {
+            parseCSVLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    const nextChar = line[i + 1];
+                    
+                    if (char === '"' && inQuotes && nextChar === '"') {
+                        current += '"';
+                        i++;
+                    } else if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                
+                result.push(current.trim());
+                return result;
+            },
+
+            async copyToClipboard(text, label) {
                 try {
                     if (navigator.clipboard && window.isSecureContext) {
                         await navigator.clipboard.writeText(text);
@@ -2903,20 +1969,14 @@
                         document.execCommand('copy');
                         document.body.removeChild(textArea);
                     }
-                    this.showNotification(`${type} copied: ${text}`, 'success');
+                    this.showNotification(`${label} copied: ${text}`, 'success');
                 } catch (err) {
                     this.showNotification('Failed to copy', 'error');
                 }
             },
 
             showNotification(message, type = 'info') {
-                let container = document.getElementById('notification-container');
-                if (!container) {
-                    container = document.createElement('div');
-                    container.id = 'notification-container';
-                    document.body.appendChild(container);
-                }
-                
+                const container = document.getElementById('notification-container');
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
                 notification.textContent = message;
@@ -2927,22 +1987,23 @@
                 
                 setTimeout(() => {
                     notification.classList.remove('show');
-                    setTimeout(() => container.removeChild(notification), 300);
+                    setTimeout(() => notification.remove(), 300);
                 }, 3000);
             },
 
-            h(unsafe) {
-                if (!unsafe) return '';
-                return unsafe.toString()
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
+            h(text) {
+                const div = document.createElement('div');
+                div.textContent = text || '';
+                return div.innerHTML;
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => app.init());
+        // Initialize the app when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => app.init());
+        } else {
+            app.init();
+        }
     </script>
 </body>
 </html>
