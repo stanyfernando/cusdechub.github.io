@@ -47,83 +47,6 @@
         .header-content { display: flex; justify-content: center; align-items: center; margin-bottom: var(--spacing); }
         .logo-img { max-height: 120px; width: auto; }
         
-        .bin-info-bar {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: var(--spacing);
-            margin: 0 auto calc(var(--spacing) * 2) auto;
-            max-width: 600px;
-            display: none;
-        }
-        
-        .bin-info-bar.active { display: block; animation: slideDown 0.3s ease-out; }
-        .bin-info-bar.highlight { animation: slideDown 0.3s ease-out, highlight 2s ease-in-out; }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes highlight {
-            0%, 100% { border-color: var(--border); }
-            50% { border-color: var(--success); box-shadow: 0 0 10px rgba(67, 181, 129, 0.3); }
-        }
-        
-        .bin-info-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--spacing);
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .bin-info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--bg-tertiary);
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            font-size: 0.875rem;
-        }
-        
-        .bin-info-item strong { color: var(--text-secondary); }
-        
-        .bin-info-item code {
-            font-family: var(--font);
-            color: var(--accent);
-            padding: 2px 4px;
-            border-radius: 3px;
-            transition: background var(--transition), transform 0.1s ease;
-            position: relative;
-        }
-        
-        .bin-info-item code[style*="cursor: pointer"] { cursor: pointer; }
-        .bin-info-item code[style*="cursor: pointer"]:hover { background: var(--bg-hover); }
-        
-        .bin-info-item code[style*="cursor: pointer"]::after {
-            content: 'Click to copy';
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            padding: 4px 8px;
-            border-radius: var(--radius);
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition);
-            margin-bottom: 4px;
-            border: 1px solid var(--border);
-        }
-        
-        .bin-info-item code[style*="cursor: pointer"]:hover::after { opacity: 1; }
-        
         .dashboard { display: block; opacity: 1; transform: translateY(0); transition: all var(--transition); }
         .dashboard.hidden { display: none; }
 
@@ -276,14 +199,16 @@
         .btn:active { transform: translateY(0); }
         .btn.primary { border-color: var(--accent); }
         .btn.sync { position: relative; }
-        .btn.sync.connected { border-color: var(--success); color: var(--success); }
         .btn.sync.connected::after {
-            content: '●';
+            content: '';
             position: absolute;
-            top: 4px;
-            right: 4px;
-            color: var(--success);
-            font-size: 8px;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 4px var(--success);
         }
 
         .results {
@@ -605,10 +530,6 @@
             .result-actions { position: static; opacity: 1; margin-top: var(--spacing); }
             .warehouse-container { grid-template-columns: 1fr; }
             .modal-content { margin: var(--spacing); width: calc(100% - 2rem); }
-            .bin-info-bar { margin: 0 var(--spacing) calc(var(--spacing) * 2) var(--spacing); }
-            .bin-info-content { flex-direction: column; gap: 0.5rem; }
-            .bin-info-item { width: 100%; justify-content: space-between; }
-            .bin-info-item span { display: block; margin-left: 0; margin-top: 0.25rem; }
         }
     </style>
 </head>
@@ -617,35 +538,6 @@
         <div class="header">
             <div class="header-content">
                 <img src="https://i.ibb.co/pJLFmm5/ARR.png" alt="Arrow Clearing Agency" class="logo-img">
-            </div>
-        </div>
-
-        <div class="bin-info-bar" id="binInfoBar">
-            <div class="bin-info-content">
-                <div class="bin-info-item">
-                    <strong>HSN Bin:</strong>
-                    <code id="hsnBinDisplay" onclick="app.copyBinId('hsn')" title="Click to copy">Click Sync to create</code>
-                    <span id="hsnCount" style="color: var(--text-muted); font-size: 0.75rem; margin-left: 0.5rem;"></span>
-                </div>
-                <div class="bin-info-item">
-                    <strong>Client Bin:</strong>
-                    <code id="clientBinDisplay" onclick="app.copyBinId('client')" title="Click to copy">Click Sync to create</code>
-                    <span id="clientCount" style="color: var(--text-muted); font-size: 0.75rem; margin-left: 0.5rem;"></span>
-                </div>
-                <div class="bin-info-item">
-                    <strong>Status:</strong>
-                    <span id="connectionStatus" style="color: var(--success);">Connected</span>
-                </div>
-                <div class="bin-info-item" style="border-left: 1px solid var(--border); padding-left: var(--spacing);">
-                    <button class="btn" onclick="app.showBinInfo()" style="padding: 0.25rem 0.75rem; min-width: auto; height: auto; font-size: 0.75rem;">
-                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                        </svg>
-                        Help
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -706,7 +598,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="btn" onclick="document.getElementById('hsnImport').click()">
+                <button class="btn" onclick="app.handleImport('hsn')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
@@ -775,7 +667,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="btn" onclick="document.getElementById('clientImport').click()">
+                <button class="btn" onclick="app.handleImport('client')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
@@ -826,104 +718,52 @@
 
     <script>
         const app = {
+            // Core data structure
             data: { hsn: [], client: [] },
-            searchState: { hsn: '', client: '' },
-            debounceTimer: null,
-            syncDebounceTimer: null,
+            
+            // State management
+            state: {
+                search: { hsn: '', client: '' },
+                timers: { debounce: null, sync: null },
+                syncInProgress: false,
+                currentApiKeyCallback: null
+            },
+            
+            // JSONBin configuration
             jsonBin: {
                 apiKey: localStorage.getItem('jsonbin_api_key') || '',
                 baseUrl: 'https://api.jsonbin.io/v3',
                 bins: {
                     hsn: localStorage.getItem('jsonbin_hsn_id') || null,
                     client: localStorage.getItem('jsonbin_client_id') || null
-                },
-                isConnected: false,
-                syncInProgress: false
+                }
             },
 
+            // Constants
+            SEARCH_DEBOUNCE: 300,
+            SYNC_DEBOUNCE: 2000,
+
+            // Initialize application
             init() {
                 this.loadData();
                 this.attachEventListeners();
                 this.checkJsonBinConnection();
             },
 
+            // JSONBin Methods
+            get isConnected() {
+                return !!(this.jsonBin.apiKey && this.jsonBin.apiKey.trim());
+            },
+
             checkJsonBinConnection() {
-                this.jsonBin.isConnected = !!(this.jsonBin.apiKey && this.jsonBin.apiKey.trim());
-                this.updateSyncButtons(this.jsonBin.isConnected);
-                this.updateBinInfoBar();
+                this.updateSyncButtons(this.isConnected);
             },
 
             updateSyncButtons(isConnected) {
                 document.querySelectorAll('.btn.sync').forEach(btn => {
                     btn.classList.toggle('connected', isConnected);
-                    btn.title = isConnected ? 'Connected - Click to sync' : 'Click to setup and sync';
+                    btn.title = isConnected ? 'Connected to cloud storage' : 'Click to setup cloud sync';
                 });
-            },
-            
-            updateBinInfoBar(highlight = false) {
-                const binInfoBar = document.getElementById('binInfoBar');
-                const hsnBinDisplay = document.getElementById('hsnBinDisplay');
-                const clientBinDisplay = document.getElementById('clientBinDisplay');
-                const connectionStatus = document.getElementById('connectionStatus');
-                const hsnCount = document.getElementById('hsnCount');
-                const clientCount = document.getElementById('clientCount');
-                
-                if (this.jsonBin.isConnected) {
-                    binInfoBar.classList.add('active');
-                    
-                    if (highlight) {
-                        binInfoBar.classList.add('highlight');
-                        setTimeout(() => binInfoBar.classList.remove('highlight'), 2000);
-                    }
-                    
-                    hsnBinDisplay.textContent = this.jsonBin.bins.hsn || 'Click Sync to create';
-                    hsnBinDisplay.style.color = this.jsonBin.bins.hsn ? 'var(--accent)' : 'var(--text-muted)';
-                    hsnBinDisplay.style.cursor = this.jsonBin.bins.hsn ? 'pointer' : 'default';
-                    
-                    clientBinDisplay.textContent = this.jsonBin.bins.client || 'Click Sync to create';
-                    clientBinDisplay.style.color = this.jsonBin.bins.client ? 'var(--accent)' : 'var(--text-muted)';
-                    clientBinDisplay.style.cursor = this.jsonBin.bins.client ? 'pointer' : 'default';
-                    
-                    hsnCount.textContent = this.jsonBin.bins.hsn ? `(${this.data.hsn.length} records)` : '';
-                    clientCount.textContent = this.jsonBin.bins.client ? `(${this.data.client.length} records)` : '';
-                    
-                    connectionStatus.textContent = 'Connected';
-                    connectionStatus.style.color = 'var(--success)';
-                } else {
-                    binInfoBar.classList.remove('active');
-                }
-            },
-            
-            async copyBinId(type) {
-                const binId = this.jsonBin.bins[type];
-                if (!binId) {
-                    this.showNotification(`No ${type} bin ID to copy. Sync first!`, 'error');
-                    return;
-                }
-                
-                try {
-                    if (navigator.clipboard && window.isSecureContext) {
-                        await navigator.clipboard.writeText(binId);
-                    } else {
-                        const textArea = document.createElement('textarea');
-                        textArea.value = binId;
-                        textArea.style.position = 'fixed';
-                        textArea.style.opacity = '0';
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                    }
-                    this.showNotification(`${type.toUpperCase()} bin ID copied: ${binId}`, 'success');
-                    
-                    const element = document.getElementById(type + 'BinDisplay');
-                    if (element) {
-                        element.style.transform = 'scale(0.95)';
-                        setTimeout(() => element.style.transform = 'scale(1)', 100);
-                    }
-                } catch (err) {
-                    this.showNotification('Failed to copy', 'error');
-                }
             },
 
             getApiHeaders() {
@@ -933,406 +773,19 @@
                 };
             },
 
-            showApiKeyModal(callback) {
-                const content = `
-                    <form onsubmit="app.saveApiKey(event)">
-                        <div class="form-group">
-                            <label class="form-label">JSONBin.io API Key</label>
-                            <input type="text" class="form-input" id="apiKeyInput" 
-                                   placeholder="$2a$10$..." 
-                                   value="${this.h(this.jsonBin.apiKey)}" required>
-                            <div class="help-text">
-                                Don't have an API key? 
-                                <a href="https://jsonbin.io/" target="_blank" class="help-link">Sign up at JSONBin.io</a><br>
-                                <strong>Note:</strong> After first sync, you'll get Bin IDs that you need to save for other devices.
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">HSN Bin ID (Optional)</label>
-                            <input type="text" class="form-input" id="hsnBinInput" 
-                                   placeholder="Leave empty if first time syncing" 
-                                   value="${this.h(this.jsonBin.bins.hsn || '')}">
-                            <div class="help-text">If you've synced before on another device, enter the bin ID</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Client Bin ID (Optional)</label>
-                            <input type="text" class="form-input" id="clientBinInput" 
-                                   placeholder="Leave empty if first time syncing" 
-                                   value="${this.h(this.jsonBin.bins.client || '')}">
-                            <div class="help-text">If you've synced before on another device, enter the bin ID</div>
-                        </div>
-                        <button type="submit" class="save-btn">Connect to JSONBin</button>
-                    </form>
-                `;
-                
-                this.showModal('JSONBin.io API Setup', content);
-                this.currentApiKeyCallback = callback;
-                setTimeout(() => document.getElementById('apiKeyInput').focus(), 100);
-            },
-
-            saveApiKey(event) {
-                event.preventDefault();
-                const apiKey = document.getElementById('apiKeyInput').value.trim();
-                const hsnBin = document.getElementById('hsnBinInput').value.trim();
-                const clientBin = document.getElementById('clientBinInput').value.trim();
-                
-                if (!apiKey) {
-                    this.showNotification('Please enter an API key', 'error');
-                    return;
-                }
-                
-                localStorage.setItem('jsonbin_api_key', apiKey);
-                this.jsonBin.apiKey = apiKey;
-                
-                if (hsnBin) {
-                    localStorage.setItem('jsonbin_hsn_id', hsnBin);
-                    this.jsonBin.bins.hsn = hsnBin;
-                }
-                
-                if (clientBin) {
-                    localStorage.setItem('jsonbin_client_id', clientBin);
-                    this.jsonBin.bins.client = clientBin;
-                }
-                
-                this.checkJsonBinConnection();
-                this.updateBinInfoBar();
-                this.closeModal();
-                this.showNotification('API key saved successfully', 'success');
-                
-                if (this.currentApiKeyCallback) {
-                    this.currentApiKeyCallback();
-                    this.currentApiKeyCallback = null;
-                }
-            },
-
-            async loadFromCloud(type) {
-                if (!this.jsonBin.apiKey) {
-                    this.showApiKeyModal(() => this.loadFromCloud(type));
-                    return;
-                }
-
-                this.showNotification(`Loading ${type} data...`, 'info');
-
-                try {
-                    if (!this.jsonBin.bins[type]) {
-                        this.showNotification(`No ${type} bin ID found. Please enter it in the API setup.`, 'error');
-                        this.showApiKeyModal(() => this.loadFromCloud(type));
-                        return;
-                    }
-
-                    const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
-                        headers: this.getApiHeaders()
-                    });
-
-                    if (!response.ok) {
-                        if (response.status === 401) {
-                            this.showNotification('Invalid API key. Please update it.', 'error');
-                            this.showApiKeyModal(() => this.loadFromCloud(type));
-                            return;
-                        } else if (response.status === 404) {
-                            this.showNotification('Bin not found. Please check your bin ID.', 'error');
-                            this.showApiKeyModal(() => this.loadFromCloud(type));
-                            return;
-                        }
-                        throw new Error(`Failed to load: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    const cloudData = result.record || [];
-
-                    this.data[type] = cloudData;
-                    this.saveData(false);
-                    
-                    const searchInput = document.getElementById(type + 'Search');
-                    if (searchInput?.value.trim()) {
-                        this.performSearch(type, searchInput.value);
-                    } else {
-                        this.showEmptyState(type);
-                    }
-                    
-                    this.showNotification(`Loaded ${cloudData.length} records from cloud`, 'success');
-                    this.updateBinInfoBar();
-                    
-                    if (cloudData.length > 0) {
-                        this.showNotification('You can now search and edit your data!', 'info');
-                    }
-                } catch (error) {
-                    this.showNotification(`Failed to load from cloud`, 'error');
-                }
-            },
-
-            async createJsonBin(type, apiKey) {
-                const headers = apiKey.startsWith('$2a$') 
-                    ? { 
-                        'Content-Type': 'application/json',
-                        'X-Access-Key': apiKey,
-                        'X-Bin-Name': `cusdec_${type}_data`,
-                        'X-Collection-Id': 'uncategorized'
-                      }
-                    : { 
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': apiKey,
-                        'X-Bin-Name': `cusdec_${type}_data`
-                      };
-                
-                const response = await fetch(`${this.jsonBin.baseUrl}/b`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(this.data[type] || [])
-                });
-
-                if (!response.ok) throw new Error(`Failed to create bin: ${response.status}`);
-
-                const result = await response.json();
-                const binId = result.metadata.id;
-                
-                this.showNotification(`Created ${type} bin: ${binId} - Check top of page!`, 'success');
-                
-                return binId;
-            },
-
-            showBinInfo() {
-                if (!this.jsonBin.bins.hsn && !this.jsonBin.bins.client) {
-                    this.showNotification('No bin IDs found. Sync first to create cloud storage.', 'info');
-                    return;
-                }
-                
-                const hsnBin = this.jsonBin.bins.hsn || 'Not created yet';
-                const clientBin = this.jsonBin.bins.client || 'Not created yet';
-                
-                const content = `
-                    <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing); border: 2px solid var(--success);">
-                        <h4 style="margin-bottom: var(--spacing); color: var(--success);">⚠️ Your Cloud Storage is Ready!</h4>
-                        <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
-                            Your bin IDs are now displayed at the top of the page for easy access.
-                            You can click on any ID to copy it.
-                        </p>
-                        <div class="form-group">
-                            <label class="form-label">HSN Bin ID:</label>
-                            <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Client Bin ID:</label>
-                            <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
-                        </div>
-                        <div class="help-text" style="background: var(--bg-secondary); padding: var(--spacing); border-radius: var(--radius); margin-top: var(--spacing);">
-                            <strong>To access your data on another device:</strong><br>
-                            1. Open the app on the new device<br>
-                            2. Click Sync or Load button<br>
-                            3. Enter your API key AND these Bin IDs<br>
-                            4. Your data will load immediately<br><br>
-                            <strong>Note:</strong> Your bin IDs are always visible at the top of the page when connected. Click any ID to copy it.
-                        </div>
-                    </div>
-                    <button class="save-btn" onclick="app.closeModal()">Got It!</button>
-                `;
-                
-                this.showModal('Your Cloud Storage IDs', content);
-            },
-
-            async syncWithCloud(type) {
-                if (!this.jsonBin.apiKey) {
-                    this.showApiKeyModal(() => this.syncWithCloud(type));
-                    return;
-                }
-
-                if (this.jsonBin.syncInProgress) {
-                    this.showNotification('Sync in progress...', 'info');
-                    return;
-                }
-
-                this.jsonBin.syncInProgress = true;
-                this.showNotification(`Syncing ${type} data...`, 'info');
-
-                try {
-                    if (!this.jsonBin.bins[type]) {
-                        this.showNotification('First time sync - creating cloud storage...', 'info');
-                        const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
-                        this.jsonBin.bins[type] = binId;
-                        localStorage.setItem(`jsonbin_${type}_id`, binId);
-                        this.updateBinInfoBar(true);
-                        this.showNotification(`Created cloud storage for ${type}`, 'success');
-                        await this.saveToJsonBin(type);
-                        this.showNotification(`Synced ${this.data[type].length} ${type} records`, 'success');
-                        setTimeout(() => this.showBinInfo(), 1000);
-                    } else {
-                        const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
-                            headers: this.getApiHeaders()
-                        });
-
-                        if (!response.ok) {
-                            if (response.status === 401) {
-                                this.showNotification('Invalid API key. Please update it.', 'error');
-                                this.jsonBin.syncInProgress = false;
-                                this.showApiKeyModal(() => this.syncWithCloud(type));
-                                return;
-                            } else if (response.status === 404) {
-                                const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
-                                this.jsonBin.bins[type] = binId;
-                                localStorage.setItem(`jsonbin_${type}_id`, binId);
-                                this.updateBinInfoBar(true);
-                                this.showNotification(`Created cloud storage for ${type}`, 'success');
-                                await this.saveToJsonBin(type);
-                                setTimeout(() => this.showBinInfo(), 1000);
-                            } else {
-                                throw new Error(`Failed to fetch: ${response.status}`);
-                            }
-                        } else {
-                            const result = await response.json();
-                            const cloudData = result.record || [];
-                            const mergedData = this.mergeData(type, this.data[type], cloudData);
-                            const addedCount = mergedData.length - this.data[type].length;
-                            
-                            this.data[type] = mergedData;
-                            this.saveData(false);
-                            
-                            if (mergedData.length > cloudData.length) {
-                                await this.saveToJsonBin(type);
-                            }
-                            
-                            const searchInput = document.getElementById(type + 'Search');
-                            if (searchInput?.value.trim()) {
-                                this.performSearch(type, searchInput.value);
-                            }
-                            
-                            this.showNotification(
-                                addedCount > 0 ? `Added ${addedCount} new records` : `Data up to date`,
-                                'success'
-                            );
-                            this.updateBinInfoBar();
-                            
-                            setTimeout(() => this.showBinInfo(), 1000);
-                        }
-                    }
-                } catch (error) {
-                    this.showNotification(`Sync failed: ${error.message}`, 'error');
-                } finally {
-                    this.jsonBin.syncInProgress = false;
-                }
-            },
-
-            async saveToJsonBin(type) {
-                if (!this.jsonBin.apiKey || !this.jsonBin.bins[type]) return;
-
-                try {
-                    await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}`, {
-                        method: 'PUT',
-                        headers: this.getApiHeaders(),
-                        body: JSON.stringify(this.data[type])
-                    });
-                } catch (error) {}
-            },
-
-            mergeData(type, localData, cloudData) {
-                localData = localData || [];
-                cloudData = cloudData || [];
-                
-                if (type === 'hsn') {
-                    const localCodes = new Set(localData.map(item => item.code));
-                    const newItems = cloudData.filter(item => item.code && !localCodes.has(item.code));
-                    return [...localData, ...newItems];
-                } else {
-                    const localKeys = new Set(localData.map(item => `${item.tin}-${item.warehouse}`));
-                    const newItems = cloudData.filter(item => 
-                        item.tin && item.warehouse && !localKeys.has(`${item.tin}-${item.warehouse}`)
-                    );
-                    return [...localData, ...newItems];
-                }
-            },
-
+            // Data Management
             loadData() {
-                const hsnData = localStorage.getItem('cusdec_hsn_data');
-                const clientData = localStorage.getItem('cusdec_client_data');
+                try {
+                    const hsnData = localStorage.getItem('cusdec_hsn_data');
+                    const clientData = localStorage.getItem('cusdec_client_data');
 
-                this.data.hsn = hsnData ? JSON.parse(hsnData) : this.getDefaultHSN();
-                this.data.client = clientData ? JSON.parse(clientData) : this.getDefaultClients();
-            },
-
-            getDefaultHSN() {
-                return [
-                    {c:'HAIR CARE',p:'Hair Dryer',code:'85163100'},{c:'HAIR CARE',p:'Hair Clipper',code:'85102000'},
-                    {c:'HAIR CARE',p:'Hair Groomer',code:'85102000'},{c:'HAIR CARE',p:'Hair Straightener',code:'85163200'},
-                    {c:'HAIR CARE',p:'Shaver',code:'85101000'},{c:'COSMETICS',p:'Shampoo',code:'33051000'},
-                    {c:'COSMETICS',p:'Hair Colour',code:'33051000'},{c:'COSMETICS',p:'Hair Cream',code:'33051000'},
-                    {c:'COSMETICS',p:'Hair Spray',code:'33051000'},{c:'COSMETICS',p:'Eye Shadow',code:'33042000'},
-                    {c:'COSMETICS',p:'Eye Makeup',code:'33042000'},{c:'COSMETICS',p:'Lipstick',code:'33041000'},
-                    {c:'COSMETICS',p:'Lip Gloss',code:'33041000'},{c:'COSMETICS',p:'Nail Polish',code:'33043000'},
-                    {c:'COSMETICS',p:'Manicure Set',code:'33043000'},{c:'COSMETICS',p:'Pedicure Set',code:'33043000'},
-                    {c:'COSMETICS',p:'Talcum Powder',code:'33049100'},{c:'KITCHEN APPLIANCES',p:'Air Fryer',code:'85166090'},
-                    {c:'KITCHEN APPLIANCES',p:'Blender',code:'85094000'},{c:'KITCHEN APPLIANCES',p:'Coffee Maker',code:'85167100'},
-                    {c:'KITCHEN APPLIANCES',p:'Gas Cooker',code:'85166090'},{c:'KITCHEN APPLIANCES',p:'Electric Cooker',code:'85166090'},
-                    {c:'KITCHEN APPLIANCES',p:'Cooker',code:'73211100'},{c:'KITCHEN APPLIANCES',p:'Cooker Hood',code:'84146000'},
-                    {c:'KITCHEN APPLIANCES',p:'Cookware Set',code:'73239300'},{c:'KITCHEN APPLIANCES',p:'Electric Oven',code:'85166090'},
-                    {c:'KITCHEN APPLIANCES',p:'Built-in Oven',code:'85166090'},{c:'KITCHEN APPLIANCES',p:'Food Steamer',code:'76151020'},
-                    {c:'KITCHEN APPLIANCES',p:'Hob',code:'73211100'},{c:'KITCHEN APPLIANCES',p:'Kettle',code:'85167920'},
-                    {c:'KITCHEN APPLIANCES',p:'Microwave Oven',code:'85165000'},{c:'KITCHEN APPLIANCES',p:'Pressure Cooker',code:'76151020'},
-                    {c:'KITCHEN APPLIANCES',p:'Rice Cooker',code:'85166010'},{c:'KITCHEN APPLIANCES',p:'Stainless Steel Water Bottle',code:'73239900'},
-                    {c:'KITCHEN APPLIANCES',p:'Tea Maker',code:'85167100'},{c:'KITCHEN APPLIANCES',p:'Toaster',code:'85167200'},
-                    {c:'KITCHEN APPLIANCES',p:'Sandwich Maker',code:'85167200'},{c:'KITCHEN APPLIANCES',p:'Waffle Maker',code:'85167200'},
-                    {c:'KITCHEN APPLIANCES',p:'BBQ Grill',code:'85167200'},{c:'KITCHEN APPLIANCES',p:'Induction Cooker',code:'85166090'},
-                    {c:'KITCHEN APPLIANCES',p:'Noodle Maker',code:'84381000'},{c:'KITCHEN APPLIANCES',p:'Spaghetti Maker',code:'84381000'},
-                    {c:'KITCHEN APPLIANCES',p:'Macaroni Maker',code:'84381000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'CD Player',code:'85271900'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'DVD Player',code:'85219000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Hi-Fi Set',code:'85279100'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Home Theatre',code:'85279100'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Radio',code:'85271900'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Sound Bar',code:'85182900'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Speaker',code:'85182900'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Music Organ',code:'92071000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV 32"',code:'85287291'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV (Over 32")',code:'85287299'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV Wall Mount',code:'83025000'},
-                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Car Stereo Set',code:'85272900'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Microphone',code:'85181000'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Air Cooler',code:'84796000'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Fridge/Refrigerator',code:'84181090'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Iron',code:'85164000'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Garment Steamer',code:'84513000'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Fan',code:'84145100'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Vacuum Cleaner',code:'85081100'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Dispenser',code:'84158190'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Filter',code:'84158190'},
-                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Purifier',code:'84158190'},{c:'WASHING MACHINES',p:'Washing Machine Front Load (5.5-7.5 KG)',code:'84501143'},
-                    {c:'WASHING MACHINES',p:'Washing Machine Front Load (7.5-9.5 KG)',code:'84501144'},{c:'WASHING MACHINES',p:'Washing Machine Front Load (Over 10 KG)',code:'84501149'},
-                    {c:'WASHING MACHINES',p:'Washing Machine Top Load (5.5-7.5 KG)',code:'84501133'},{c:'WASHING MACHINES',p:'Washing Machine Top Load (7.5-9.5 KG)',code:'84501134'},
-                    {c:'WASHING MACHINES',p:'Washing Machine Top Load (Over 10 KG)',code:'84502000'},{c:'PERSONAL ITEMS',p:'Mobile Phone',code:'85171390'},
-                    {c:'PERSONAL ITEMS',p:'Weight Scale',code:'84231010'},{c:'PERSONAL ITEMS',p:'Laptop',code:'84713090'},
-                    {c:'PERSONAL ITEMS',p:'Notebook',code:'84713090'},{c:'PERSONAL ITEMS',p:'Watch',code:'91021900'},
-                    {c:'BATHROOM',p:'Water Heater',code:'85161000'},{c:'BATHROOM',p:'Home Shower',code:'85161000'},
-                    {c:'BATHROOM',p:'High Pressure Washer',code:'84242000'},{c:'EMERGENCY LIGHTS & TORCHES',p:'Emergency Lantern',code:'85131090'},
-                    {c:'EMERGENCY LIGHTS & TORCHES',p:'Emergency Light LED',code:'85131090'},{c:'EMERGENCY LIGHTS & TORCHES',p:'Torch',code:'85131090'},
-                    {c:'FOOD & BEVERAGES',p:'Chocolate',code:'18063100'},{c:'FOOD & BEVERAGES',p:'Nescafe/Coffee',code:'21011200'},
-                    {c:'FOOD & BEVERAGES',p:'Pringles/Chips',code:'19059020'},{c:'FOOD & BEVERAGES',p:'Soft Drinks',code:'22021000'},
-                    {c:'FOOD & BEVERAGES',p:'Energy Drinks',code:'22029930'},{c:'PERFUMES & FRAGRANCES',p:'Body Spray',code:'33072000'},
-                    {c:'PERFUMES & FRAGRANCES',p:'Perfumes',code:'33030010'},{c:'LIQUOR',p:'Brandy VSOP',code:'22082000'},
-                    {c:'LIQUOR',p:'Gin',code:'22085000'},{c:'LIQUOR',p:'Rum',code:'22084010'},
-                    {c:'LIQUOR',p:'Tequila',code:'22087000'},{c:'LIQUOR',p:'Liqueur',code:'22087000'},
-                    {c:'LIQUOR',p:'Vodka',code:'22086000'},{c:'LIQUOR',p:'Whisky',code:'22083000'},
-                    {c:'LIQUOR',p:'Wine (Sweet)',code:'22042100'},{c:'LIQUOR',p:'Wine (Red)',code:'22042100'},
-                    {c:'LIQUOR',p:'Wine (White)',code:'22042100'},{c:'CIGARETTES',p:'Cigarettes (74-84 MM)',code:'24022050'},
-                    {c:'CIGARETTES',p:'Cigarettes (Over 99 MM)',code:'24022060'},{c:'TOYS',p:'Toys (General)',code:'95030090'},
-                    {c:'TOYS',p:'Toy Jeep',code:'95030010'},{c:'TOYS',p:'Toy Car',code:'95030010'},
-                    {c:'TOYS',p:'Toy Helicopter',code:'95030070'},{c:'TOYS',p:'Doll',code:'95030070'}
-                ].map(item => ({category: item.c, product: item.p, code: item.code}));
-            },
-
-            getDefaultClients() {
-                return [
-                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Colombo Harbour',w:'7501121'},
-                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Palaly Arrival',w:'7501302'},
-                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Palaly Departure',w:'7501303'},
-                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Service Bond',w:'7401172'},
-                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Colombo Harbour',w:'7501300'},
-                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Hambantota',w:'7501293'},
-                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Service Bond',w:'7400995'},
-                    {n:'AMF DUTY FREE',t:'1144513632525',wn:'Feeder Bond',w:'7500965'},
-                    {n:'METRO INTERNATIONAL',t:'1142987192525',wn:'Feeder Bond',w:'7501066'},
-                    {n:'METRO INTERNATIONAL',t:'1142987192525',wn:'CFS 5',w:'7101127'},
-                    {n:'MORICH TRADING',t:'1146083352525',wn:'Feeder Bond',w:'7501122'},
-                    {n:'MORICH TRADING',t:'1146083352525',wn:'CFS 5',w:'7101127'},
-                    {n:'VICTORY SILK STORES',t:'1040867722525',wn:'Feeder Bond',w:'7500941'},
-                    {n:'TELCEY SERVICES',t:'1147100327000',wn:'Feeder Bond',w:'7501138'},
-                    {n:'AVENTURA HOLDINGS',t:'1747968152525',wn:'Feeder Bond',w:'7501144'},
-                    {n:'ESWARAN BROTHERS',t:'1141272802525',wn:'FEEDER BOND (24A)',w:'7500803'},
-                    {n:'ESWARAN BROTHERS',t:'1141272802525',wn:'DFS (20A)',w:'7501332'},
-                    {n:'FREE LANKA TRADING',t:'1040318707000',wn:'Feeder Bond',w:'7500815'},
-                    {n:'INDIKA INTERNATIONAL DUTY FREE',t:'7622623712525-1',wn:'Feeder Bond',w:'7501059'},
-                    {n:'CROWN ELECTRONICS',t:'4091279912525',wn:'Feeder Bond',w:'7501050'},
-                    {n:'PROJECT PROSPECT',t:'1141861712525',wn:'Feeder Bond',w:'7501064'},
-                    {n:'S. N JAYASINGHE',t:'5229425882525-1',wn:'Feeder Bond',w:'7501009'},
-                    {n:'PACIFIC TRADERS',t:'5311335872525-1',wn:'Feeder Bond',w:'7501082'},
-                    {n:'D. M JEEWAN ( DMJ )',t:'1144007262525',wn:'Feeder Bond',w:'7501103'}
-                ].map(item => ({name: item.n, tin: item.t, warehouseName: item.wn, warehouse: item.w}));
+                    this.data.hsn = hsnData ? JSON.parse(hsnData) : this.getDefaultHSN();
+                    this.data.client = clientData ? JSON.parse(clientData) : this.getDefaultClients();
+                } catch (error) {
+                    this.showNotification('Error loading data', 'error');
+                    this.data.hsn = this.getDefaultHSN();
+                    this.data.client = this.getDefaultClients();
+                }
             },
 
             saveData(syncToCloud = true) {
@@ -1340,21 +793,21 @@
                     localStorage.setItem('cusdec_hsn_data', JSON.stringify(this.data.hsn));
                     localStorage.setItem('cusdec_client_data', JSON.stringify(this.data.client));
                     
-                    if (syncToCloud && this.jsonBin.isConnected) {
-                        clearTimeout(this.syncDebounceTimer);
-                        this.syncDebounceTimer = setTimeout(() => {
+                    if (syncToCloud && this.isConnected) {
+                        clearTimeout(this.state.timers.sync);
+                        this.state.timers.sync = setTimeout(() => {
                             this.saveToJsonBin('hsn');
                             this.saveToJsonBin('client');
-                        }, 2000);
+                        }, this.SYNC_DEBOUNCE);
                     }
-                    
-                    this.updateBinInfoBar();
                 } catch (error) {
                     this.showNotification('Failed to save data', 'error');
                 }
             },
 
+            // Event Handlers
             attachEventListeners() {
+                // Search inputs
                 ['hsn', 'client'].forEach(type => {
                     const input = document.getElementById(type + 'Search');
                     if (input) {
@@ -1362,28 +815,26 @@
                     }
                 });
 
+                // Modal close on backdrop click
                 document.getElementById('modal').addEventListener('click', (e) => {
                     if (e.target.id === 'modal') this.closeModal();
                 });
 
+                // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        if (document.getElementById('modal').classList.contains('active')) {
-                            this.closeModal();
-                        } else {
-                            this.showDashboard();
-                        }
-                    } else if (e.key === 'i' && e.ctrlKey && this.jsonBin.isConnected) {
-                        e.preventDefault();
-                        this.showBinInfo();
+                    if (e.key === 'Escape' && document.getElementById('modal').classList.contains('active')) {
+                        this.closeModal();
+                    } else if (e.key === 'Escape') {
+                        this.showDashboard();
                     }
                 });
             },
 
+            // Search functionality
             debounceSearch(type, query) {
-                clearTimeout(this.debounceTimer);
-                this.searchState[type] = query;
-                this.debounceTimer = setTimeout(() => this.performSearch(type, query), 300);
+                clearTimeout(this.state.timers.debounce);
+                this.state.search[type] = query;
+                this.state.timers.debounce = setTimeout(() => this.performSearch(type, query), this.SEARCH_DEBOUNCE);
             },
 
             performSearch(type, query) {
@@ -1404,20 +855,28 @@
                     return searchTerms.every(term => searchableText.includes(term));
                 });
 
-                filtered.sort((a, b) => {
-                    if (type === 'hsn') {
-                        if (a.code === trimmedQuery) return -1;
-                        if (b.code === trimmedQuery) return 1;
-                        if (a.code.startsWith(trimmedQuery)) return -1;
-                        if (b.code.startsWith(trimmedQuery)) return 1;
-                    } else {
-                        if (a.tin === trimmedQuery) return -1;
-                        if (b.tin === trimmedQuery) return 1;
-                        if (a.warehouse === trimmedQuery) return -1;
-                        if (b.warehouse === trimmedQuery) return 1;
-                    }
-                    return 0;
-                });
+                // Optimized sorting
+                if (type === 'hsn') {
+                    filtered.sort((a, b) => {
+                        const aExact = a.code === trimmedQuery;
+                        const bExact = b.code === trimmedQuery;
+                        if (aExact && !bExact) return -1;
+                        if (!aExact && bExact) return 1;
+                        
+                        const aStarts = a.code.startsWith(trimmedQuery);
+                        const bStarts = b.code.startsWith(trimmedQuery);
+                        if (aStarts && !bStarts) return -1;
+                        if (!aStarts && bStarts) return 1;
+                        
+                        return 0;
+                    });
+                } else {
+                    filtered.sort((a, b) => {
+                        if (a.tin === trimmedQuery || a.warehouse === trimmedQuery) return -1;
+                        if (b.tin === trimmedQuery || b.warehouse === trimmedQuery) return 1;
+                        return 0;
+                    });
+                }
 
                 if (filtered.length === 0) {
                     this.showEmptyState(type, `No results found for "${query}"`);
@@ -1426,103 +885,7 @@
                 }
             },
 
-            displayResults(type, data) {
-                const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
-                if (!container) return;
-                
-                container.innerHTML = '';
-
-                if (type === 'hsn') {
-                    data.forEach((item) => {
-                        const actualIndex = this.data.hsn.findIndex(h => h.code === item.code);
-                        const div = document.createElement('div');
-                        div.className = 'result-item';
-                        div.innerHTML = `
-                            <div class="result-actions">
-                                <button class="result-action-btn edit" onclick="app.editItem('hsn', ${actualIndex})">
-                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
-                                    Edit
-                                </button>
-                            </div>
-                            <div class="result-title" onclick="app.copyToClipboard('${item.code}', 'HSN Code')">
-                                ${this.h(item.code || 'N/A')}
-                                <span class="copy-hint">📋 Copy</span>
-                            </div>
-                            <div class="result-details"><span style="color: var(--text-secondary);">Product:</span> ${this.h(item.product || 'N/A')}</div>
-                            <div class="result-category">${this.h(item.category || 'N/A')}</div>
-                        `;
-                        container.appendChild(div);
-                    });
-                } else {
-                    const grouped = this.groupClientData(data);
-                    
-                    Object.values(grouped).forEach(company => {
-                        const div = document.createElement('div');
-                        div.className = 'result-item';
-                        
-                        const warehouseChips = company.warehouses.map(wh => `
-                            <div class="warehouse-chip" onclick="app.copyToClipboard('${wh.code}', 'Warehouse Code')">
-                                <div class="warehouse-code">${this.h(wh.code || 'N/A')}</div>
-                                <div class="warehouse-name">${this.h(wh.name || 'N/A')}</div>
-                            </div>
-                        `).join('');
-                        
-                        div.innerHTML = `
-                            <div class="result-actions">
-                                <button class="result-action-btn edit" onclick="app.editClient('${company.tin}')">
-                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
-                                    Edit
-                                </button>
-                            </div>
-                            <div class="result-title" onclick="app.copyToClipboard('${company.tin}', 'TIN')">
-                                <span style="color: var(--text-secondary); font-weight: 400; font-size: 0.875rem;">TIN:</span> ${this.h(company.tin || 'N/A')}
-                                <span class="copy-hint">📋 Copy</span>
-                            </div>
-                            <div class="result-details"><span style="color: var(--text-secondary);">Company:</span> ${this.h(company.name || 'N/A')}</div>
-                            <div style="margin-top: var(--spacing);">
-                                <div class="warehouse-label">Warehouses</div>
-                                <div class="warehouse-container">${warehouseChips}</div>
-                            </div>
-                        `;
-                        container.appendChild(div);
-                    });
-                }
-            },
-
-            groupClientData(data) {
-                return data.reduce((acc, item) => {
-                    const key = `${item.name}-${item.tin}`;
-                    if (!acc[key]) {
-                        acc[key] = { name: item.name, tin: item.tin, warehouses: [] };
-                    }
-                    acc[key].warehouses.push({ name: item.warehouseName, code: item.warehouse });
-                    return acc;
-                }, {});
-            },
-
-            showEmptyState(type, message = null) {
-                const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
-                if (!container) return;
-                
-                const defaultMessage = type === 'hsn' 
-                    ? 'Start typing to search HSN codes...' 
-                    : 'Start typing to search client information...';
-                
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🔍</div>
-                        <div class="empty-title">${message ? 'No Results' : 'Ready to Search'}</div>
-                        <div class="empty-message">${message || defaultMessage}</div>
-                    </div>
-                `;
-            },
-
+            // UI Methods
             showSection(section) {
                 document.getElementById('dashboard').classList.add('hidden');
                 const sectionEl = document.getElementById(section + 'Section');
@@ -1551,9 +914,131 @@
                 document.getElementById('modal').classList.remove('active');
             },
 
+            showNotification(message, type = 'info') {
+                const container = document.getElementById('notification-container');
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                container.appendChild(notification);
+                
+                requestAnimationFrame(() => {
+                    notification.classList.add('show');
+                });
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            },
+
+            // Display Methods
+            displayResults(type, data) {
+                const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
+                if (!container) return;
+                
+                // Use DocumentFragment for better performance
+                const fragment = document.createDocumentFragment();
+
+                if (type === 'hsn') {
+                    data.forEach((item) => {
+                        const actualIndex = this.data.hsn.findIndex(h => h.code === item.code);
+                        const div = document.createElement('div');
+                        div.className = 'result-item';
+                        div.innerHTML = `
+                            <div class="result-actions">
+                                <button class="result-action-btn edit" onclick="app.editItem('hsn', ${actualIndex})">
+                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                </button>
+                            </div>
+                            <div class="result-title" onclick="app.copyToClipboard('${this.h(item.code)}', 'HSN Code')">
+                                ${this.h(item.code || 'N/A')}
+                                <span class="copy-hint">📋 Copy</span>
+                            </div>
+                            <div class="result-details"><span style="color: var(--text-secondary);">Product:</span> ${this.h(item.product || 'N/A')}</div>
+                            <div class="result-category">${this.h(item.category || 'N/A')}</div>
+                        `;
+                        fragment.appendChild(div);
+                    });
+                } else {
+                    const grouped = this.groupClientData(data);
+                    
+                    Object.values(grouped).forEach(company => {
+                        const div = document.createElement('div');
+                        div.className = 'result-item';
+                        
+                        const warehouseChips = company.warehouses.map(wh => `
+                            <div class="warehouse-chip" onclick="app.copyToClipboard('${this.h(wh.code)}', 'Warehouse Code')">
+                                <div class="warehouse-code">${this.h(wh.code || 'N/A')}</div>
+                                <div class="warehouse-name">${this.h(wh.name || 'N/A')}</div>
+                            </div>
+                        `).join('');
+                        
+                        div.innerHTML = `
+                            <div class="result-actions">
+                                <button class="result-action-btn edit" onclick="app.editClient('${this.h(company.tin)}')">
+                                    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                </button>
+                            </div>
+                            <div class="result-title" onclick="app.copyToClipboard('${this.h(company.tin)}', 'TIN')">
+                                <span style="color: var(--text-secondary); font-weight: 400; font-size: 0.875rem;">TIN:</span> ${this.h(company.tin || 'N/A')}
+                                <span class="copy-hint">📋 Copy</span>
+                            </div>
+                            <div class="result-details"><span style="color: var(--text-secondary);">Company:</span> ${this.h(company.name || 'N/A')}</div>
+                            <div style="margin-top: var(--spacing);">
+                                <div class="warehouse-label">Warehouses</div>
+                                <div class="warehouse-container">${warehouseChips}</div>
+                            </div>
+                        `;
+                        fragment.appendChild(div);
+                    });
+                }
+
+                container.innerHTML = '';
+                container.appendChild(fragment);
+            },
+
+            groupClientData(data) {
+                const grouped = {};
+                data.forEach(item => {
+                    const key = `${item.name}-${item.tin}`;
+                    if (!grouped[key]) {
+                        grouped[key] = { name: item.name, tin: item.tin, warehouses: [] };
+                    }
+                    grouped[key].warehouses.push({ name: item.warehouseName, code: item.warehouse });
+                });
+                return grouped;
+            },
+
+            showEmptyState(type, message = null) {
+                const container = document.getElementById(type === 'hsn' ? 'hsnResults' : 'clientResults');
+                if (!container) return;
+                
+                const defaultMessage = type === 'hsn' 
+                    ? 'Start typing to search HSN codes...' 
+                    : 'Start typing to search client information...';
+                
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">${message ? 'No Results' : 'Ready to Search'}</div>
+                        <div class="empty-message">${message || defaultMessage}</div>
+                    </div>
+                `;
+            },
+
+            // CRUD Operations
             showAddModal(type) {
                 const categories = type === 'hsn' 
-                    ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))]
+                    ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))].sort()
                     : [];
                     
                 const content = type === 'hsn' ? `
@@ -1561,7 +1046,7 @@
                         <div class="form-group">
                             <label class="form-label">Category</label>
                             <input type="text" class="form-input" name="category" list="categoryList" required>
-                            <datalist id="categoryList">${categories.map(cat => `<option value="${cat}">`).join('')}</datalist>
+                            <datalist id="categoryList">${categories.map(cat => `<option value="${this.h(cat)}">`).join('')}</datalist>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Product Name</label>
@@ -1597,7 +1082,7 @@
                 `;
                 
                 this.showModal(type === 'hsn' ? 'Add New HSN Code' : 'Add New Client', content);
-                setTimeout(() => document.querySelector('.form-input').focus(), 100);
+                setTimeout(() => document.querySelector('.form-input')?.focus(), 100);
             },
 
             saveItem(event, type) {
@@ -1631,7 +1116,7 @@
                 if (!item) return;
                 
                 const categories = type === 'hsn' 
-                    ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))]
+                    ? [...new Set(this.data.hsn.map(item => item.category).filter(Boolean))].sort()
                     : [];
                     
                 const content = type === 'hsn' ? `
@@ -1640,7 +1125,7 @@
                             <label class="form-label">Category</label>
                             <input type="text" class="form-input" name="category" list="categoryList" 
                                    value="${this.h(item.category)}" required>
-                            <datalist id="categoryList">${categories.map(cat => `<option value="${cat}">`).join('')}</datalist>
+                            <datalist id="categoryList">${categories.map(cat => `<option value="${this.h(cat)}">`).join('')}</datalist>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Product Name</label>
@@ -1686,9 +1171,50 @@
                 `;
                 
                 this.showModal(type === 'hsn' ? 'Edit HSN Code' : 'Edit Client', content);
-                setTimeout(() => document.querySelector('.form-input').focus(), 100);
+                setTimeout(() => document.querySelector('.form-input')?.focus(), 100);
             },
 
+            updateItem(event, type, index) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const updatedItem = Object.fromEntries(formData);
+                
+                const isDuplicate = type === 'hsn'
+                    ? this.data.hsn.some((item, i) => i !== index && item.code === updatedItem.code)
+                    : this.data.client.some((item, i) => 
+                        i !== index && item.tin === updatedItem.tin && item.warehouse === updatedItem.warehouse
+                      );
+                
+                if (isDuplicate) {
+                    this.showNotification(
+                        type === 'hsn' ? 'HSN code already exists' : 'This warehouse already exists for this TIN',
+                        'error'
+                    );
+                    return;
+                }
+                
+                this.data[type][index] = updatedItem;
+                this.saveData();
+                this.closeModal();
+                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} updated successfully`, 'success');
+                
+                const searchQuery = document.getElementById(type + 'Search').value.trim();
+                if (searchQuery) this.performSearch(type, searchQuery);
+            },
+
+            deleteItem(type, index) {
+                if (confirm(`Are you sure you want to delete this ${type === 'hsn' ? 'HSN code' : 'warehouse'}?`)) {
+                    this.data[type].splice(index, 1);
+                    this.saveData();
+                    this.closeModal();
+                    this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Warehouse'} deleted successfully`, 'success');
+                    
+                    const searchQuery = document.getElementById(type + 'Search').value.trim();
+                    if (searchQuery) this.performSearch(type, searchQuery);
+                }
+            },
+
+            // Client specific methods
             editClient(tin) {
                 const clientWarehouses = this.data.client.filter(c => c.tin === tin);
                 if (clientWarehouses.length === 0) return;
@@ -1731,7 +1257,7 @@
                     </div>
                     <div class="warehouses-list">${warehousesList}</div>
                     <button type="button" class="save-btn" style="margin-top: var(--spacing)" 
-                            onclick="app.showAddWarehouseModal('${tin}', '${companyName}')">
+                            onclick="app.showAddWarehouseModal('${this.h(tin)}', '${this.h(companyName)}')">
                         Add New Warehouse
                     </button>
                 `;
@@ -1741,7 +1267,7 @@
 
             showAddWarehouseModal(tin, companyName) {
                 const content = `
-                    <form onsubmit="app.saveWarehouse(event, '${tin}', '${companyName}')">
+                    <form onsubmit="app.saveWarehouse(event, '${this.h(tin)}', '${this.h(companyName)}')">
                         <div class="form-group">
                             <label class="form-label">Company Name</label>
                             <input type="text" class="form-input" value="${this.h(companyName)}" readonly>
@@ -1763,7 +1289,7 @@
                 `;
                 
                 this.showModal('Add New Warehouse', content);
-                setTimeout(() => document.querySelector('input[name="warehouseName"]').focus(), 100);
+                setTimeout(() => document.querySelector('input[name="warehouseName"]')?.focus(), 100);
             },
 
             saveWarehouse(event, tin, companyName) {
@@ -1790,44 +1316,45 @@
                 if (searchQuery) this.performSearch('client', searchQuery);
             },
 
-            updateItem(event, type, index) {
-                event.preventDefault();
-                const formData = new FormData(event.target);
-                const updatedItem = Object.fromEntries(formData);
-                
-                const isDuplicate = type === 'hsn'
-                    ? this.data.hsn.some((item, i) => i !== index && item.code === updatedItem.code)
-                    : this.data.client.some((item, i) => 
-                        i !== index && item.tin === updatedItem.tin && item.warehouse === updatedItem.warehouse
-                      );
-                
-                if (isDuplicate) {
-                    this.showNotification(
-                        type === 'hsn' ? 'HSN code already exists' : 'This warehouse already exists for this TIN',
-                        'error'
-                    );
-                    return;
+            // Import/Export Methods
+            handleImport(type) {
+                if (this.isConnected && (this.jsonBin.bins.hsn || this.jsonBin.bins.client)) {
+                    this.showImportInfoModal(type);
+                } else {
+                    document.getElementById(type + 'Import').click();
                 }
-                
-                this.data[type][index] = updatedItem;
-                this.saveData();
-                this.closeModal();
-                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} updated successfully`, 'success');
-                
-                const searchQuery = document.getElementById(type + 'Search').value.trim();
-                if (searchQuery) this.performSearch(type, searchQuery);
             },
 
-            deleteItem(type, index) {
-                if (confirm(`Are you sure you want to delete this ${type === 'hsn' ? 'HSN code' : 'warehouse'}?`)) {
-                    this.data[type].splice(index, 1);
-                    this.saveData();
-                    this.closeModal();
-                    this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Warehouse'} deleted successfully`, 'success');
-                    
-                    const searchQuery = document.getElementById(type + 'Search').value.trim();
-                    if (searchQuery) this.performSearch(type, searchQuery);
-                }
+            showImportInfoModal(type) {
+                const hsnBin = this.jsonBin.bins.hsn || 'Not created yet';
+                const clientBin = this.jsonBin.bins.client || 'Not created yet';
+                
+                const content = `
+                    <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing);">
+                        <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
+                            To import your cloud data on another device, you'll need these IDs:
+                        </p>
+                        <div class="form-group">
+                            <label class="form-label">HSN Bin ID:</label>
+                            <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Client Bin ID:</label>
+                            <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                        </div>
+                        <div class="help-text">
+                            Click any ID above to select it for copying
+                        </div>
+                    </div>
+                    <button class="save-btn" onclick="app.closeModal(); document.getElementById('${type}Import').click()">
+                        Continue with File Import
+                    </button>
+                    <button class="btn" onclick="app.closeModal()" style="width: 100%; margin-top: 0.5rem;">
+                        Cancel
+                    </button>
+                `;
+                
+                this.showModal('Your Cloud Storage IDs', content);
             },
 
             exportData(type) {
@@ -1955,6 +1482,310 @@
                 return result;
             },
 
+            // Cloud Sync Methods
+            showApiKeyModal(callback) {
+                const content = `
+                    <form onsubmit="app.saveApiKey(event)">
+                        <div class="form-group">
+                            <label class="form-label">JSONBin.io API Key</label>
+                            <input type="text" class="form-input" id="apiKeyInput" 
+                                   placeholder="$2a$10$..." 
+                                   value="${this.h(this.jsonBin.apiKey)}" required>
+                            <div class="help-text">
+                                Don't have an API key? 
+                                <a href="https://jsonbin.io/" target="_blank" class="help-link">Sign up at JSONBin.io</a><br>
+                                <strong>Note:</strong> After first sync, you'll get Bin IDs that you need to save for other devices.
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">HSN Bin ID (Optional)</label>
+                            <input type="text" class="form-input" id="hsnBinInput" 
+                                   placeholder="Leave empty if first time syncing" 
+                                   value="${this.h(this.jsonBin.bins.hsn || '')}">
+                            <div class="help-text">If you've synced before on another device, enter the bin ID</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Client Bin ID (Optional)</label>
+                            <input type="text" class="form-input" id="clientBinInput" 
+                                   placeholder="Leave empty if first time syncing" 
+                                   value="${this.h(this.jsonBin.bins.client || '')}">
+                            <div class="help-text">If you've synced before on another device, enter the bin ID</div>
+                        </div>
+                        <button type="submit" class="save-btn">Connect to JSONBin</button>
+                    </form>
+                `;
+                
+                this.showModal('JSONBin.io API Setup', content);
+                this.state.currentApiKeyCallback = callback;
+                setTimeout(() => document.getElementById('apiKeyInput')?.focus(), 100);
+            },
+
+            saveApiKey(event) {
+                event.preventDefault();
+                const apiKey = document.getElementById('apiKeyInput').value.trim();
+                const hsnBin = document.getElementById('hsnBinInput').value.trim();
+                const clientBin = document.getElementById('clientBinInput').value.trim();
+                
+                if (!apiKey) {
+                    this.showNotification('Please enter an API key', 'error');
+                    return;
+                }
+                
+                localStorage.setItem('jsonbin_api_key', apiKey);
+                this.jsonBin.apiKey = apiKey;
+                
+                if (hsnBin) {
+                    localStorage.setItem('jsonbin_hsn_id', hsnBin);
+                    this.jsonBin.bins.hsn = hsnBin;
+                }
+                
+                if (clientBin) {
+                    localStorage.setItem('jsonbin_client_id', clientBin);
+                    this.jsonBin.bins.client = clientBin;
+                }
+                
+                this.checkJsonBinConnection();
+                this.closeModal();
+                this.showNotification('API key saved successfully', 'success');
+                
+                if (this.state.currentApiKeyCallback) {
+                    this.state.currentApiKeyCallback();
+                    this.state.currentApiKeyCallback = null;
+                }
+            },
+
+            showBinInfo() {
+                if (!this.jsonBin.bins.hsn && !this.jsonBin.bins.client) {
+                    this.showNotification('No bin IDs found. Sync first to create cloud storage.', 'info');
+                    return;
+                }
+                
+                const hsnBin = this.jsonBin.bins.hsn || 'Not created yet';
+                const clientBin = this.jsonBin.bins.client || 'Not created yet';
+                
+                const content = `
+                    <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing); border: 2px solid var(--success);">
+                        <h4 style="margin-bottom: var(--spacing); color: var(--success);">✅ Your Cloud Storage is Ready!</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
+                            Save these IDs to access your data on other devices:
+                        </p>
+                        <div class="form-group">
+                            <label class="form-label">HSN Bin ID:</label>
+                            <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Client Bin ID:</label>
+                            <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                        </div>
+                        <div class="help-text" style="background: var(--bg-secondary); padding: var(--spacing); border-radius: var(--radius); margin-top: var(--spacing);">
+                            <strong>To access your data on another device:</strong><br>
+                            1. Open the app on the new device<br>
+                            2. Click Sync or Load button<br>
+                            3. Enter your API key AND these Bin IDs<br>
+                            4. Your data will sync immediately
+                        </div>
+                    </div>
+                    <button class="save-btn" onclick="app.closeModal()">Got It!</button>
+                `;
+                
+                this.showModal('Your Cloud Storage IDs', content);
+            },
+
+            async loadFromCloud(type) {
+                if (!this.jsonBin.apiKey) {
+                    this.showApiKeyModal(() => this.loadFromCloud(type));
+                    return;
+                }
+
+                this.showNotification(`Loading ${type} data...`, 'info');
+
+                try {
+                    if (!this.jsonBin.bins[type]) {
+                        this.showNotification(`No ${type} bin ID found. Please enter it in the API setup.`, 'error');
+                        this.showApiKeyModal(() => this.loadFromCloud(type));
+                        return;
+                    }
+
+                    const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
+                        headers: this.getApiHeaders()
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            this.showNotification('Invalid API key. Please update it.', 'error');
+                            this.showApiKeyModal(() => this.loadFromCloud(type));
+                            return;
+                        } else if (response.status === 404) {
+                            this.showNotification('Bin not found. Please check your bin ID.', 'error');
+                            this.showApiKeyModal(() => this.loadFromCloud(type));
+                            return;
+                        }
+                        throw new Error(`Failed to load: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const cloudData = result.record || [];
+
+                    this.data[type] = cloudData;
+                    this.saveData(false);
+                    
+                    const searchInput = document.getElementById(type + 'Search');
+                    if (searchInput?.value.trim()) {
+                        this.performSearch(type, searchInput.value);
+                    } else {
+                        this.showEmptyState(type);
+                    }
+                    
+                    this.showNotification(`Loaded ${cloudData.length} records from cloud`, 'success');
+                    
+                    if (cloudData.length > 0) {
+                        this.showNotification('You can now search and edit your data!', 'info');
+                    }
+                } catch (error) {
+                    this.showNotification(`Failed to load from cloud`, 'error');
+                }
+            },
+
+            async createJsonBin(type, apiKey) {
+                const headers = apiKey.startsWith('$2a$') 
+                    ? { 
+                        'Content-Type': 'application/json',
+                        'X-Access-Key': apiKey,
+                        'X-Bin-Name': `cusdec_${type}_data`,
+                        'X-Collection-Id': 'uncategorized'
+                      }
+                    : { 
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': apiKey,
+                        'X-Bin-Name': `cusdec_${type}_data`
+                      };
+                
+                const response = await fetch(`${this.jsonBin.baseUrl}/b`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(this.data[type] || [])
+                });
+
+                if (!response.ok) throw new Error(`Failed to create bin: ${response.status}`);
+
+                const result = await response.json();
+                const binId = result.metadata.id;
+                
+                this.showNotification(`Created ${type} bin: ${binId}`, 'success');
+                
+                return binId;
+            },
+
+            async syncWithCloud(type) {
+                if (!this.jsonBin.apiKey) {
+                    this.showApiKeyModal(() => this.syncWithCloud(type));
+                    return;
+                }
+
+                if (this.state.syncInProgress) {
+                    this.showNotification('Sync in progress...', 'info');
+                    return;
+                }
+
+                this.state.syncInProgress = true;
+                this.showNotification(`Syncing ${type} data...`, 'info');
+
+                try {
+                    if (!this.jsonBin.bins[type]) {
+                        this.showNotification('First time sync - creating cloud storage...', 'info');
+                        const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
+                        this.jsonBin.bins[type] = binId;
+                        localStorage.setItem(`jsonbin_${type}_id`, binId);
+                        this.showNotification(`Created cloud storage for ${type}`, 'success');
+                        await this.saveToJsonBin(type);
+                        this.showNotification(`Synced ${this.data[type].length} ${type} records`, 'success');
+                        setTimeout(() => this.showBinInfo(), 1000);
+                    } else {
+                        const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
+                            headers: this.getApiHeaders()
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 401) {
+                                this.showNotification('Invalid API key. Please update it.', 'error');
+                                this.state.syncInProgress = false;
+                                this.showApiKeyModal(() => this.syncWithCloud(type));
+                                return;
+                            } else if (response.status === 404) {
+                                const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
+                                this.jsonBin.bins[type] = binId;
+                                localStorage.setItem(`jsonbin_${type}_id`, binId);
+                                this.showNotification(`Created cloud storage for ${type}`, 'success');
+                                await this.saveToJsonBin(type);
+                                setTimeout(() => this.showBinInfo(), 1000);
+                            } else {
+                                throw new Error(`Failed to fetch: ${response.status}`);
+                            }
+                        } else {
+                            const result = await response.json();
+                            const cloudData = result.record || [];
+                            const mergedData = this.mergeData(type, this.data[type], cloudData);
+                            const addedCount = mergedData.length - this.data[type].length;
+                            
+                            this.data[type] = mergedData;
+                            this.saveData(false);
+                            
+                            if (mergedData.length > cloudData.length) {
+                                await this.saveToJsonBin(type);
+                            }
+                            
+                            const searchInput = document.getElementById(type + 'Search');
+                            if (searchInput?.value.trim()) {
+                                this.performSearch(type, searchInput.value);
+                            }
+                            
+                            this.showNotification(
+                                addedCount > 0 ? `Added ${addedCount} new records` : `Data up to date`,
+                                'success'
+                            );
+                            
+                            setTimeout(() => this.showBinInfo(), 1000);
+                        }
+                    }
+                } catch (error) {
+                    this.showNotification(`Sync failed: ${error.message}`, 'error');
+                } finally {
+                    this.state.syncInProgress = false;
+                }
+            },
+
+            async saveToJsonBin(type) {
+                if (!this.jsonBin.apiKey || !this.jsonBin.bins[type]) return;
+
+                try {
+                    await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}`, {
+                        method: 'PUT',
+                        headers: this.getApiHeaders(),
+                        body: JSON.stringify(this.data[type])
+                    });
+                } catch (error) {
+                    // Silent fail for background sync
+                }
+            },
+
+            mergeData(type, localData, cloudData) {
+                localData = localData || [];
+                cloudData = cloudData || [];
+                
+                if (type === 'hsn') {
+                    const localCodes = new Set(localData.map(item => item.code));
+                    const newItems = cloudData.filter(item => item.code && !localCodes.has(item.code));
+                    return [...localData, ...newItems];
+                } else {
+                    const localKeys = new Set(localData.map(item => `${item.tin}-${item.warehouse}`));
+                    const newItems = cloudData.filter(item => 
+                        item.tin && item.warehouse && !localKeys.has(`${item.tin}-${item.warehouse}`)
+                    );
+                    return [...localData, ...newItems];
+                }
+            },
+
+            // Utility Methods
             async copyToClipboard(text, label) {
                 try {
                     if (navigator.clipboard && window.isSecureContext) {
@@ -1975,26 +1806,98 @@
                 }
             },
 
-            showNotification(message, type = 'info') {
-                const container = document.getElementById('notification-container');
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.textContent = message;
-                
-                container.appendChild(notification);
-                
-                setTimeout(() => notification.classList.add('show'), 10);
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => notification.remove(), 300);
-                }, 3000);
-            },
-
             h(text) {
                 const div = document.createElement('div');
                 div.textContent = text || '';
                 return div.innerHTML;
+            },
+
+            // Default Data
+            getDefaultHSN() {
+                return [
+                    {c:'HAIR CARE',p:'Hair Dryer',code:'85163100'},{c:'HAIR CARE',p:'Hair Clipper',code:'85102000'},
+                    {c:'HAIR CARE',p:'Hair Groomer',code:'85102000'},{c:'HAIR CARE',p:'Hair Straightener',code:'85163200'},
+                    {c:'HAIR CARE',p:'Shaver',code:'85101000'},{c:'COSMETICS',p:'Shampoo',code:'33051000'},
+                    {c:'COSMETICS',p:'Hair Colour',code:'33051000'},{c:'COSMETICS',p:'Hair Cream',code:'33051000'},
+                    {c:'COSMETICS',p:'Hair Spray',code:'33051000'},{c:'COSMETICS',p:'Eye Shadow',code:'33042000'},
+                    {c:'COSMETICS',p:'Eye Makeup',code:'33042000'},{c:'COSMETICS',p:'Lipstick',code:'33041000'},
+                    {c:'COSMETICS',p:'Lip Gloss',code:'33041000'},{c:'COSMETICS',p:'Nail Polish',code:'33043000'},
+                    {c:'COSMETICS',p:'Manicure Set',code:'33043000'},{c:'COSMETICS',p:'Pedicure Set',code:'33043000'},
+                    {c:'COSMETICS',p:'Talcum Powder',code:'33049100'},{c:'KITCHEN APPLIANCES',p:'Air Fryer',code:'85166090'},
+                    {c:'KITCHEN APPLIANCES',p:'Blender',code:'85094000'},{c:'KITCHEN APPLIANCES',p:'Coffee Maker',code:'85167100'},
+                    {c:'KITCHEN APPLIANCES',p:'Gas Cooker',code:'85166090'},{c:'KITCHEN APPLIANCES',p:'Electric Cooker',code:'85166090'},
+                    {c:'KITCHEN APPLIANCES',p:'Cooker',code:'73211100'},{c:'KITCHEN APPLIANCES',p:'Cooker Hood',code:'84146000'},
+                    {c:'KITCHEN APPLIANCES',p:'Cookware Set',code:'73239300'},{c:'KITCHEN APPLIANCES',p:'Electric Oven',code:'85166090'},
+                    {c:'KITCHEN APPLIANCES',p:'Built-in Oven',code:'85166090'},{c:'KITCHEN APPLIANCES',p:'Food Steamer',code:'76151020'},
+                    {c:'KITCHEN APPLIANCES',p:'Hob',code:'73211100'},{c:'KITCHEN APPLIANCES',p:'Kettle',code:'85167920'},
+                    {c:'KITCHEN APPLIANCES',p:'Microwave Oven',code:'85165000'},{c:'KITCHEN APPLIANCES',p:'Pressure Cooker',code:'76151020'},
+                    {c:'KITCHEN APPLIANCES',p:'Rice Cooker',code:'85166010'},{c:'KITCHEN APPLIANCES',p:'Stainless Steel Water Bottle',code:'73239900'},
+                    {c:'KITCHEN APPLIANCES',p:'Tea Maker',code:'85167100'},{c:'KITCHEN APPLIANCES',p:'Toaster',code:'85167200'},
+                    {c:'KITCHEN APPLIANCES',p:'Sandwich Maker',code:'85167200'},{c:'KITCHEN APPLIANCES',p:'Waffle Maker',code:'85167200'},
+                    {c:'KITCHEN APPLIANCES',p:'BBQ Grill',code:'85167200'},{c:'KITCHEN APPLIANCES',p:'Induction Cooker',code:'85166090'},
+                    {c:'KITCHEN APPLIANCES',p:'Noodle Maker',code:'84381000'},{c:'KITCHEN APPLIANCES',p:'Spaghetti Maker',code:'84381000'},
+                    {c:'KITCHEN APPLIANCES',p:'Macaroni Maker',code:'84381000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'CD Player',code:'85271900'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'DVD Player',code:'85219000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Hi-Fi Set',code:'85279100'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Home Theatre',code:'85279100'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Radio',code:'85271900'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Sound Bar',code:'85182900'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Speaker',code:'85182900'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Music Organ',code:'92071000'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV 32"',code:'85287291'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV (Over 32")',code:'85287299'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'TV Wall Mount',code:'83025000'},
+                    {c:'HOME APPLIANCES - ENTERTAINMENT',p:'Car Stereo Set',code:'85272900'},{c:'HOME APPLIANCES - ENTERTAINMENT',p:'Microphone',code:'85181000'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Air Cooler',code:'84796000'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Fridge/Refrigerator',code:'84181090'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Iron',code:'85164000'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Garment Steamer',code:'84513000'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Fan',code:'84145100'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Vacuum Cleaner',code:'85081100'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Dispenser',code:'84158190'},{c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Filter',code:'84158190'},
+                    {c:'HOME APPLIANCES - HOUSEHOLD',p:'Water Purifier',code:'84158190'},{c:'WASHING MACHINES',p:'Washing Machine Front Load (5.5-7.5 KG)',code:'84501143'},
+                    {c:'WASHING MACHINES',p:'Washing Machine Front Load (7.5-9.5 KG)',code:'84501144'},{c:'WASHING MACHINES',p:'Washing Machine Front Load (Over 10 KG)',code:'84501149'},
+                    {c:'WASHING MACHINES',p:'Washing Machine Top Load (5.5-7.5 KG)',code:'84501133'},{c:'WASHING MACHINES',p:'Washing Machine Top Load (7.5-9.5 KG)',code:'84501134'},
+                    {c:'WASHING MACHINES',p:'Washing Machine Top Load (Over 10 KG)',code:'84502000'},{c:'PERSONAL ITEMS',p:'Mobile Phone',code:'85171390'},
+                    {c:'PERSONAL ITEMS',p:'Weight Scale',code:'84231010'},{c:'PERSONAL ITEMS',p:'Laptop',code:'84713090'},
+                    {c:'PERSONAL ITEMS',p:'Notebook',code:'84713090'},{c:'PERSONAL ITEMS',p:'Watch',code:'91021900'},
+                    {c:'BATHROOM',p:'Water Heater',code:'85161000'},{c:'BATHROOM',p:'Home Shower',code:'85161000'},
+                    {c:'BATHROOM',p:'High Pressure Washer',code:'84242000'},{c:'EMERGENCY LIGHTS & TORCHES',p:'Emergency Lantern',code:'85131090'},
+                    {c:'EMERGENCY LIGHTS & TORCHES',p:'Emergency Light LED',code:'85131090'},{c:'EMERGENCY LIGHTS & TORCHES',p:'Torch',code:'85131090'},
+                    {c:'FOOD & BEVERAGES',p:'Chocolate',code:'18063100'},{c:'FOOD & BEVERAGES',p:'Nescafe/Coffee',code:'21011200'},
+                    {c:'FOOD & BEVERAGES',p:'Pringles/Chips',code:'19059020'},{c:'FOOD & BEVERAGES',p:'Soft Drinks',code:'22021000'},
+                    {c:'FOOD & BEVERAGES',p:'Energy Drinks',code:'22029930'},{c:'PERFUMES & FRAGRANCES',p:'Body Spray',code:'33072000'},
+                    {c:'PERFUMES & FRAGRANCES',p:'Perfumes',code:'33030010'},{c:'LIQUOR',p:'Brandy VSOP',code:'22082000'},
+                    {c:'LIQUOR',p:'Gin',code:'22085000'},{c:'LIQUOR',p:'Rum',code:'22084010'},
+                    {c:'LIQUOR',p:'Tequila',code:'22087000'},{c:'LIQUOR',p:'Liqueur',code:'22087000'},
+                    {c:'LIQUOR',p:'Vodka',code:'22086000'},{c:'LIQUOR',p:'Whisky',code:'22083000'},
+                    {c:'LIQUOR',p:'Wine (Sweet)',code:'22042100'},{c:'LIQUOR',p:'Wine (Red)',code:'22042100'},
+                    {c:'LIQUOR',p:'Wine (White)',code:'22042100'},{c:'CIGARETTES',p:'Cigarettes (74-84 MM)',code:'24022050'},
+                    {c:'CIGARETTES',p:'Cigarettes (Over 99 MM)',code:'24022060'},{c:'TOYS',p:'Toys (General)',code:'95030090'},
+                    {c:'TOYS',p:'Toy Jeep',code:'95030010'},{c:'TOYS',p:'Toy Car',code:'95030010'},
+                    {c:'TOYS',p:'Toy Helicopter',code:'95030070'},{c:'TOYS',p:'Doll',code:'95030070'}
+                ].map(item => ({category: item.c, product: item.p, code: item.code}));
+            },
+
+            getDefaultClients() {
+                return [
+                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Colombo Harbour',w:'7501121'},
+                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Palaly Arrival',w:'7501302'},
+                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Palaly Departure',w:'7501303'},
+                    {n:'EDISON ELECTRICALS',t:'1144156182525',wn:'Service Bond',w:'7401172'},
+                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Colombo Harbour',w:'7501300'},
+                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Hambantota',w:'7501293'},
+                    {n:'ROYALE ELECTRONICS',t:'1141827457000',wn:'Service Bond',w:'7400995'},
+                    {n:'AMF DUTY FREE',t:'1144513632525',wn:'Feeder Bond',w:'7500965'},
+                    {n:'METRO INTERNATIONAL',t:'1142987192525',wn:'Feeder Bond',w:'7501066'},
+                    {n:'METRO INTERNATIONAL',t:'1142987192525',wn:'CFS 5',w:'7101127'},
+                    {n:'MORICH TRADING',t:'1146083352525',wn:'Feeder Bond',w:'7501122'},
+                    {n:'MORICH TRADING',t:'1146083352525',wn:'CFS 5',w:'7101127'},
+                    {n:'VICTORY SILK STORES',t:'1040867722525',wn:'Feeder Bond',w:'7500941'},
+                    {n:'TELCEY SERVICES',t:'1147100327000',wn:'Feeder Bond',w:'7501138'},
+                    {n:'AVENTURA HOLDINGS',t:'1747968152525',wn:'Feeder Bond',w:'7501144'},
+                    {n:'ESWARAN BROTHERS',t:'1141272802525',wn:'FEEDER BOND (24A)',w:'7500803'},
+                    {n:'ESWARAN BROTHERS',t:'1141272802525',wn:'DFS (20A)',w:'7501332'},
+                    {n:'FREE LANKA TRADING',t:'1040318707000',wn:'Feeder Bond',w:'7500815'},
+                    {n:'INDIKA INTERNATIONAL DUTY FREE',t:'7622623712525-1',wn:'Feeder Bond',w:'7501059'},
+                    {n:'CROWN ELECTRONICS',t:'4091279912525',wn:'Feeder Bond',w:'7501050'},
+                    {n:'PROJECT PROSPECT',t:'1141861712525',wn:'Feeder Bond',w:'7501064'},
+                    {n:'S. N JAYASINGHE',t:'5229425882525-1',wn:'Feeder Bond',w:'7501009'},
+                    {n:'PACIFIC TRADERS',t:'5311335872525-1',wn:'Feeder Bond',w:'7501082'},
+                    {n:'D. M JEEWAN ( DMJ )',t:'1144007262525',wn:'Feeder Bond',w:'7501103'}
+                ].map(item => ({name: item.n, tin: item.t, warehouseName: item.wn, warehouse: item.w}));
             }
         };
 
