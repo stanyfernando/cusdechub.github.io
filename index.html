@@ -6,6 +6,7 @@
     <title>Arrow Clearing Agency - Cloud Sync</title>
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5253/5253968.png">
     <link href="https://fonts.cdnfonts.com/css/dejavu-sans-mono" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0a;
@@ -590,7 +591,7 @@
                     </svg>
                     Add HSN
                 </button>
-                <button class="btn" onclick="app.exportData('hsn')">
+                <button class="btn" onclick="app.showExportModal('hsn')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -606,7 +607,7 @@
                     </svg>
                     Load
                 </button>
-                <input type="file" id="hsnImport" accept=".xls,.xlsx,.csv" style="display:none" onchange="app.importData('hsn', this)">
+                <input type="file" id="hsnImport" accept=".json" style="display:none" onchange="app.importData('hsn', this)">
                 <button class="btn sync" onclick="app.syncWithCloud('hsn')" id="hsnSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
@@ -651,7 +652,7 @@
                     </svg>
                     Add Client
                 </button>
-                <button class="btn" onclick="app.exportData('client')">
+                <button class="btn" onclick="app.showExportModal('client')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -1318,10 +1319,10 @@
                                 Load from File
                             </h4>
                             <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: var(--spacing);">
-                                Import data from CSV or Excel files
+                                Import data from JSON backup files
                             </p>
                             <button class="save-btn" onclick="document.getElementById('${type}Import').click(); app.closeModal();">
-                                Choose File (.csv, .xls, .xlsx)
+                                Choose File (JSON)
                             </button>
                         </div>
                         
@@ -1356,6 +1357,124 @@
                 `;
                 
                 this.showModal(`Load ${type.toUpperCase()} Data`, content);
+            },
+
+            showExportModal(type) {
+                const recordCount = this.data[type].length;
+                const content = `
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing);">
+                        <div style="text-align: center; margin-bottom: var(--spacing);">
+                            <p style="color: var(--text-secondary);">Export ${recordCount} ${type === 'hsn' ? 'HSN codes' : 'client records'}</p>
+                        </div>
+                        <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); border: 1px solid var(--border);">
+                            <h4 style="margin-bottom: 0.5rem; font-size: 1rem;">
+                                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4z"></path>
+                                    <polyline points="13 2 13 9 20 9"></polyline>
+                                </svg>
+                                Export as JSON
+                            </h4>
+                            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: var(--spacing);">
+                                Perfect for backups and data transfer
+                            </p>
+                            <button class="save-btn" onclick="app.exportAsJSON('${type}'); app.closeModal();">
+                                Download JSON
+                            </button>
+                        </div>
+                        
+                        <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); border: 1px solid var(--border);">
+                            <h4 style="margin-bottom: 0.5rem; font-size: 1rem;">
+                                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                                    <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                                </svg>
+                                Export as Excel
+                            </h4>
+                            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: var(--spacing);">
+                                Formatted spreadsheet for reports and analysis
+                            </p>
+                            <button class="save-btn" onclick="app.exportAsExcel('${type}'); app.closeModal();">
+                                Download Excel
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                this.showModal(`Export ${type.toUpperCase()} Data`, content);
+            },
+
+            exportAsJSON(type) {
+                const data = this.data[type];
+                if (data.length === 0) {
+                    this.showNotification('No data to export', 'error');
+                    return;
+                }
+                
+                const filename = `cusdec_${type}_export_${new Date().toISOString().split('T')[0]}.json`;
+                const jsonStr = JSON.stringify(data, null, 2);
+                
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                this.showNotification(`Exported ${data.length} records as JSON`, 'success');
+            },
+
+            exportAsExcel(type) {
+                const data = this.data[type];
+                if (data.length === 0) {
+                    this.showNotification('No data to export', 'error');
+                    return;
+                }
+                
+                const filename = `cusdec_${type}_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                
+                // Prepare data with headers
+                let wsData;
+                if (type === 'hsn') {
+                    wsData = [
+                        ['CATEGORY', 'PRODUCT NAME', 'HSN CODE'],
+                        ...data.map(item => [item.category || '', item.product || '', item.code || ''])
+                    ];
+                } else {
+                    wsData = [
+                        ['COMPANY NAME', 'TIN NUMBER', 'WAREHOUSE NAME', 'WAREHOUSE CODE'],
+                        ...data.map(item => [item.name || '', item.tin || '', item.warehouseName || '', item.warehouse || ''])
+                    ];
+                }
+                
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                
+                // Set column widths for better readability
+                const colWidths = type === 'hsn' 
+                    ? [{ wch: 25 }, { wch: 35 }, { wch: 15 }]
+                    : [{ wch: 30 }, { wch: 20 }, { wch: 25 }, { wch: 15 }];
+                ws['!cols'] = colWidths;
+                
+                // Add autofilter
+                ws['!autofilter'] = { ref: XLSX.utils.encode_range({
+                    s: { r: 0, c: 0 },
+                    e: { r: wsData.length - 1, c: type === 'hsn' ? 2 : 3 }
+                }) };
+                
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(wb, ws, type === 'hsn' ? 'HSN Codes' : 'Clients & Warehouses');
+                
+                // Write file
+                XLSX.writeFile(wb, filename);
+                
+                this.showNotification(`Exported ${data.length} records as Excel`, 'success');
             },
 
             exportData(type) {
@@ -1396,19 +1515,18 @@
 
                 try {
                     const text = await file.text();
-                    const lines = text.trim().split('\n');
-                    const headers = lines[0].toLowerCase();
+                    let importedData;
                     
-                    const expectedHeaders = type === 'hsn' 
-                        ? ['category', 'product', 'hsn code']
-                        : ['company name', 'tin', 'warehouse name', 'warehouse number'];
+                    try {
+                        importedData = JSON.parse(text);
+                    } catch (e) {
+                        this.showNotification('Invalid JSON file format', 'error');
+                        input.value = '';
+                        return;
+                    }
                     
-                    const hasValidHeaders = expectedHeaders.every(header => 
-                        headers.includes(header.toLowerCase())
-                    );
-                    
-                    if (!hasValidHeaders) {
-                        this.showNotification('Invalid file format. Check column headers.', 'error');
+                    if (!Array.isArray(importedData)) {
+                        this.showNotification('Invalid data structure - expected an array', 'error');
                         input.value = '';
                         return;
                     }
@@ -1416,24 +1534,37 @@
                     const imported = [];
                     let duplicates = 0;
                     
-                    for (let i = 1; i < lines.length; i++) {
-                        const values = this.parseCSVLine(lines[i]);
-                        if (values.length < expectedHeaders.length) continue;
-                        
-                        const item = type === 'hsn' 
-                            ? { category: values[0], product: values[1], code: values[2] }
-                            : { name: values[0], tin: values[1], warehouseName: values[2], warehouse: values[3] };
-                        
-                        const isDuplicate = type === 'hsn'
-                            ? this.data.hsn.some(existing => existing.code === item.code)
-                            : this.data.client.some(existing => 
-                                existing.tin === item.tin && existing.warehouse === item.warehouse
-                              );
-                        
-                        if (!isDuplicate) {
-                            imported.push(item);
+                    for (const item of importedData) {
+                        // Validate structure
+                        if (type === 'hsn') {
+                            if (!item.code || !item.product || !item.category) continue;
+                            
+                            const isDuplicate = this.data.hsn.some(existing => existing.code === item.code);
+                            if (!isDuplicate) {
+                                imported.push({
+                                    category: item.category,
+                                    product: item.product,
+                                    code: item.code
+                                });
+                            } else {
+                                duplicates++;
+                            }
                         } else {
-                            duplicates++;
+                            if (!item.name || !item.tin || !item.warehouseName || !item.warehouse) continue;
+                            
+                            const isDuplicate = this.data.client.some(existing => 
+                                existing.tin === item.tin && existing.warehouse === item.warehouse
+                            );
+                            if (!isDuplicate) {
+                                imported.push({
+                                    name: item.name,
+                                    tin: item.tin,
+                                    warehouseName: item.warehouseName,
+                                    warehouse: item.warehouse
+                                });
+                            } else {
+                                duplicates++;
+                            }
                         }
                     }
                     
@@ -1448,7 +1579,7 @@
                         const searchQuery = document.getElementById(type + 'Search').value.trim();
                         if (searchQuery) this.performSearch(type, searchQuery);
                     } else {
-                        this.showNotification('No new records to import', 'info');
+                        this.showNotification('No valid records to import', 'info');
                     }
                 } catch (error) {
                     this.showNotification('Failed to import file', 'error');
@@ -1555,7 +1686,7 @@
                 }
             },
 
-            showBinInfo(showBoth = true) {
+            showBinInfo(type = null) {
                 if (!this.jsonBin.bins.hsn && !this.jsonBin.bins.client) {
                     this.showNotification('No bin IDs found. Sync first to create cloud storage.', 'info');
                     return;
@@ -1563,6 +1694,7 @@
                 
                 const hsnBin = this.jsonBin.bins.hsn || 'Not created yet';
                 const clientBin = this.jsonBin.bins.client || 'Not created yet';
+                const showBoth = !type;
                 
                 const content = `
                     <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing); border: 2px solid var(--success);">
@@ -1570,13 +1702,13 @@
                         <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
                             Save these IDs to access your data on other devices:
                         </p>
-                        ${showBoth || this.jsonBin.bins.hsn ? `
+                        ${(showBoth || type === 'hsn') && this.jsonBin.bins.hsn ? `
                             <div class="form-group">
                                 <label class="form-label">HSN Bin ID:</label>
                                 <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
                             </div>
                         ` : ''}
-                        ${showBoth || this.jsonBin.bins.client ? `
+                        ${(showBoth || type === 'client') && this.jsonBin.bins.client ? `
                             <div class="form-group">
                                 <label class="form-label">Client Bin ID:</label>
                                 <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
@@ -1704,7 +1836,7 @@
                         this.showNotification(`Created cloud storage for ${type}`, 'success');
                         await this.saveToJsonBin(type);
                         this.showNotification(`Synced ${this.data[type].length} ${type} records`, 'success');
-                        setTimeout(() => this.showBinInfo(), 1000);
+                        setTimeout(() => this.showBinInfo(type), 1000);
                     } else {
                         const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
                             headers: this.getApiHeaders()
@@ -1722,7 +1854,7 @@
                                 localStorage.setItem(`jsonbin_${type}_id`, binId);
                                 this.showNotification(`Created cloud storage for ${type}`, 'success');
                                 await this.saveToJsonBin(type);
-                                setTimeout(() => this.showBinInfo(), 1000);
+                                setTimeout(() => this.showBinInfo(type), 1000);
                             } else {
                                 throw new Error(`Failed to fetch: ${response.status}`);
                             }
@@ -1749,7 +1881,7 @@
                                 'success'
                             );
                             
-                            setTimeout(() => this.showBinInfo(), 1000);
+                            setTimeout(() => this.showBinInfo(type), 1000);
                         }
                     }
                 } catch (error) {
