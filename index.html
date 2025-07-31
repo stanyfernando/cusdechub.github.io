@@ -211,6 +211,13 @@
             border-radius: 50%;
             box-shadow: 0 0 4px var(--success);
         }
+        .btn.sync.syncing::after {
+            animation: syncPulse 1s ease-in-out;
+        }
+        @keyframes syncPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
 
         .results {
             flex: 1;
@@ -472,7 +479,7 @@
             min-height: 300px;
         }
 
-        .empty-icon { font-size: 3rem; margin-bottom: var(--spacing); opacity: 0.2; animation: pulse 3s infinite; }
+        .empty-icon { font-size: 3rem; margin-bottom: var(--spacing); opacity: 0.2; animation: pulse 3s infinite; width: 48px; height: 48px; }
         @keyframes pulse {
             0%, 100% { opacity: 0.2; transform: scale(1); }
             50% { opacity: 0.3; transform: scale(1.02); }
@@ -564,7 +571,7 @@
         <div class="search-section" id="hsnSection">
             <div class="search-header">
                 <h2>HSN Code Finder</h2>
-                <button class="close-btn" onclick="app.showDashboard()">
+                <button class="close-btn" onclick="app.showDashboard()" title="Close">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -584,14 +591,15 @@
             </div>
             
             <div class="action-buttons">
-                <button class="btn primary" onclick="app.showAddModal('hsn')">
+                <button class="btn primary" onclick="app.showAddModal('hsn')" title="Add new HSN code">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
                     </svg>
                     Add HSN
                 </button>
-                <button class="btn" onclick="app.showExportModal('hsn')">
+                <button class="btn" onclick="app.showExportModal('hsn')" title="Export HSN data">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -599,7 +607,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="btn" onclick="app.showLoadModal('hsn')">
+                <button class="btn" onclick="app.showLoadModal('hsn')" title="Load HSN data">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
@@ -625,7 +633,7 @@
         <div class="search-section" id="clientSection">
             <div class="search-header">
                 <h2>TIN & Warehouse Finder</h2>
-                <button class="close-btn" onclick="app.showDashboard()">
+                <button class="close-btn" onclick="app.showDashboard()" title="Close">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -645,14 +653,15 @@
             </div>
             
             <div class="action-buttons">
-                <button class="btn primary" onclick="app.showAddModal('client')">
+                <button class="btn primary" onclick="app.showAddModal('client')" title="Add new client">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
                     </svg>
                     Add Client
                 </button>
-                <button class="btn" onclick="app.showExportModal('client')">
+                <button class="btn" onclick="app.showExportModal('client')" title="Export client data">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -660,7 +669,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="btn" onclick="app.showLoadModal('client')">
+                <button class="btn" onclick="app.showLoadModal('client')" title="Load client data">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
@@ -669,12 +678,11 @@
                     Load
                 </button>
                 <input type="file" id="clientImport" accept=".xls,.xlsx,.csv" style="display:none" onchange="app.importData('client', this)">
-                <button class="btn sync" onclick="app.syncWithCloud('client')" id="clientSyncBtn">
+                <button class="btn sync" onclick="app.syncWithCloud('client')" id="clientSyncBtn" title="Setup cloud sync or force sync">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M2 12a10 10 0 0 0 18 6"></path>
-                        <path d="M22 12A10 10 0 0 0 4 6"></path>
-                        <polyline points="22 2 22 12 12 12"></polyline>
-                        <polyline points="2 22 2 12 12 12"></polyline>
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
                     </svg>
                     Sync
                 </button>
@@ -688,7 +696,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalTitle">Modal</h3>
-                <button class="close-btn" onclick="app.closeModal()">
+                <button class="close-btn" onclick="app.closeModal()" title="Close modal">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -711,7 +719,8 @@
                 search: { hsn: '', client: '' },
                 timers: { debounce: null, sync: null },
                 syncInProgress: false,
-                currentApiKeyCallback: null
+                currentApiKeyCallback: null,
+                editingClient: null
             },
             
             // JSONBin configuration
@@ -747,7 +756,9 @@
             updateSyncButtons(isConnected) {
                 document.querySelectorAll('.btn.sync').forEach(btn => {
                     btn.classList.toggle('connected', isConnected);
-                    btn.title = isConnected ? 'Connected to cloud storage' : 'Click to setup cloud sync';
+                    btn.title = isConnected 
+                        ? 'Auto-sync active • Click to force sync all data' 
+                        : 'Click to setup cloud sync';
                 });
             },
 
@@ -897,13 +908,23 @@
 
             closeModal() {
                 document.getElementById('modal').classList.remove('active');
+                this.state.editingClient = null; // Clear editing state
             },
 
             showNotification(message, type = 'info') {
                 const container = document.getElementById('notification-container');
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
-                notification.textContent = message;
+                
+                // Add icon based on type
+                const iconSvg = {
+                    success: '<svg class="notification-icon" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+                    error: '<svg class="notification-icon" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+                    info: '<svg class="notification-icon" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+                };
+                
+                notification.innerHTML = iconSvg[type] || iconSvg.info;
+                notification.appendChild(document.createTextNode(message));
                 
                 container.appendChild(notification);
                 
@@ -932,17 +953,22 @@
                         div.className = 'result-item';
                         div.innerHTML = `
                             <div class="result-actions">
-                                <button class="result-action-btn edit" onclick="app.editItem('hsn', ${actualIndex})">
+                                <button class="result-action-btn edit" onclick="app.editItem('hsn', ${actualIndex})" title="Edit HSN code">
                                     <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
                                     </svg>
                                     Edit
                                 </button>
                             </div>
                             <div class="result-title" onclick="app.copyToClipboard('${this.h(item.code)}', 'HSN Code')">
                                 ${this.h(item.code || 'N/A')}
-                                <span class="copy-hint">📋 Copy</span>
+                                <span class="copy-hint">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                    Copy
+                                </span>
                             </div>
                             <div class="result-details"><span style="color: var(--text-secondary);">Product:</span> ${this.h(item.product || 'N/A')}</div>
                             <div class="result-category">${this.h(item.category || 'N/A')}</div>
@@ -965,17 +991,22 @@
                         
                         div.innerHTML = `
                             <div class="result-actions">
-                                <button class="result-action-btn edit" onclick="app.editClient('${this.h(company.tin)}')">
+                                <button class="result-action-btn edit" onclick="app.editClient('${this.h(company.tin)}')" title="Edit client">
                                     <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
                                     </svg>
                                     Edit
                                 </button>
                             </div>
                             <div class="result-title" onclick="app.copyToClipboard('${this.h(company.tin)}', 'TIN')">
                                 <span style="color: var(--text-secondary); font-weight: 400; font-size: 0.875rem;">TIN:</span> ${this.h(company.tin || 'N/A')}
-                                <span class="copy-hint">📋 Copy</span>
+                                <span class="copy-hint">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                    Copy
+                                </span>
                             </div>
                             <div class="result-details"><span style="color: var(--text-secondary);">Company:</span> ${this.h(company.name || 'N/A')}</div>
                             <div style="margin-top: var(--spacing);">
@@ -1013,7 +1044,10 @@
                 
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">🔍</div>
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
                         <div class="empty-title">${message ? 'No Results' : 'Ready to Search'}</div>
                         <div class="empty-message">${message || defaultMessage}</div>
                     </div>
@@ -1090,7 +1124,10 @@
                 this.data[type].push(newItem);
                 this.saveData();
                 this.closeModal();
-                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} added successfully`, 'success');
+                this.showNotification(
+                    `${type === 'hsn' ? 'HSN code' : 'Client'} added${this.isConnected ? ' (auto-syncing to cloud)' : ''}`, 
+                    'success'
+                );
                 
                 const searchQuery = document.getElementById(type + 'Search').value.trim();
                 if (searchQuery) this.performSearch(type, searchQuery);
@@ -1181,7 +1218,10 @@
                 this.data[type][index] = updatedItem;
                 this.saveData();
                 this.closeModal();
-                this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Client'} updated successfully`, 'success');
+                this.showNotification(
+                    `${type === 'hsn' ? 'HSN code' : 'Client'} updated${this.isConnected ? ' (auto-syncing to cloud)' : ''}`, 
+                    'success'
+                );
                 
                 const searchQuery = document.getElementById(type + 'Search').value.trim();
                 if (searchQuery) this.performSearch(type, searchQuery);
@@ -1192,7 +1232,10 @@
                     this.data[type].splice(index, 1);
                     this.saveData();
                     this.closeModal();
-                    this.showNotification(`${type === 'hsn' ? 'HSN code' : 'Warehouse'} deleted successfully`, 'success');
+                    this.showNotification(
+                        `${type === 'hsn' ? 'HSN code' : 'Warehouse'} deleted${this.isConnected ? ' (auto-syncing to cloud)' : ''}`, 
+                        'success'
+                    );
                     
                     const searchQuery = document.getElementById(type + 'Search').value.trim();
                     if (searchQuery) this.performSearch(type, searchQuery);
@@ -1206,6 +1249,9 @@
                 
                 const companyName = clientWarehouses[0].name;
                 
+                // Store current editing client
+                this.state.editingClient = { tin, name: companyName };
+                
                 const warehousesList = clientWarehouses.map((item) => {
                     const actualIndex = this.data.client.findIndex(c => 
                         c.tin === item.tin && c.warehouse === item.warehouse
@@ -1217,17 +1263,16 @@
                             </div>
                             <div class="warehouse-edit-actions">
                                 <button type="button" class="small-btn edit" 
-                                        onclick="app.editItem('client', ${actualIndex})">
+                                        onclick="app.editItem('client', ${actualIndex})" title="Edit warehouse">
                                     <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
                                     </svg>
                                 </button>
                                 <button type="button" class="small-btn delete" 
-                                        onclick="app.deleteItem('client', ${actualIndex})">
+                                        onclick="app.deleteItem('client', ${actualIndex})" title="Delete warehouse">
                                     <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                     </svg>
                                 </button>
                             </div>
@@ -1236,18 +1281,102 @@
                 }).join('');
                 
                 const content = `
+                    <form onsubmit="app.updateClientInfo(event, '${this.h(tin)}', '${this.h(companyName)}')">
+                        <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing);">
+                            <div class="form-group">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" class="form-input" name="newName" value="${this.h(companyName)}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TIN Code</label>
+                                <input type="text" class="form-input" name="newTin" value="${this.h(tin)}" required>
+                            </div>
+                            <button type="submit" class="save-btn">Update Company Info</button>
+                        </div>
+                    </form>
                     <div style="margin-bottom: var(--spacing);">
-                        <strong>Company:</strong> ${this.h(companyName)}<br>
-                        <strong>TIN:</strong> ${this.h(tin)}
+                        <h4 style="margin-bottom: var(--spacing); font-size: 0.875rem; text-transform: uppercase; color: var(--text-secondary);">Warehouses</h4>
+                        <div class="warehouses-list">${warehousesList}</div>
                     </div>
-                    <div class="warehouses-list">${warehousesList}</div>
-                    <button type="button" class="save-btn" style="margin-top: var(--spacing)" 
-                            onclick="app.showAddWarehouseModal('${this.h(tin)}', '${this.h(companyName)}')">
+                    <button type="button" class="save-btn" onclick="app.showAddWarehouseModalFromEdit()">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
                         Add New Warehouse
+                    </button>
+                    <button type="button" class="delete-btn" onclick="app.deleteClient('${this.h(tin)}')">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                        Delete Entire Client
                     </button>
                 `;
                 
-                this.showModal('Edit Client Warehouses', content);
+                this.showModal('Edit Client & Warehouses', content);
+            },
+
+            updateClientInfo(event, oldTin, oldName) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const newName = formData.get('newName').trim();
+                const newTin = formData.get('newTin').trim();
+                
+                // Check if TIN changed and if new TIN already exists
+                if (newTin !== oldTin) {
+                    const tinExists = this.data.client.some(c => c.tin === newTin);
+                    if (tinExists) {
+                        this.showNotification('TIN already exists for another client', 'error');
+                        return;
+                    }
+                }
+                
+                // Update all records with this TIN
+                let updateCount = 0;
+                this.data.client.forEach(item => {
+                    if (item.tin === oldTin) {
+                        item.name = newName;
+                        item.tin = newTin;
+                        updateCount++;
+                    }
+                });
+                
+                // Update editing state
+                this.state.editingClient = { tin: newTin, name: newName };
+                
+                this.saveData();
+                this.editClient(newTin); // Reload modal with new data
+                this.showNotification(
+                    `Updated ${updateCount} records${this.isConnected ? ' (auto-syncing to cloud)' : ''}`, 
+                    'success'
+                );
+                
+                // Update search results if needed
+                const searchQuery = document.getElementById('clientSearch').value.trim();
+                if (searchQuery) this.performSearch('client', searchQuery);
+            },
+
+            deleteClient(tin) {
+                const warehouses = this.data.client.filter(c => c.tin === tin);
+                const companyName = warehouses[0]?.name || 'this client';
+                
+                if (confirm(`Are you sure you want to delete ${companyName} and all ${warehouses.length} warehouse(s)?`)) {
+                    // Remove all warehouses for this TIN
+                    this.data.client = this.data.client.filter(c => c.tin !== tin);
+                    this.saveData();
+                    this.closeModal();
+                    this.showNotification(
+                        `Deleted ${companyName} (${warehouses.length} warehouses)${this.isConnected ? ' (auto-syncing to cloud)' : ''}`, 
+                        'success'
+                    );
+                    
+                    const searchQuery = document.getElementById('clientSearch').value.trim();
+                    if (searchQuery) this.performSearch('client', searchQuery);
+                }
             },
 
             showAddWarehouseModal(tin, companyName) {
@@ -1277,6 +1406,15 @@
                 setTimeout(() => document.querySelector('input[name="warehouseName"]')?.focus(), 100);
             },
 
+            showAddWarehouseModalFromEdit() {
+                if (this.state.editingClient) {
+                    // Get latest name in case it was updated
+                    const currentName = document.querySelector('input[name="newName"]')?.value || this.state.editingClient.name;
+                    const currentTin = document.querySelector('input[name="newTin"]')?.value || this.state.editingClient.tin;
+                    this.showAddWarehouseModal(currentTin, currentName);
+                }
+            },
+
             saveWarehouse(event, tin, companyName) {
                 event.preventDefault();
                 const formData = new FormData(event.target);
@@ -1295,7 +1433,10 @@
                 this.data.client.push({ name: companyName, tin, warehouseName, warehouse });
                 this.saveData();
                 this.editClient(tin);
-                this.showNotification('Warehouse added successfully', 'success');
+                this.showNotification(
+                    `Warehouse added${this.isConnected ? ' (auto-syncing to cloud)' : ''}`, 
+                    'success'
+                );
                 
                 const searchQuery = document.getElementById('clientSearch').value.trim();
                 if (searchQuery) this.performSearch('client', searchQuery);
@@ -1311,10 +1452,8 @@
                         <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); border: 1px solid var(--border);">
                             <h4 style="margin-bottom: 0.5rem; font-size: 1rem;">
                                 <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="12" y1="18" x2="12" y2="12"></line>
-                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                    <polyline points="13 2 13 9 20 9"></polyline>
                                 </svg>
                                 Load from File
                             </h4>
@@ -1322,6 +1461,11 @@
                                 Import data from JSON backup files
                             </p>
                             <button class="save-btn" onclick="document.getElementById('${type}Import').click(); app.closeModal();">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
                                 Choose File (JSON)
                             </button>
                         </div>
@@ -1335,13 +1479,19 @@
                             </h4>
                             ${hasCloudStorage ? `
                                 <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: var(--spacing);">
-                                    Your ${type.toUpperCase()} data is connected to cloud storage
+                                    <strong>⚠️ Warning:</strong> This will replace ALL your local ${type} data with cloud data
                                 </p>
                                 <div class="form-group" style="margin-bottom: var(--spacing);">
                                     <label class="form-label">${type.toUpperCase()} Bin ID:</label>
                                     <input type="text" class="form-input" value="${binId}" readonly onclick="this.select()" style="cursor: pointer;">
                                 </div>
+                                <div class="help-text" style="margin-bottom: var(--spacing);">
+                                    <strong>Note:</strong> Your local changes auto-sync to cloud every 2 seconds
+                                </div>
                                 <button class="save-btn" onclick="app.closeModal(); app.loadFromCloud('${type}');">
+                                    <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                                    </svg>
                                     Load from Cloud
                                 </button>
                             ` : `
@@ -1349,6 +1499,9 @@
                                     ${this.isConnected ? 'No cloud storage found for this data type' : 'Setup cloud sync to load from JSONBin'}
                                 </p>
                                 <button class="save-btn" onclick="app.closeModal(); ${this.isConnected ? `app.syncWithCloud('${type}')` : `app.showApiKeyModal(() => app.loadFromCloud('${type}'))`};">
+                                    <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                        ${this.isConnected ? '<polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>' : '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>'}
+                                    </svg>
                                     ${this.isConnected ? 'Create Cloud Storage' : 'Setup Cloud Sync'}
                                 </button>
                             `}
@@ -1369,7 +1522,7 @@
                         <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); border: 1px solid var(--border);">
                             <h4 style="margin-bottom: 0.5rem; font-size: 1rem;">
                                 <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
-                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4z"></path>
+                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
                                     <polyline points="13 2 13 9 20 9"></polyline>
                                 </svg>
                                 Export as JSON
@@ -1378,6 +1531,11 @@
                                 Perfect for backups and data transfer
                             </p>
                             <button class="save-btn" onclick="app.exportAsJSON('${type}'); app.closeModal();">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
                                 Download JSON
                             </button>
                         </div>
@@ -1385,11 +1543,11 @@
                         <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); border: 1px solid var(--border);">
                             <h4 style="margin-bottom: 0.5rem; font-size: 1rem;">
                                 <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="9" y1="3" x2="9" y2="21"></line>
-                                    <line x1="15" y1="3" x2="15" y2="21"></line>
-                                    <line x1="3" y1="9" x2="21" y2="9"></line>
-                                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                                    <path d="M3 3h18v18H3z"></path>
+                                    <path d="M3 9h18"></path>
+                                    <path d="M3 15h18"></path>
+                                    <path d="M9 3v18"></path>
+                                    <path d="M15 3v18"></path>
                                 </svg>
                                 Export as Excel
                             </h4>
@@ -1397,6 +1555,11 @@
                                 Formatted spreadsheet for reports and analysis
                             </p>
                             <button class="save-btn" onclick="app.exportAsExcel('${type}'); app.closeModal();">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
                                 Download Excel
                             </button>
                         </div>
@@ -1572,14 +1735,17 @@
                         this.data[type].push(...imported);
                         this.saveData();
                         this.showNotification(
-                            `Imported ${imported.length} records${duplicates > 0 ? ` (${duplicates} duplicates skipped)` : ''}`, 
+                            `Imported ${imported.length} records${duplicates > 0 ? ` (${duplicates} duplicates skipped)` : ''}${this.isConnected ? ' - auto-syncing to cloud' : ''}`, 
                             'success'
                         );
                         
                         const searchQuery = document.getElementById(type + 'Search').value.trim();
                         if (searchQuery) this.performSearch(type, searchQuery);
                     } else {
-                        this.showNotification('No valid records to import', 'info');
+                        this.showNotification(
+                            duplicates > 0 ? `All ${duplicates} records already exist` : 'No valid records to import', 
+                            'info'
+                        );
                     }
                 } catch (error) {
                     this.showNotification('Failed to import file', 'error');
@@ -1698,7 +1864,13 @@
                 
                 const content = `
                     <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing); border: 2px solid var(--success);">
-                        <h4 style="margin-bottom: var(--spacing); color: var(--success);">✅ Your Cloud Storage is Ready!</h4>
+                        <h4 style="margin-bottom: var(--spacing); color: var(--success);">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            Your Cloud Storage is Ready!
+                        </h4>
                         <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
                             Save these IDs to access your data on other devices:
                         </p>
@@ -1715,11 +1887,14 @@
                             </div>
                         ` : ''}
                         <div class="help-text" style="background: var(--bg-secondary); padding: var(--spacing); border-radius: var(--radius); margin-top: var(--spacing);">
+                            <strong>How syncing works:</strong><br>
+                            • Local changes auto-sync to cloud every 2 seconds<br>
+                            • Loading from cloud is manual (use Load button)<br><br>
                             <strong>To access your data on another device:</strong><br>
                             1. Open the app on the new device<br>
                             2. Click Load button and choose "Load from Cloud"<br>
                             3. Enter your API key AND the Bin ID<br>
-                            4. Your data will sync immediately
+                            4. Your cloud data will load to local storage
                         </div>
                     </div>
                     <button class="save-btn" onclick="app.closeModal()">Got It!</button>
@@ -1734,7 +1909,14 @@
                     return;
                 }
 
-                this.showNotification(`Loading ${type} data...`, 'info');
+                // Confirm before loading (will replace local data)
+                if (this.data[type].length > 0) {
+                    if (!confirm(`This will replace your current ${this.data[type].length} local ${type} records with cloud data. Continue?`)) {
+                        return;
+                    }
+                }
+
+                this.showNotification(`Loading ${type} data from cloud...`, 'info');
 
                 try {
                     if (!this.jsonBin.bins[type]) {
@@ -1763,8 +1945,9 @@
                     const result = await response.json();
                     const cloudData = result.record || [];
 
+                    // Replace local data with cloud data (manual load)
                     this.data[type] = cloudData;
-                    this.saveData(false);
+                    this.saveData(false); // false = don't sync back to cloud
                     
                     const searchInput = document.getElementById(type + 'Search');
                     if (searchInput?.value.trim()) {
@@ -1773,7 +1956,7 @@
                         this.showEmptyState(type);
                     }
                     
-                    this.showNotification(`Loaded ${cloudData.length} records from cloud`, 'success');
+                    this.showNotification(`Replaced local data with ${cloudData.length} records from cloud`, 'success');
                     
                     if (cloudData.length > 0) {
                         this.showNotification('You can now search and edit your data!', 'info');
@@ -1825,7 +2008,13 @@
                 }
 
                 this.state.syncInProgress = true;
-                this.showNotification(`Syncing ${type} data...`, 'info');
+                
+                // If bins exist, this is a manual force sync
+                if (this.jsonBin.bins[type]) {
+                    this.showNotification(`Force syncing ${type} data to cloud...`, 'info');
+                } else {
+                    this.showNotification(`Setting up cloud storage for ${type}...`, 'info');
+                }
 
                 try {
                     if (!this.jsonBin.bins[type]) {
@@ -1833,9 +2022,9 @@
                         const binId = await this.createJsonBin(type, this.jsonBin.apiKey);
                         this.jsonBin.bins[type] = binId;
                         localStorage.setItem(`jsonbin_${type}_id`, binId);
-                        this.showNotification(`Created cloud storage for ${type}`, 'success');
+                        this.showNotification(`Cloud storage created! Auto-sync is now active`, 'success');
                         await this.saveToJsonBin(type);
-                        this.showNotification(`Synced ${this.data[type].length} ${type} records`, 'success');
+                        this.showNotification(`Synced ${this.data[type].length} ${type} records to cloud`, 'success');
                         setTimeout(() => this.showBinInfo(type), 1000);
                     } else {
                         const response = await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}/latest`, {
@@ -1859,6 +2048,7 @@
                                 throw new Error(`Failed to fetch: ${response.status}`);
                             }
                         } else {
+                            // When bins exist, sync is a two-way merge and push
                             const result = await response.json();
                             const cloudData = result.record || [];
                             const mergedData = this.mergeData(type, this.data[type], cloudData);
@@ -1867,9 +2057,8 @@
                             this.data[type] = mergedData;
                             this.saveData(false);
                             
-                            if (mergedData.length > cloudData.length) {
-                                await this.saveToJsonBin(type);
-                            }
+                            // Always push merged data back to cloud
+                            await this.saveToJsonBin(type);
                             
                             const searchInput = document.getElementById(type + 'Search');
                             if (searchInput?.value.trim()) {
@@ -1877,7 +2066,7 @@
                             }
                             
                             this.showNotification(
-                                addedCount > 0 ? `Added ${addedCount} new records` : `Data up to date`,
+                                `Force sync complete: ${addedCount > 0 ? `Added ${addedCount} records from cloud` : 'All data synced'}`,
                                 'success'
                             );
                             
@@ -1895,13 +2084,30 @@
                 if (!this.jsonBin.apiKey || !this.jsonBin.bins[type]) return;
 
                 try {
+                    // Add syncing animation
+                    const syncBtn = document.getElementById(type + 'SyncBtn');
+                    if (syncBtn) {
+                        syncBtn.classList.add('syncing');
+                    }
+                    
                     await fetch(`${this.jsonBin.baseUrl}/b/${this.jsonBin.bins[type]}`, {
                         method: 'PUT',
                         headers: this.getApiHeaders(),
                         body: JSON.stringify(this.data[type])
                     });
+                    
+                    // Remove animation after sync
+                    setTimeout(() => {
+                        if (syncBtn) {
+                            syncBtn.classList.remove('syncing');
+                        }
+                    }, 1000);
                 } catch (error) {
                     // Silent fail for background sync
+                    const syncBtn = document.getElementById(type + 'SyncBtn');
+                    if (syncBtn) {
+                        syncBtn.classList.remove('syncing');
+                    }
                 }
             },
 
