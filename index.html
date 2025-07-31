@@ -598,16 +598,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="btn" onclick="app.handleImport('hsn')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                    Import
-                </button>
-                <input type="file" id="hsnImport" accept=".xls,.xlsx,.csv" style="display:none" onchange="app.importData('hsn', this)">
-                <button class="btn" onclick="app.loadFromCloud('hsn')">
+                <button class="btn" onclick="app.showLoadModal('hsn')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
@@ -615,6 +606,7 @@
                     </svg>
                     Load
                 </button>
+                <input type="file" id="hsnImport" accept=".xls,.xlsx,.csv" style="display:none" onchange="app.importData('hsn', this)">
                 <button class="btn sync" onclick="app.syncWithCloud('hsn')" id="hsnSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
@@ -667,16 +659,7 @@
                     </svg>
                     Export
                 </button>
-                <button class="btn" onclick="app.handleImport('client')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                    Import
-                </button>
-                <input type="file" id="clientImport" accept=".xls,.xlsx,.csv" style="display:none" onchange="app.importData('client', this)">
-                <button class="btn" onclick="app.loadFromCloud('client')">
+                <button class="btn" onclick="app.showLoadModal('client')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
@@ -684,6 +667,7 @@
                     </svg>
                     Load
                 </button>
+                <input type="file" id="clientImport" accept=".xls,.xlsx,.csv" style="display:none" onchange="app.importData('client', this)">
                 <button class="btn sync" onclick="app.syncWithCloud('client')" id="clientSyncBtn">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12a10 10 0 0 0 18 6"></path>
@@ -1317,44 +1301,61 @@
             },
 
             // Import/Export Methods
-            handleImport(type) {
-                if (this.isConnected && (this.jsonBin.bins.hsn || this.jsonBin.bins.client)) {
-                    this.showImportInfoModal(type);
-                } else {
-                    document.getElementById(type + 'Import').click();
-                }
-            },
-
-            showImportInfoModal(type) {
-                const hsnBin = this.jsonBin.bins.hsn || 'Not created yet';
-                const clientBin = this.jsonBin.bins.client || 'Not created yet';
+            showLoadModal(type) {
+                const binId = this.jsonBin.bins[type];
+                const hasCloudStorage = this.isConnected && binId;
                 
                 const content = `
-                    <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); margin-bottom: var(--spacing);">
-                        <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
-                            To import your cloud data on another device, you'll need these IDs:
-                        </p>
-                        <div class="form-group">
-                            <label class="form-label">HSN Bin ID:</label>
-                            <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing);">
+                        <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); border: 1px solid var(--border);">
+                            <h4 style="margin-bottom: 0.5rem; font-size: 1rem;">
+                                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                </svg>
+                                Load from File
+                            </h4>
+                            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: var(--spacing);">
+                                Import data from CSV or Excel files
+                            </p>
+                            <button class="save-btn" onclick="document.getElementById('${type}Import').click(); app.closeModal();">
+                                Choose File (.csv, .xls, .xlsx)
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Client Bin ID:</label>
-                            <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
-                        </div>
-                        <div class="help-text">
-                            Click any ID above to select it for copying
+                        
+                        <div style="background: var(--bg-tertiary); padding: var(--spacing); border-radius: var(--radius); border: 1px solid ${hasCloudStorage ? 'var(--success)' : 'var(--border)'};">
+                            <h4 style="margin-bottom: 0.5rem; font-size: 1rem;">
+                                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                                </svg>
+                                Load from Cloud
+                            </h4>
+                            ${hasCloudStorage ? `
+                                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: var(--spacing);">
+                                    Your ${type.toUpperCase()} data is connected to cloud storage
+                                </p>
+                                <div class="form-group" style="margin-bottom: var(--spacing);">
+                                    <label class="form-label">${type.toUpperCase()} Bin ID:</label>
+                                    <input type="text" class="form-input" value="${binId}" readonly onclick="this.select()" style="cursor: pointer;">
+                                </div>
+                                <button class="save-btn" onclick="app.closeModal(); app.loadFromCloud('${type}');">
+                                    Load from Cloud
+                                </button>
+                            ` : `
+                                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: var(--spacing);">
+                                    ${this.isConnected ? 'No cloud storage found for this data type' : 'Setup cloud sync to load from JSONBin'}
+                                </p>
+                                <button class="save-btn" onclick="app.closeModal(); ${this.isConnected ? `app.syncWithCloud('${type}')` : `app.showApiKeyModal(() => app.loadFromCloud('${type}'))`};">
+                                    ${this.isConnected ? 'Create Cloud Storage' : 'Setup Cloud Sync'}
+                                </button>
+                            `}
                         </div>
                     </div>
-                    <button class="save-btn" onclick="app.closeModal(); document.getElementById('${type}Import').click()">
-                        Continue with File Import
-                    </button>
-                    <button class="btn" onclick="app.closeModal()" style="width: 100%; margin-top: 0.5rem;">
-                        Cancel
-                    </button>
                 `;
                 
-                this.showModal('Your Cloud Storage IDs', content);
+                this.showModal(`Load ${type.toUpperCase()} Data`, content);
             },
 
             exportData(type) {
@@ -1554,7 +1555,7 @@
                 }
             },
 
-            showBinInfo() {
+            showBinInfo(showBoth = true) {
                 if (!this.jsonBin.bins.hsn && !this.jsonBin.bins.client) {
                     this.showNotification('No bin IDs found. Sync first to create cloud storage.', 'info');
                     return;
@@ -1569,19 +1570,23 @@
                         <p style="color: var(--text-secondary); margin-bottom: var(--spacing);">
                             Save these IDs to access your data on other devices:
                         </p>
-                        <div class="form-group">
-                            <label class="form-label">HSN Bin ID:</label>
-                            <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Client Bin ID:</label>
-                            <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
-                        </div>
+                        ${showBoth || this.jsonBin.bins.hsn ? `
+                            <div class="form-group">
+                                <label class="form-label">HSN Bin ID:</label>
+                                <input type="text" class="form-input" value="${hsnBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                            </div>
+                        ` : ''}
+                        ${showBoth || this.jsonBin.bins.client ? `
+                            <div class="form-group">
+                                <label class="form-label">Client Bin ID:</label>
+                                <input type="text" class="form-input" value="${clientBin}" readonly onclick="this.select()" style="cursor: pointer;">
+                            </div>
+                        ` : ''}
                         <div class="help-text" style="background: var(--bg-secondary); padding: var(--spacing); border-radius: var(--radius); margin-top: var(--spacing);">
                             <strong>To access your data on another device:</strong><br>
                             1. Open the app on the new device<br>
-                            2. Click Sync or Load button<br>
-                            3. Enter your API key AND these Bin IDs<br>
+                            2. Click Load button and choose "Load from Cloud"<br>
+                            3. Enter your API key AND the Bin ID<br>
                             4. Your data will sync immediately
                         </div>
                     </div>
